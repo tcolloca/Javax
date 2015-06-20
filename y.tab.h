@@ -39,93 +39,101 @@
    enum yytokentype {
      INT = 258,
      BOOLEAN = 259,
-     STRING = 260,
-     CHAR = 261,
+     CHAR = 260,
+     IDENTIFIER = 261,
      TYPE_INT = 262,
      TYPE_BOOLEAN = 263,
-     TYPE_STRING = 264,
-     TYPE_CHAR = 265,
-     IF = 266,
-     ELSE = 267,
-     FOR = 268,
-     WHILE = 269,
-     CONST = 270,
-     NEW = 271,
-     OP_PLUS = 272,
-     OP_MINUS = 273,
-     OP_MULTIPLICATION = 274,
-     OP_DIVITION = 275,
-     OP_EXP = 276,
-     OP_MODULO = 277,
-     OP_EQ = 278,
-     OP_NE = 279,
-     OP_GE = 280,
-     OP_LE = 281,
-     OP_GT = 282,
-     OP_LT = 283,
-     OP_AND = 284,
-     OP_OR = 285,
-     OP_NOT = 286,
-     OP_IMPLIES = 287,
-     LPAR = 288,
-     RPAR = 289,
-     LBRA = 290,
-     RBRA = 291,
-     LCUR = 292,
-     RCUR = 293,
-     SEMC = 294,
-     COMA = 295,
-     PDOT = 296,
-     COLN = 297,
-     QUES = 298,
-     QTHM = 299,
-     DQTHM = 300
+     TYPE_CHAR = 264,
+     IF = 265,
+     ELSE = 266,
+     FOR = 267,
+     WHILE = 268,
+     CONST = 269,
+     NEW = 270,
+     CLASS = 271,
+     METHOD = 272,
+     RETURN = 273,
+     MAIN = 274,
+     OP_PLUS = 275,
+     OP_MINUS = 276,
+     OP_MULTIPLICATION = 277,
+     OP_DIVITION = 278,
+     OP_EXP = 279,
+     OP_MODULO = 280,
+     OP_EQ = 281,
+     OP_NE = 282,
+     OP_GE = 283,
+     OP_LE = 284,
+     OP_GT = 285,
+     OP_LT = 286,
+     OP_AND = 287,
+     OP_OR = 288,
+     OP_NOT = 289,
+     OP_IMPLIES = 290,
+     OP_ASSIGN = 291,
+     OP_PROP = 292,
+     LPAR = 293,
+     RPAR = 294,
+     LBRA = 295,
+     RBRA = 296,
+     LCUR = 297,
+     RCUR = 298,
+     SEMC = 299,
+     COMA = 300,
+     COLN = 301,
+     QUES = 302,
+     QTHM = 303,
+     DQTHM = 304
    };
 #endif
 /* Tokens.  */
 #define INT 258
 #define BOOLEAN 259
-#define STRING 260
-#define CHAR 261
+#define CHAR 260
+#define IDENTIFIER 261
 #define TYPE_INT 262
 #define TYPE_BOOLEAN 263
-#define TYPE_STRING 264
-#define TYPE_CHAR 265
-#define IF 266
-#define ELSE 267
-#define FOR 268
-#define WHILE 269
-#define CONST 270
-#define NEW 271
-#define OP_PLUS 272
-#define OP_MINUS 273
-#define OP_MULTIPLICATION 274
-#define OP_DIVITION 275
-#define OP_EXP 276
-#define OP_MODULO 277
-#define OP_EQ 278
-#define OP_NE 279
-#define OP_GE 280
-#define OP_LE 281
-#define OP_GT 282
-#define OP_LT 283
-#define OP_AND 284
-#define OP_OR 285
-#define OP_NOT 286
-#define OP_IMPLIES 287
-#define LPAR 288
-#define RPAR 289
-#define LBRA 290
-#define RBRA 291
-#define LCUR 292
-#define RCUR 293
-#define SEMC 294
-#define COMA 295
-#define PDOT 296
-#define COLN 297
-#define QUES 298
-#define QTHM 299
-#define DQTHM 300
+#define TYPE_CHAR 264
+#define IF 265
+#define ELSE 266
+#define FOR 267
+#define WHILE 268
+#define CONST 269
+#define NEW 270
+#define CLASS 271
+#define METHOD 272
+#define RETURN 273
+#define MAIN 274
+#define OP_PLUS 275
+#define OP_MINUS 276
+#define OP_MULTIPLICATION 277
+#define OP_DIVITION 278
+#define OP_EXP 279
+#define OP_MODULO 280
+#define OP_EQ 281
+#define OP_NE 282
+#define OP_GE 283
+#define OP_LE 284
+#define OP_GT 285
+#define OP_LT 286
+#define OP_AND 287
+#define OP_OR 288
+#define OP_NOT 289
+#define OP_IMPLIES 290
+#define OP_ASSIGN 291
+#define OP_PROP 292
+#define LPAR 293
+#define RPAR 294
+#define LBRA 295
+#define RBRA 296
+#define LCUR 297
+#define RCUR 298
+#define SEMC 299
+#define COMA 300
+#define COLN 301
+#define QUES 302
+#define QTHM 303
+#define DQTHM 304
 
 
 
@@ -145,7 +153,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 149 "y.tab.h"
+#line 157 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

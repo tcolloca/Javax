@@ -48,6 +48,24 @@ sumInts(int a, int b) {
 %token QUES
 %token QTHM DQTHM
 
+%type <integer> expr_arithmetic
+%type <integer> expr_mul_or_div_or_mod
+%type <integer> number
+%type <integer> neg_number
+%type <integer> pos_number
+
+%type <boolean> expr_boolean
+%type <boolean> expr_logic
+%type <boolean> expr_or
+%type <boolean> expr_and
+%type <boolean> expr_relation
+%type <boolean> expr_relation_equivalence
+%type <boolean> expr_relation_order
+
+%type <integer> base_number
+%type <boolean> base_boolean
+
+
 %start program
 
 %%
@@ -55,6 +73,8 @@ sumInts(int a, int b) {
  /*** Program definition ***/
 
 program:
+	main
+	|
 	classes main
 	;
 
@@ -111,7 +131,7 @@ class_instance_methods:
 	; 
 
 class_instance_method:
-	METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
+	METHOD IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
 	;
 
 /*** Instruction types definition ***/
@@ -165,7 +185,7 @@ var_assignment:
 method_call:
 	method
 	|
-	expr_object_par OP_PROP method
+	expr_object OP_PROP method
 
 method:
 	 IDENTIFIER LPAR parameters RPAR
@@ -202,13 +222,9 @@ block_while:
 	/*** General expression ***/
 
 expr_general:
-	expr_general_without_bool
+	expr_arithmetic
 	|
 	expr_boolean
-	;
-
-expr_general_without_bool:
-	expr_arithmetic
 	|
 	expr_object
 	|
@@ -218,33 +234,39 @@ expr_general_without_bool:
 	/*** Arithmetic expression ***/	
 
 expr_arithmetic:
-	literal_number
+	expr_mul_or_div_or_mod {
+		$$=$1;
+	}
 	|
-	expr_mul_or_div_or_mod
+	expr_arithmetic OP_PLUS expr_mul_or_div_or_mod {
+		$$=$1 + $3;
+	}
 	|
-	expr_arithmetic OP_PLUS expr_mul_or_div_or_mod_or_num
-	|
-	expr_arithmetic OP_MINUS expr_mul_or_div_or_mod_or_num
+	expr_arithmetic OP_MINUS expr_mul_or_div_or_mod {
+		$$=$1 - $3;
+	} 
 	;
 
 expr_mul_or_div_or_mod:
-	expr_mul_or_div_or_mod_or_num OP_MULTIPLICATION number
+	number {
+		$$=$1;
+	}
 	|
-	expr_mul_or_div_or_mod_or_num OP_DIVITION number
+	expr_mul_or_div_or_mod OP_MULTIPLICATION number {
+		$$=$1 * $3;
+	}
 	|
-	expr_mul_or_div_or_mod_or_num OP_MODULO number
-	;
-
-expr_mul_or_div_or_mod_or_num:
-	number
+	expr_mul_or_div_or_mod OP_DIVITION number {
+		$$=$1 / $3;
+	} 
 	|
-	expr_mul_or_div_or_mod
+	expr_mul_or_div_or_mod OP_MODULO number {
+		$$=$1 % $3;
+	} 
 	;
 
 number:
-	literal_number
-	|
-	variable_number
+	base_number
 	|
 	neg_number
 	|
@@ -252,105 +274,54 @@ number:
 	;
 
 neg_number:
-	OP_MINUS literal_number
-	|
-	OP_MINUS variable_number
+	OP_MINUS base_number {
+		$$=-$2;
+	}
 	;
 
 pos_number:
-	OP_PLUS literal_number
-	|
-	OP_PLUS variable_number
+	OP_PLUS base_number {
+		$$=$2;
+	}
 	;
-
-literal_number:
-	INT
-	|
-	LPAR expr_arithmetic RPAR
-	;
-
-
-variable_number:
-	LPAR var_assignment RPAR
-	|
-	IDENTIFIER
-	|
-	method_call
-	;	
 
 	/*** Boolean expression ***/
 
 expr_boolean:
-	literal_boolean
-	|
 	expr_logic
 	;
 
 	/*** (Boolean) Logic expression ***/
 
 expr_logic:
-	expr_or
+	expr_or {
+		$$=$1;
+	}
 	|
-	expr_logic OP_IMPLIES expr_or_bool
-	;
-
-expr_or_bool:
-	boolean
-	|
-	expr_or
+	expr_logic OP_IMPLIES expr_or {
+		$$=(!($1)) || $3;
+	}
 	;
 
 expr_or:
-	expr_and
+	expr_and {
+		$$=$1;
+	}
 	|
-	expr_or_bool OP_OR expr_and_bool
-	;
-
-expr_and_bool:
-	boolean
-	|
-	expr_and
+	expr_or OP_OR expr_and {
+		$$=$1 || $3;
+	}
 	;
 
 expr_and:
-	expr_and_bool OP_AND boolean
+	base_boolean {
+		$$=$1;
+	}
+	|
+	expr_and OP_AND base_boolean {
+		$$=$1 && $3;
+	}
 	;
-
-boolean:
-	simple_boolean
-	|
-	expr_relation
-	;
-
-simple_boolean:
-	literal_boolean
-	|
-	variable_boolean
-	;
-
-literal_boolean:
-	BOOLEAN
-	|
-	OP_NOT BOOLEAN
-	|
-	LPAR expr_boolean RPAR
-	|
-	OP_NOT LPAR expr_boolean RPAR
-	;
-	
-variable_boolean:
-	LPAR var_assignment RPAR
-	|
-	OP_NOT LPAR var_assignment RPAR
-	|
-	method_call
-	|
-	OP_NOT method_call
-	|
-	IDENTIFIER
-	|
-	OP_NOT IDENTIFIER
-	;	
 
 	/*** (Boolean) Relation expression ***/
 
@@ -361,27 +332,27 @@ expr_relation:
 	;
 
 expr_relation_equivalence:
-	expr_general_without_bool OP_EQ expr_general_without_bool
+	expr_general OP_EQ expr_general
 	|
-	expr_general_without_bool OP_NE expr_general_without_bool
-	|
-	boolean OP_EQ simple_boolean
-	|
-	boolean OP_NE simple_boolean
-	|
-	boolean OP_EQ LPAR expr_relation RPAR
-	|
-	boolean OP_NE LPAR expr_relation RPAR
+	expr_general OP_NE expr_general
 	;
 
 expr_relation_order:
-	expr_arithmetic OP_GE expr_arithmetic
+	expr_arithmetic OP_GE expr_arithmetic {
+		$$=$1 >= $3;
+	}
 	|
-	expr_arithmetic OP_LE expr_arithmetic
+	expr_arithmetic OP_LE expr_arithmetic {
+		$$=$1 <= $3;
+	}
 	|
-	expr_arithmetic OP_GT expr_arithmetic
+	expr_arithmetic OP_GT expr_arithmetic {
+		$$=$1 > $3;
+	}
 	|
-	expr_arithmetic OP_LT expr_arithmetic
+	expr_arithmetic OP_LT expr_arithmetic {
+		$$=$1 < $3;
+	}
 	;
 
 	/*** Object expression ***/
@@ -389,27 +360,60 @@ expr_relation_order:
 expr_object:
 	NEW IDENTIFIER LPAR parameters RPAR
 	|
-	LPAR var_assignment RPAR
+	var_assignment
 	|
 	method_call
-	|
-	IDENTIFIER
-	;
-
-expr_object_par:
-	LPAR var_assignment RPAR
-	|
-	LPAR NEW IDENTIFIER LPAR parameters RPAR RPAR
 	;
 
 /*** Property access ***/
 
 property_access:
-	expr_object_par OP_PROP IDENTIFIER
+	expr_object OP_PROP IDENTIFIER
 	;
 
-/*** TODO ***/
+/*** Base types definition ***/
 
+base_number:
+	INT {
+		$$=$1;
+	}
+	|
+	LPAR expr_arithmetic RPAR {
+		$$=$2;
+	}
+	|
+	var_assignment
+	|
+	method_call
+	;
+
+base_boolean:
+	expr_relation {
+		$$=$1;
+	}
+	|
+	BOOLEAN {
+		$$=$1;
+	}
+	|
+	OP_NOT BOOLEAN {
+		$$=!$2;
+	}
+	|
+	LPAR expr_boolean RPAR {
+		$$=$2;
+	}
+	|
+	OP_NOT LPAR expr_boolean RPAR {
+		$$=!$3;
+	}
+	|
+	var_assignment
+	|
+	method_call
+	|
+	OP_NOT method_call
+	;
 
 /*** Types ***/
 
@@ -446,6 +450,5 @@ parameters:
 parameter:
 	expr_general
 	;
-
 
 %%	

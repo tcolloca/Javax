@@ -20,9 +20,6 @@ extern YYSTYPE yylval;
 true SAVE_BOOLEAN(TRUE); return BOOLEAN;
 false SAVE_BOOLEAN(FALSE); return BOOLEAN;
 
-(?!true|false|int|boolean|char|if|else|for|while|const|new|class|method|main|and|or|implies)(?:[a-zA-Z_][a-zA-Z_0-9]*) SAVE_STRING; return IDENTIFIER;
-
-
 int return TYPE_INT;
 boolean return TYPE_BOOLEAN;
 char return TYPE_CHAR;
@@ -64,6 +61,8 @@ implies return OP_IMPLIES;
 
 \= return OP_ASSIGN;
 
+\. return OP_PROP;
+
 \( return LPAR;
 \) return RPAR;
 \[ return LBRA;
@@ -73,13 +72,14 @@ implies return OP_IMPLIES;
 
 \; return SEMC;
 \, return COMA;
-\. return PDOT;
 \: return COLN;
 
 \? return QUES;
 
 ' return QTHM;
-\" return DQTHM;
+\" return DQTHM; 
+
+(?:[a-zA-Z_][a-zA-Z_0-9]*) SAVE_STRING; return IDENTIFIER;
 
 \n ;
 [ \t\n]+ ; 
