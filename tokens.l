@@ -11,7 +11,21 @@ extern YYSTYPE yylval;
 #define SAVE_STRING yylval.string = strdup(yytext)
 #define SAVE_INT yylval.integer = strtol(yytext, NULL, 0)
 #define SAVE_BOOLEAN(x) yylval.boolean = x 
-#define SAVE_CHAR yylval.character = strdup(yytext[0])
+#define SAVE_CHAR yylval.character = getChar(yytext)
+#define SAVE_STRING_VAL yylval.string = getString(yytext)
+
+char getChar(char * string) {
+	char * ans = malloc(1);
+	memcpy(ans, string + 1, 1);
+	return ans[0];
+}
+
+char * getString(char * string) {
+	int len = strlen(string);
+	char * ans = malloc(len-2);
+	memcpy(ans, string + 1, len - 2);
+	return ans;
+}
 
 %}
 
@@ -19,10 +33,13 @@ extern YYSTYPE yylval;
 (0|[1-9][0-9]*|0[0-7]*|0(x|X)[0-9a-fA-F]+) SAVE_INT; return INT;
 true SAVE_BOOLEAN(TRUE); return BOOLEAN;
 false SAVE_BOOLEAN(FALSE); return BOOLEAN;
+'[[:print:]]{-}[\']' SAVE_CHAR; return CHAR; 
+\"([[:print:]]{-}[\"])*\" SAVE_STRING_VAL; return STRING; //"
 
 int return TYPE_INT;
 boolean return TYPE_BOOLEAN;
 char return TYPE_CHAR;
+string return TYPE_STRING;
 
 
 if return IF;
@@ -34,6 +51,10 @@ new return NEW;
 class return CLASS;
 method return METHOD;
 main return MAIN;
+(return) return RETURN;
+
+\+\+ return OP_PLUS_PLUS;
+\-\- return OP_MINUS_MINUS;
 
 \+ return OP_PLUS;
 - return OP_MINUS;
@@ -60,6 +81,14 @@ implies return OP_IMPLIES;
 -\> return OP_IMPLIES;
 
 \= return OP_ASSIGN;
+\+\= return OP_PLUS_SH;
+-\= return OP_MINUS_SH;
+\*\= return OP_MULT_SH;
+\/\= return OP_DIV_SH;
+\%\= return OP_MOD_SH;
+
+\? return COND_QUES;
+\: return COND_COLN;
 
 \. return OP_PROP;
 
@@ -72,12 +101,6 @@ implies return OP_IMPLIES;
 
 \; return SEMC;
 \, return COMA;
-\: return COLN;
-
-\? return QUES;
-
-' return QTHM;
-\" return DQTHM; 
 
 (?:[a-zA-Z_][a-zA-Z_0-9]*) SAVE_STRING; return IDENTIFIER;
 

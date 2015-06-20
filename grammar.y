@@ -35,18 +35,19 @@ sumInts(int a, int b) {
 %token <integer> INT
 %token <boolean> BOOLEAN
 %token <character> CHAR
+%token <string> STRING
 %token <string> IDENTIFIER
-%token TYPE_INT TYPE_BOOLEAN TYPE_CHAR
+%token TYPE_INT TYPE_BOOLEAN TYPE_CHAR TYPE_STRING
 %token IF ELSE FOR WHILE CONST NEW CLASS METHOD RETURN MAIN
 %token OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
+%token OP_PLUS_PLUS OP_MINUS_MINUS
 %token OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
 %token OP_AND OP_OR OP_NOT OP_IMPLIES
-%token OP_ASSIGN
+%token OP_ASSIGN OP_PLUS_SH OP_MINUS_SH OP_MULT_SH OP_DIV_SH OP_MOD_SH
 %token OP_PROP
 %token LPAR RPAR LBRA RBRA LCUR RCUR
-%token SEMC COMA COLN
-%token QUES
-%token QTHM DQTHM
+%token SEMC COMA 
+%token COND_QUES COND_COLN
 
 %start program
 
@@ -88,6 +89,16 @@ class_instance_properties:
 
 class_instance_property:
 	var_declaration SEMC
+	;
+
+var_declaration:
+	type IDENTIFIER
+	|
+	type var_assignment
+	;
+
+var_assignment:
+	IDENTIFIER OP_ASSIGN expr
 	;
 
 	/*** constructors ***/
@@ -133,13 +144,7 @@ instr:
 	;
 
 instr_simple:
-	var_declaration
-	|
-	var_assignment
-	|
-	method_call
-	|
-	method_return
+	expr
 	;
 
 instr_conditional:
@@ -148,31 +153,6 @@ instr_conditional:
 
 instr_loop:
 	block_while
-	;
-
-/*** Simple instructions definition ***/
-
-var_declaration:
-	type IDENTIFIER
-	|
-	type var_assignment
-	;
-
-var_assignment:
-	IDENTIFIER OP_ASSIGN expr_general
-	;
-
-method_call:
-	method
-	|
-	expr_object_par OP_PROP method
-
-method:
-	 IDENTIFIER LPAR parameters RPAR
-	 ;
-
-method_return:
-	RETURN expr_general
 	;
 
 /*** Conditional instructions definition ***/
@@ -197,228 +177,187 @@ block_while:
 	WHILE LPAR expr_boolean RPAR instr
 	;
 
-/*** Expressions definition ***/
+/*** Expressions definitions ***/
 
 	/*** General expression ***/
 
-expr_general:
-	expr_general_without_bool
+expr: 
+	//TODO BASE: Identifier, raw type
+	expr_assignment
+	;
+
+	/*** Assignment expressions (=, +=, -=, *=, /=, %=) ***/
+
+expr_assignment:
+	expr_conditional
 	|
+	expr_conditional OP_ASSIGN expr_assignment
+	|
+	expr_conditional OP_PLUS_SH expr_assignment
+	|
+	expr_conditional OP_MINUS_SH expr_assignment
+	|
+	expr_conditional OP_MULT_SH expr_assignment
+	|
+	expr_conditional OP_DIV_SH expr_assignment
+	|
+	expr_conditional OP_MOD_SH expr_assignment
+	;
+
+	/*** Conditional expression (?:) ***/
+
+expr_conditional:
 	expr_boolean
+	|
+	expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional
 	;
 
-expr_general_without_bool:
-	expr_arithmetic
-	|
-	expr_object
-	|
-	property_access
-	;
-
-	/*** Arithmetic expression ***/	
-
-expr_arithmetic:
-	literal_number
-	|
-	expr_mul_or_div_or_mod
-	|
-	expr_arithmetic OP_PLUS expr_mul_or_div_or_mod_or_num
-	|
-	expr_arithmetic OP_MINUS expr_mul_or_div_or_mod_or_num
-	;
-
-expr_mul_or_div_or_mod:
-	expr_mul_or_div_or_mod_or_num OP_MULTIPLICATION number
-	|
-	expr_mul_or_div_or_mod_or_num OP_DIVITION number
-	|
-	expr_mul_or_div_or_mod_or_num OP_MODULO number
-	;
-
-expr_mul_or_div_or_mod_or_num:
-	number
-	|
-	expr_mul_or_div_or_mod
-	;
-
-number:
-	literal_number
-	|
-	variable_number
-	|
-	neg_number
-	|
-	pos_number
-	;
-
-neg_number:
-	OP_MINUS literal_number
-	|
-	OP_MINUS variable_number
-	;
-
-pos_number:
-	OP_PLUS literal_number
-	|
-	OP_PLUS variable_number
-	;
-
-literal_number:
-	INT
-	|
-	LPAR expr_arithmetic RPAR
-	;
-
-
-variable_number:
-	LPAR var_assignment RPAR
-	|
-	IDENTIFIER
-	|
-	method_call
-	;	
-
-	/*** Boolean expression ***/
+	/*** Boolean expressions (implies, or, and) ***/
 
 expr_boolean:
-	literal_boolean
-	|
-	expr_logic
+	expr_implies
 	;
 
-	/*** (Boolean) Logic expression ***/
-
-expr_logic:
+expr_implies:
 	expr_or
 	|
-	expr_logic OP_IMPLIES expr_or_bool
-	;
-
-expr_or_bool:
-	boolean
-	|
-	expr_or
+	expr_implies OP_IMPLIES expr_or
 	;
 
 expr_or:
 	expr_and
 	|
-	expr_or_bool OP_OR expr_and_bool
-	;
-
-expr_and_bool:
-	boolean
-	|
-	expr_and
+	expr_or OP_OR expr_and
 	;
 
 expr_and:
-	expr_and_bool OP_AND boolean
+	expr_equality
+	|
+	expr_and OP_AND expr_equality
 	;
 
-boolean:
-	simple_boolean
+	/*** Relation expressions (==, !=, <=, >=, <, >) ***/
+
+expr_equality:
+	expr_order
 	|
-	expr_relation
+	expr_equality OP_EQ expr_order
+	|
+	expr_equality OP_NE expr_order
 	;
 
-simple_boolean:
-	literal_boolean
+expr_order:
+	expr_additive
 	|
-	variable_boolean
+	expr_order OP_GE expr_additive
+	|
+	expr_order OP_LE expr_additive
+	|
+	expr_order OP_GT expr_additive
+	|
+	expr_order OP_LT expr_additive
 	;
 
-literal_boolean:
-	BOOLEAN
-	|
-	OP_NOT BOOLEAN
-	|
-	LPAR expr_boolean RPAR
-	|
-	OP_NOT LPAR expr_boolean RPAR
-	;
-	
-variable_boolean:
-	LPAR var_assignment RPAR
-	|
-	OP_NOT LPAR var_assignment RPAR
-	|
-	method_call
-	|
-	OP_NOT method_call
-	|
-	IDENTIFIER
-	|
-	OP_NOT IDENTIFIER
-	;	
+	/*** Arithmetic expressions (+,-,*,/,%) ***/
 
-	/*** (Boolean) Relation expression ***/
-
-expr_relation:
-	expr_relation_equivalence
+expr_additive:
+	expr_multiplicative
 	|
-	expr_relation_order
+	expr_additive OP_PLUS expr_multiplicative
+	|
+	expr_additive OP_MINUS expr_multiplicative
 	;
 
-expr_relation_equivalence:
-	expr_general_without_bool OP_EQ expr_general_without_bool
+expr_multiplicative:
+	expr_object_creation
 	|
-	expr_general_without_bool OP_NE expr_general_without_bool
+	expr_multiplicative OP_MULTIPLICATION expr_object_creation
 	|
-	boolean OP_EQ simple_boolean
+	expr_multiplicative OP_DIVITION expr_object_creation
 	|
-	boolean OP_NE simple_boolean
-	|
-	boolean OP_EQ LPAR expr_relation RPAR
-	|
-	boolean OP_NE LPAR expr_relation RPAR
+	expr_multiplicative OP_MODULO expr_object_creation
 	;
 
-expr_relation_order:
-	expr_arithmetic OP_GE expr_arithmetic
-	|
-	expr_arithmetic OP_LE expr_arithmetic
-	|
-	expr_arithmetic OP_GT expr_arithmetic
-	|
-	expr_arithmetic OP_LT expr_arithmetic
-	;
+	/*** Object creation expression (new) ***/
 
-	/*** Object expression ***/
-
-expr_object:
+expr_object_creation:
+	expr_pre_additive_sign_and_not
+	|
 	NEW IDENTIFIER LPAR parameters RPAR
-	|
-	LPAR var_assignment RPAR
-	|
-	method_call
-	|
-	IDENTIFIER
 	;
 
-expr_object_par:
-	LPAR var_assignment RPAR
+	/*** Pre additives, sign and not expressions ***/
+
+expr_pre_additive_sign_and_not:
+	expr_post_additive_or_access
 	|
-	LPAR NEW IDENTIFIER LPAR parameters RPAR RPAR
+	OP_PLUS_PLUS expr_post_additive_or_access
+	|
+	OP_MINUS_MINUS expr_post_additive_or_access
+	|
+	OP_PLUS expr_post_additive_or_access
+	|
+	OP_MINUS expr_post_additive_or_access
+	|
+	OP_NOT expr_post_additive_or_access
 	;
 
-/*** Property access ***/
+	/*** Post additives and access expressions ***/
+
+expr_post_additive_or_access:
+	expr_basic
+	|
+	expr_basic OP_PLUS_PLUS
+	|
+	expr_basic OP_MINUS_MINUS
+	|
+	expr_post_additive_or_access method_call
+	|
+	expr_post_additive_or_access property_access
+	;
 
 property_access:
-	expr_object_par OP_PROP IDENTIFIER
+	OP_PROP expr_basic
 	;
 
-/*** TODO ***/
+method_call:
+	LPAR parameters RPAR
+	;
 
+	/*** Basic expressions ***/
+
+expr_basic:
+	built_in
+	|
+	IDENTIFIER
+	|
+	LPAR expr RPAR
+	;
+
+built_in:
+	INT
+	|
+	BOOLEAN
+	|
+	CHAR {
+		printf("char: %c \n", $1);
+	}
+	|
+	STRING {
+		printf("string: %s \n", $1);
+	}
+	;
 
 /*** Types ***/
 
 type:
-	TYPE_CHAR
+	TYPE_INT
 	|
 	TYPE_BOOLEAN
 	|
-	TYPE_INT
+	TYPE_CHAR
+	|
+	TYPE_STRING
 	;
 
 /*** Parameters ***/
@@ -444,7 +383,7 @@ parameters:
 	;
 
 parameter:
-	expr_general
+	expr
 	;
 
 
