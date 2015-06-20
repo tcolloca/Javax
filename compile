@@ -1,0 +1,4 @@
+flex -d tokens.l;
+yacc -vd grammar.y;
+cc lex.yy.c y.tab.c -o test
+
