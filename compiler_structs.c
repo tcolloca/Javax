@@ -4,11 +4,6 @@
 #include "expressions.h"
 #include "lib/uthash.h"
 
-char * _int = "int";
-char * _char = "char"; 
-char * _boolean = "boolean"; 
-char * _string = "string"; 
-
 // TODO: View how types/names are freed
 
 typedef struct _main {
@@ -592,7 +587,7 @@ void deleteInstr(int type, void * instr) {
 }
 
 void solveInstrSimple(tSymbolsTable * symbolsTable, tInstrSimple * instr) {
-	solveExpr(symbolsTable, (tExpr *) instr);
+	solveRValue(symbolsTable, (tExpr *) instr);
 }
 
 void deleteInstrSimple(tInstrSimple * instr) {
@@ -609,15 +604,19 @@ void solveInstrDeclaration(tSymbolsTable * symbolsTable, tInstrDeclaration * ins
 		rValue = solveRValue(symbolsTable, instr->expr);
 		if (rValue == NULL) {
 			//TODO: Right-side of assignment is not a rvalue.
+			// There is a nested error
+			return;
 		}
 		if (!isType(rValue, instr->type)) {
 			// TODO: non-matching types error.
+			deleteRValue(rValue);
 			return;
 		}
 	} else {
 		rValue = getDefaultValue(instr->type);
 	}
 	addSymbol(symbolsTable, instr->identifier, instr->type, rValue->value, rValue->bytes);
+	deleteRValue(rValue);
 }
 
 void deleteInstrDeclaration(tInstrDeclaration * instr) {
@@ -630,12 +629,9 @@ void deleteInstrDeclaration(tInstrDeclaration * instr) {
 
 void solveInstrIf(tSymbolsTable * symbolsTable, tInstrIf * instr) {
 	if (instr->expr != NULL) {
-		tRValue * rValue = solveRValue(symbolsTable, instr->expr);
+		tRValue * rValue = solveBoolean(symbolsTable, instr->expr);
 		if (rValue == NULL) {
-			//TODO: expression is not a rvalue. (?)
-		}
-		if (!isType(rValue, _boolean)) {
-			// TODO: expression is not boolean.
+			//TODO: expression is not boolean.
 			return;
 		}
 		if (isTrue(rValue)) {
@@ -643,6 +639,7 @@ void solveInstrIf(tSymbolsTable * symbolsTable, tInstrIf * instr) {
 		} else {
 			solveInstrElse(symbolsTable, instr->instrElse);
 		}
+		deleteRValue(rValue);
 	} else {
 		//TODO: If expr is null
 		return;
@@ -682,18 +679,17 @@ void deleteInstrElse(tInstrElse * instr) {
 
 void solveInstrWhile(tSymbolsTable * symbolsTable, tInstrWhile * instr) {
 	if (instr->expr != NULL) {
-		tRValue * rValue = solveRValue(symbolsTable, instr->expr);
+		tRValue * rValue = solveBoolean(symbolsTable, instr->expr);
 		if (rValue == NULL) {
-			//TODO: expression is not a rvalue. (?)
-		}
-		if (!isType(rValue, _boolean)) {
-			// TODO: expression is not boolean.
+			//TODO: expression is not boolean.
 			return;
 		}
 		while (isTrue(rValue)) {
 			solveInstrSet(symbolsTable, instr->instrSet);
+			deleteRValue(rValue);
 			rValue = solveRValue(symbolsTable, instr->expr);
 		}
+		deleteRValue(rValue);
 	} else {
 		//TODO: If expr is null
 		return;
@@ -716,17 +712,17 @@ int main(void) {
 	tProperty * properties = NULL;
 	tMethod * methods = NULL;
 	tDefParameterList * defParamsList = newDefParamsList();
-	addDefParameter(defParamsList, _int, "var1");
-	addDefParameter(defParamsList, _int, "var2");
-	addDefParameter(defParamsList, _string, "var3");
+	addDefParameter(defParamsList, "int", "var1");
+	addDefParameter(defParamsList, "int", "var2");
+	addDefParameter(defParamsList, "string", "var3");
 	int age = 4;
 	char sex = 'm';
 	char * name = "pedro";
-	addProperty(&properties, "age", _int, &age, sizeof(int));
-	addProperty(&properties, "name", _string, name, strlen(name) + 1);
-	addProperty(&properties, "sex", _char, &sex, sizeof(char));
-	addMethod(&methods, _int, "getAge", defParamsList, NULL);
-	addMethod(&methods, _string, "getName", NULL, NULL);
+	addProperty(&properties, "age", "int", &age, sizeof(int));
+	addProperty(&properties, "name", "string", name, strlen(name) + 1);
+	addProperty(&properties, "sex", "char", &sex, sizeof(char));
+	addMethod(&methods, "int", "getAge", defParamsList, NULL);
+	addMethod(&methods, "string", "getName", NULL, NULL);
 	addClass("Person", properties, NULL, methods);
 	addClass("Person", NULL, NULL, NULL);
 	tClass * gotClass = getClass("Person");
