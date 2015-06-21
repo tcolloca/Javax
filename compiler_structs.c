@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "compiler_structs.h"
 #include "expressions.h"
 #include "lib/uthash.h"
@@ -96,7 +97,8 @@ typedef struct instrNode {
 typedef tExpr tInstrSimple;
 
 typedef struct instrDeclaration {
-	char * identifier; // TODO
+	char * type;
+	char * identifier; /* owner TODO */
 	tExpr * expr;
 } tInstrDeclaration;
 
@@ -107,7 +109,6 @@ typedef struct instrIf {
 } tInstrIf;
 
 typedef struct instrElse {
-	tExpr * expr;
 	tInstrSet * instrSet;
 	tInstrIf * instrIf;
 } tInstrElse;
@@ -116,6 +117,16 @@ typedef struct instrWhile {
 	tExpr * expr;
 	tInstrSet * instrSet;
 } tInstrWhile;
+
+typedef struct value {
+	char * type;
+	void * value;
+	int bytes;
+} tValue;
+
+typedef tValue tLValue;
+
+typedef tValue tRValue;
 
 /*** Main ***/
 
@@ -127,7 +138,11 @@ typedef struct _main {
 
 tMain * _main = NULL;
 
-void deleteMain(tMain * _main) {
+void solveMain() {
+	solveInstrSet(NULL, _main->instrSet);
+}
+
+void deleteMain() {
 	deleteInstrSet(_main->instrSet);
 	free(_main);
 }
@@ -160,14 +175,13 @@ typedef struct symbolsTable {
 */
 
 int addSymbol(tSymbolsTable * symbolsTable, char * name, char * type, void * content, int bytes) {
-	tSymbol * symbol = getSymbol(symbolsTable, name);
-	if (symbol != NULL) {
+	if (hasSymbol(symbolsTable, name)) {
 		return -1;
 	}
-	symbol = malloc(sizeof(tSymbol));
+	tSymbol * symbol = malloc(sizeof(tSymbol));
 
-	int len = strlen(name) + 1;
-	symbol->name = malloc(len);
+	int len = strlen(name);
+	symbol->name = malloc(len + 1);
 	strcpy(symbol->name, name);
 
 	symbol->type = type;
@@ -178,7 +192,15 @@ int addSymbol(tSymbolsTable * symbolsTable, char * name, char * type, void * con
 	symbol->bytes = bytes;
 
 	HASH_ADD_KEYPTR(hh, symbolsTable->symbols, symbol->name, len, symbol);
-	return 0;
+	return 1;
+}
+
+void _addSymbol(tSymbol * symbols, tSymbol * symbol) {
+	HASH_ADD_KEYPTR(hh, symbols, symbol->name, strlen(symbol->name), symbol);
+}
+
+int hasSymbol(tSymbolsTable * symbolsTable, char * name) {
+	return getSymbol(symbolsTable, name) != NULL;
 }
 
 tSymbol * getSymbol(tSymbolsTable * symbolsTable, char * name) {
@@ -206,6 +228,14 @@ void deleteSymbol(tSymbol * symbol) {
 	free(symbol->content);
 }
 
+void addAll(tSymbolsTable * symbolsTableDest, tSymbolsTable * symbolsTableSrc) {
+	tSymbol * symbol;
+
+	for(symbol = symbolsTableSrc->symbols; symbol != NULL; symbol = symbol->hh.next) {
+        _addSymbol(symbolsTableDest->symbols, symbol);
+    }
+}
+
 /*** Classes ***/
 
 /*
@@ -229,8 +259,8 @@ int addClass(char * name, tProperty * properties, tConstructor * constructor, tM
 	class->constructor = constructor;
 	class->methods = methods;
 
-	int len = strlen(name) + 1;
-	class->name = malloc(len);
+	int len = strlen(name);
+	class->name = malloc(len + 1);
 	strcpy(class->name, name);
 	
 	HASH_ADD_KEYPTR(hh, classes, class->name, len, class);
@@ -278,8 +308,8 @@ int addProperty(tProperty ** properties, char * name, char * type, void * defaul
 	}
 	tProperty * property = malloc(sizeof(tProperty));
 
-	int nameLen = strlen(name) + 1;
-	property->name = malloc(nameLen);
+	int nameLen = strlen(name);
+	property->name = malloc(nameLen + 1);
 	strcpy(property->name, name);
 
 	property->type = type;
@@ -354,8 +384,8 @@ int addMethod(tMethod ** methods, char * returnType, char * name,
 
 	method->returnType = returnType;
 
-	int nameLen = strlen(name) + 1;
-	method->name = malloc(nameLen);
+	int nameLen = strlen(name);
+	method->name = malloc(nameLen + 1);
 	strcpy(method->name, name);
 
 	method->defParameterList = defParameterList;
@@ -462,6 +492,12 @@ typedef struct instrNode {
 
 typedef tExpr tInstrSimple;
 
+typedef struct instrDeclaration {
+	char * type;
+	char * identifier; 
+	tExpr * expr;
+} tInstrDeclaration;
+
 typedef struct instrIf {
 	tExpr * expr;
 	tInstrSet * instrSet;
@@ -469,7 +505,6 @@ typedef struct instrIf {
 } tInstrIf;
 
 typedef struct instrElse {
-	tExpr * expr;
 	tInstrSet * instrSet;
 	tInstrIf * instrIf;
 } tInstrElse;
@@ -479,6 +514,19 @@ typedef struct instrWhile {
 	tInstrSet * instrSet;
 } tInstrWhile;
 */
+
+void solveInstrSet(tSymbolsTable * symbolsTable, tInstrSet * instrSet) {
+	if (instrSet == NULL) {
+		return;
+	}
+	instrSet->symbolsTable = NULL;
+	if (symbolsTable != NULL) {
+		addAll(instrSet->symbolsTable, symbolsTable);
+	}
+	if(instrSet->instrFirst != NULL) {
+		solveInstrNode(instrSet->symbolsTable, instrSet->instrFirst);
+	}	
+}
 
 void deleteInstrSet(tInstrSet * instrSet) {	
 	if (instrSet->symbolsTable != NULL) {
@@ -490,6 +538,15 @@ void deleteInstrSet(tInstrSet * instrSet) {
 	free(instrSet);
 }
 
+void solveInstrNode(tSymbolsTable * symbolsTable, tInstrNode * instrNode) {
+	if(instrNode->instr != NULL) {
+		solveInstr(symbolsTable, instrNode->type, instrNode->instr);
+	}
+	if (instrNode->nextInstr != NULL) {
+		solveInstrNode(symbolsTable, instrNode->nextInstr);
+	}	
+}
+
 void deleteInstrNode(tInstrNode * instrNode) {
 	if (instrNode->instr != NULL) {
 		deleteInstr(instrNode->type, instrNode->instr);
@@ -498,6 +555,23 @@ void deleteInstrNode(tInstrNode * instrNode) {
 		deleteInstrNode(instrNode->nextInstr);
 	}
 	free(instrNode);
+}
+
+void solveInstr(tSymbolsTable * symbolsTable, int type, void * instr) {
+	switch (type) {
+		case INSTR_SIMPLE:
+			solveInstrSimple(symbolsTable, (tInstrSimple *) instr);
+			break;
+		case INSTR_DECLARATION:
+			solveInstrDeclaration(symbolsTable, (tInstrDeclaration *) instr);
+			break;
+		case INSTR_IF:
+			solveInstrIf(symbolsTable, (tInstrIf *) instr);
+			break;
+		case INSTR_WHILE:
+			solveInstrWhile(symbolsTable, (tInstrWhile *) instr);
+			break;
+	}
 }
 
 void deleteInstr(int type, void * instr) {
@@ -517,8 +591,33 @@ void deleteInstr(int type, void * instr) {
 	}
 }
 
+void solveInstrSimple(tSymbolsTable * symbolsTable, tInstrSimple * instr) {
+	solveExpr(symbolsTable, (tExpr *) instr);
+}
+
 void deleteInstrSimple(tInstrSimple * instr) {
 	deleteExpr((tExpr *) instr);
+}
+
+void solveInstrDeclaration(tSymbolsTable * symbolsTable, tInstrDeclaration * instr) {
+	if (hasSymbol(symbolsTable, instr->identifier)) {
+		// TODO: var has already been declared.
+		return;
+	}
+	tRValue * rValue;
+	if (instr->expr != NULL) {
+		rValue = solveRValue(symbolsTable, instr->expr);
+		if (rValue == NULL) {
+			//TODO: Right-side of assignment is not a rvalue.
+		}
+		if (!isType(rValue, instr->type)) {
+			// TODO: non-matching types error.
+			return;
+		}
+	} else {
+		rValue = getDefaultValue(instr->type);
+	}
+	addSymbol(symbolsTable, instr->identifier, instr->type, rValue->value, rValue->bytes);
 }
 
 void deleteInstrDeclaration(tInstrDeclaration * instr) {
@@ -527,6 +626,27 @@ void deleteInstrDeclaration(tInstrDeclaration * instr) {
 		deleteExpr(instr->expr);
 	}
 	free(instr);
+}
+
+void solveInstrIf(tSymbolsTable * symbolsTable, tInstrIf * instr) {
+	if (instr->expr != NULL) {
+		tRValue * rValue = solveRValue(symbolsTable, instr->expr);
+		if (rValue == NULL) {
+			//TODO: expression is not a rvalue. (?)
+		}
+		if (!isType(rValue, _boolean)) {
+			// TODO: expression is not boolean.
+			return;
+		}
+		if (isTrue(rValue)) {
+			solveInstrSet(symbolsTable, instr->instrSet);
+		} else {
+			solveInstrElse(symbolsTable, instr->instrElse);
+		}
+	} else {
+		//TODO: If expr is null
+		return;
+	}
 }
 
 void deleteInstrIf(tInstrIf * instr) {
@@ -542,10 +662,15 @@ void deleteInstrIf(tInstrIf * instr) {
 	free(instr);
 }
 
-void deleteInstrElse(tInstrElse * instr) {
-	if (instr->expr != NULL) {
-		deleteExpr(instr->expr);
+void solveInstrElse(tSymbolsTable * symbolsTable, tInstrElse * instr) {
+	if (instr->instrIf != NULL) {
+		solveInstrIf(symbolsTable, instr->instrIf);
+	} else {
+		solveInstrSet(symbolsTable, instr->instrSet);	
 	}
+}
+
+void deleteInstrElse(tInstrElse * instr) {
 	if (instr->instrSet != NULL) {
 		deleteInstrSet(instr->instrSet);
 	}
@@ -553,6 +678,26 @@ void deleteInstrElse(tInstrElse * instr) {
 		deleteInstrIf(instr->instrIf);
 	}
 	free(instr);
+}
+
+void solveInstrWhile(tSymbolsTable * symbolsTable, tInstrWhile * instr) {
+	if (instr->expr != NULL) {
+		tRValue * rValue = solveRValue(symbolsTable, instr->expr);
+		if (rValue == NULL) {
+			//TODO: expression is not a rvalue. (?)
+		}
+		if (!isType(rValue, _boolean)) {
+			// TODO: expression is not boolean.
+			return;
+		}
+		while (isTrue(rValue)) {
+			solveInstrSet(symbolsTable, instr->instrSet);
+			rValue = solveRValue(symbolsTable, instr->expr);
+		}
+	} else {
+		//TODO: If expr is null
+		return;
+	}
 }
 
 void deleteInstrWhile(tInstrWhile * instr) {
@@ -567,7 +712,7 @@ void deleteInstrWhile(tInstrWhile * instr) {
 
 /**********************/
 
-main() {
+int main(void) {
 	tProperty * properties = NULL;
 	tMethod * methods = NULL;
 	tDefParameterList * defParamsList = newDefParamsList();
@@ -578,19 +723,25 @@ main() {
 	char sex = 'm';
 	char * name = "pedro";
 	addProperty(&properties, "age", _int, &age, sizeof(int));
-	addProperty(&properties, "name", _string, name, strlen(name));
+	addProperty(&properties, "name", _string, name, strlen(name) + 1);
 	addProperty(&properties, "sex", _char, &sex, sizeof(char));
 	addMethod(&methods, _int, "getAge", defParamsList, NULL);
 	addMethod(&methods, _string, "getName", NULL, NULL);
 	addClass("Person", properties, NULL, methods);
 	addClass("Person", NULL, NULL, NULL);
 	tClass * gotClass = getClass("Person");
+	printf("%p\n", gotClass);
+	printf("llegue acá\n");
+	tClass * tmp;
+	for(tmp = classes; tmp != NULL; tmp = tmp->hh.next) {
+        printf("class name %s\n", tmp->name);
+    }
 	if(gotClass != NULL) {
 		printf("className: %s\n", gotClass->name);
 		tProperty * gotProp = getProperty(gotClass->properties, "sex");
 		if(gotProp != NULL) {
 			printf("sex type: %s\n", gotProp->type);
-			printf("name: %s\n", (char *)getProperty(gotClass->properties, "name")->defaultValue);
+			printf("name: %s\n", (char *)(getProperty(gotClass->properties, "name")->defaultValue));
 			printf("sex: %c\n", *((char *)gotProp->defaultValue));
 			printf("age: %d\n", *((int *)getProperty(gotClass->properties, "age")->defaultValue));
 		}

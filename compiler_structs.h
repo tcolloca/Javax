@@ -48,11 +48,15 @@ typedef struct instrWhile tInstrWhile;
 
 /*** Main ***/
 
-void deleteMain(tMain * main);
+void solveMain();
+
+void deleteMain();
 
 /*** Symbols ***/
 
 int addSymbol(tSymbolsTable * symbolsTable, char * name, char * type, void * content, int bytes);
+
+int hasSymbol(tSymbolsTable * symbolsTable, char * name);
 
 tSymbol * getSymbol(tSymbolsTable * symbolsTable, char * name);
 
@@ -61,6 +65,8 @@ void deleteSymbolsTable(tSymbolsTable * symbolsTable);
 void deleteSymbols(tSymbol * symbols);
 
 void deleteSymbol(tSymbol * symbol);
+
+void addAll(tSymbolsTable * symbolsTableDest, tSymbolsTable * symbolsTableSrc);
 
 /*** Classes ***/
 
@@ -109,19 +115,35 @@ void deleteDefParameterNode(tDefParameterNode * defParameterNode);
 
 /*** Instructions ***/
 
+void solveInstrSet(tSymbolsTable * symbolsTable, tInstrSet * instrSet);
+
 void deleteInstrSet(tInstrSet * instrSet);
+
+void solveInstrNode(tSymbolsTable * symbolsTable, tInstrNode * instrNode);
 
 void deleteInstrNode(tInstrNode * instrNode);
 
+void solveInstr(tSymbolsTable * symbolsTable, int type, void * instr);
+
 void deleteInstr(int type, void * instr);
+
+void solveInstrDeclaration(tSymbolsTable * symbolsTable, tInstrDeclaration * instr);
 
 void deleteInstrDeclaration(tInstrDeclaration * instr);
 
+void solveInstrSimple(tSymbolsTable * symbolsTable, tInstrSimple * instr);
+
 void deleteInstrSimple(tInstrSimple * instr);
+
+void solveInstrIf(tSymbolsTable * symbolsTable, tInstrIf * instr);
 
 void deleteInstrIf(tInstrIf * instr);
 
+void solveInstrElse(tSymbolsTable * symbolsTable, tInstrElse * instr);
+
 void deleteInstrElse(tInstrElse * instr);
+
+void solveInstrWhile(tSymbolsTable * symbolsTable, tInstrWhile * instr);
 
 void deleteInstrWhile(tInstrWhile * instr);
 
