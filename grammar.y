@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
- 
+//#include "compiler_structs.h"
 
 void yyerror(const char *str)
 {
@@ -144,6 +144,8 @@ instr:
 	;
 
 instr_simple:
+	instr_declaration
+	|
 	expr
 	;
 
@@ -153,6 +155,12 @@ instr_conditional:
 
 instr_loop:
 	block_while
+	;
+
+instr_declaration:
+	type IDENTIFIER
+	|
+	type IDENTIFIER OP_ASSIGN expr
 	;
 
 /*** Conditional instructions definition ***/

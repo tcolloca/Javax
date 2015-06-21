@@ -51,169 +51,173 @@ Grammar
    23      | instr_conditional
    24      | instr_loop
 
-   25 instr_simple: expr
+   25 instr_simple: instr_declaration
+   26             | expr
 
-   26 instr_conditional: block_if
+   27 instr_conditional: block_if
 
-   27 instr_loop: block_while
+   28 instr_loop: block_while
 
-   28 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else
+   29 instr_declaration: type IDENTIFIER
+   30                  | type IDENTIFIER OP_ASSIGN expr
 
-   29 block_else: ELSE LCUR instr_set RCUR
-   30           | ELSE block_if
-   31           | /* empty */
+   31 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else
 
-   32 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR
-   33            | WHILE LPAR expr_boolean RPAR instr
+   32 block_else: ELSE LCUR instr_set RCUR
+   33           | ELSE block_if
+   34           | /* empty */
 
-   34 expr: expr_assignment
+   35 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR
+   36            | WHILE LPAR expr_boolean RPAR instr
 
-   35 expr_assignment: expr_conditional
-   36                | expr_conditional OP_ASSIGN expr_assignment
-   37                | expr_conditional OP_PLUS_SH expr_assignment
-   38                | expr_conditional OP_MINUS_SH expr_assignment
-   39                | expr_conditional OP_MULT_SH expr_assignment
-   40                | expr_conditional OP_DIV_SH expr_assignment
-   41                | expr_conditional OP_MOD_SH expr_assignment
+   37 expr: expr_assignment
 
-   42 expr_conditional: expr_boolean
-   43                 | expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional
+   38 expr_assignment: expr_conditional
+   39                | expr_conditional OP_ASSIGN expr_assignment
+   40                | expr_conditional OP_PLUS_SH expr_assignment
+   41                | expr_conditional OP_MINUS_SH expr_assignment
+   42                | expr_conditional OP_MULT_SH expr_assignment
+   43                | expr_conditional OP_DIV_SH expr_assignment
+   44                | expr_conditional OP_MOD_SH expr_assignment
 
-   44 expr_boolean: expr_implies
+   45 expr_conditional: expr_boolean
+   46                 | expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional
 
-   45 expr_implies: expr_or
-   46             | expr_implies OP_IMPLIES expr_or
+   47 expr_boolean: expr_implies
 
-   47 expr_or: expr_and
-   48        | expr_or OP_OR expr_and
+   48 expr_implies: expr_or
+   49             | expr_implies OP_IMPLIES expr_or
 
-   49 expr_and: expr_equality
-   50         | expr_and OP_AND expr_equality
+   50 expr_or: expr_and
+   51        | expr_or OP_OR expr_and
 
-   51 expr_equality: expr_order
-   52              | expr_equality OP_EQ expr_order
-   53              | expr_equality OP_NE expr_order
+   52 expr_and: expr_equality
+   53         | expr_and OP_AND expr_equality
 
-   54 expr_order: expr_additive
-   55           | expr_order OP_GE expr_additive
-   56           | expr_order OP_LE expr_additive
-   57           | expr_order OP_GT expr_additive
-   58           | expr_order OP_LT expr_additive
+   54 expr_equality: expr_order
+   55              | expr_equality OP_EQ expr_order
+   56              | expr_equality OP_NE expr_order
 
-   59 expr_additive: expr_multiplicative
-   60              | expr_additive OP_PLUS expr_multiplicative
-   61              | expr_additive OP_MINUS expr_multiplicative
+   57 expr_order: expr_additive
+   58           | expr_order OP_GE expr_additive
+   59           | expr_order OP_LE expr_additive
+   60           | expr_order OP_GT expr_additive
+   61           | expr_order OP_LT expr_additive
 
-   62 expr_multiplicative: expr_object_creation
-   63                    | expr_multiplicative OP_MULTIPLICATION expr_object_creation
-   64                    | expr_multiplicative OP_DIVITION expr_object_creation
-   65                    | expr_multiplicative OP_MODULO expr_object_creation
+   62 expr_additive: expr_multiplicative
+   63              | expr_additive OP_PLUS expr_multiplicative
+   64              | expr_additive OP_MINUS expr_multiplicative
 
-   66 expr_object_creation: expr_pre_additive_sign_and_not
-   67                     | NEW IDENTIFIER LPAR parameters RPAR
+   65 expr_multiplicative: expr_object_creation
+   66                    | expr_multiplicative OP_MULTIPLICATION expr_object_creation
+   67                    | expr_multiplicative OP_DIVITION expr_object_creation
+   68                    | expr_multiplicative OP_MODULO expr_object_creation
 
-   68 expr_pre_additive_sign_and_not: expr_post_additive_or_access
-   69                               | OP_PLUS_PLUS expr_post_additive_or_access
-   70                               | OP_MINUS_MINUS expr_post_additive_or_access
-   71                               | OP_PLUS expr_post_additive_or_access
-   72                               | OP_MINUS expr_post_additive_or_access
-   73                               | OP_NOT expr_post_additive_or_access
+   69 expr_object_creation: expr_pre_additive_sign_and_not
+   70                     | NEW IDENTIFIER LPAR parameters RPAR
 
-   74 expr_post_additive_or_access: expr_basic
-   75                             | expr_basic OP_PLUS_PLUS
-   76                             | expr_basic OP_MINUS_MINUS
-   77                             | expr_post_additive_or_access method_call
-   78                             | expr_post_additive_or_access property_access
+   71 expr_pre_additive_sign_and_not: expr_post_additive_or_access
+   72                               | OP_PLUS_PLUS expr_post_additive_or_access
+   73                               | OP_MINUS_MINUS expr_post_additive_or_access
+   74                               | OP_PLUS expr_post_additive_or_access
+   75                               | OP_MINUS expr_post_additive_or_access
+   76                               | OP_NOT expr_post_additive_or_access
 
-   79 property_access: OP_PROP expr_basic
+   77 expr_post_additive_or_access: expr_basic
+   78                             | expr_basic OP_PLUS_PLUS
+   79                             | expr_basic OP_MINUS_MINUS
+   80                             | expr_post_additive_or_access method_call
+   81                             | expr_post_additive_or_access property_access
 
-   80 method_call: LPAR parameters RPAR
+   82 property_access: OP_PROP expr_basic
 
-   81 expr_basic: built_in
-   82           | IDENTIFIER
-   83           | LPAR expr RPAR
+   83 method_call: LPAR parameters RPAR
 
-   84 built_in: INT
-   85         | BOOLEAN
-   86         | CHAR
-   87         | STRING
+   84 expr_basic: built_in
+   85           | IDENTIFIER
+   86           | LPAR expr RPAR
 
-   88 type: TYPE_INT
-   89     | TYPE_BOOLEAN
-   90     | TYPE_CHAR
-   91     | TYPE_STRING
+   87 built_in: INT
+   88         | BOOLEAN
+   89         | CHAR
+   90         | STRING
 
-   92 parameters_def: /* empty */
-   93               | parameter_def
-   94               | parameters_def COMA parameter_def
+   91 type: TYPE_INT
+   92     | TYPE_BOOLEAN
+   93     | TYPE_CHAR
+   94     | TYPE_STRING
 
-   95 parameter_def: type IDENTIFIER
+   95 parameters_def: /* empty */
+   96               | parameter_def
+   97               | parameters_def COMA parameter_def
 
-   96 parameters: /* empty */
-   97           | parameter
-   98           | parameters COMA parameter
+   98 parameter_def: type IDENTIFIER
 
-   99 parameter: expr
+   99 parameters: /* empty */
+  100           | parameter
+  101           | parameters COMA parameter
+
+  102 parameter: expr
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-INT (258) 84
-BOOLEAN (259) 85
-CHAR (260) 86
-STRING (261) 87
-IDENTIFIER (262) 5 10 12 15 18 67 82 95
-TYPE_INT (263) 88
-TYPE_BOOLEAN (264) 89
-TYPE_CHAR (265) 90
-TYPE_STRING (266) 91
-IF (267) 28
-ELSE (268) 29 30
+INT (258) 87
+BOOLEAN (259) 88
+CHAR (260) 89
+STRING (261) 90
+IDENTIFIER (262) 5 10 12 15 18 29 30 70 85 98
+TYPE_INT (263) 91
+TYPE_BOOLEAN (264) 92
+TYPE_CHAR (265) 93
+TYPE_STRING (266) 94
+IF (267) 31
+ELSE (268) 32 33
 FOR (269)
-WHILE (270) 32 33
+WHILE (270) 35 36
 CONST (271)
-NEW (272) 67
+NEW (272) 70
 CLASS (273) 5
 METHOD (274) 18
 RETURN (275)
 MAIN (276) 4
-OP_PLUS (277) 60 71
-OP_MINUS (278) 61 72
-OP_MULTIPLICATION (279) 63
-OP_DIVITION (280) 64
+OP_PLUS (277) 63 74
+OP_MINUS (278) 64 75
+OP_MULTIPLICATION (279) 66
+OP_DIVITION (280) 67
 OP_EXP (281)
-OP_MODULO (282) 65
-OP_PLUS_PLUS (283) 69 75
-OP_MINUS_MINUS (284) 70 76
-OP_EQ (285) 52
-OP_NE (286) 53
-OP_GE (287) 55
-OP_LE (288) 56
-OP_GT (289) 57
-OP_LT (290) 58
-OP_AND (291) 50
-OP_OR (292) 48
-OP_NOT (293) 73
-OP_IMPLIES (294) 46
-OP_ASSIGN (295) 12 36
-OP_PLUS_SH (296) 37
-OP_MINUS_SH (297) 38
-OP_MULT_SH (298) 39
-OP_DIV_SH (299) 40
-OP_MOD_SH (300) 41
-OP_PROP (301) 79
-LPAR (302) 4 15 18 28 32 33 67 80 83
-RPAR (303) 4 15 18 28 32 33 67 80 83
+OP_MODULO (282) 68
+OP_PLUS_PLUS (283) 72 78
+OP_MINUS_MINUS (284) 73 79
+OP_EQ (285) 55
+OP_NE (286) 56
+OP_GE (287) 58
+OP_LE (288) 59
+OP_GT (289) 60
+OP_LT (290) 61
+OP_AND (291) 53
+OP_OR (292) 51
+OP_NOT (293) 76
+OP_IMPLIES (294) 49
+OP_ASSIGN (295) 12 30 39
+OP_PLUS_SH (296) 40
+OP_MINUS_SH (297) 41
+OP_MULT_SH (298) 42
+OP_DIV_SH (299) 43
+OP_MOD_SH (300) 44
+OP_PROP (301) 82
+LPAR (302) 4 15 18 31 35 36 70 83 86
+RPAR (303) 4 15 18 31 35 36 70 83 86
 LBRA (304)
 RBRA (305)
-LCUR (306) 4 5 15 18 28 29 32
-RCUR (307) 4 5 15 18 28 29 32
+LCUR (306) 4 5 15 18 31 32 35
+RCUR (307) 4 5 15 18 31 32 35
 SEMC (308) 9 21 22
-COMA (309) 94 98
-COND_QUES (310) 43
-COND_COLN (311) 43
+COMA (309) 97 101
+COND_QUES (310) 46
+COND_COLN (311) 46
 
 
 Nonterminals, with rules where they appear
@@ -247,67 +251,69 @@ class_instance_methods (69)
 class_instance_method (70)
     on left: 18, on right: 16
 instr_set (71)
-    on left: 19 20, on right: 4 15 18 19 28 29 32
+    on left: 19 20, on right: 4 15 18 19 31 32 35
 instr (72)
-    on left: 21 22 23 24, on right: 19 33
+    on left: 21 22 23 24, on right: 19 36
 instr_simple (73)
-    on left: 25, on right: 22
+    on left: 25 26, on right: 22
 instr_conditional (74)
-    on left: 26, on right: 23
+    on left: 27, on right: 23
 instr_loop (75)
-    on left: 27, on right: 24
-block_if (76)
-    on left: 28, on right: 26 30
-block_else (77)
-    on left: 29 30 31, on right: 28
-block_while (78)
-    on left: 32 33, on right: 27
-expr (79)
-    on left: 34, on right: 12 25 83 99
-expr_assignment (80)
-    on left: 35 36 37 38 39 40 41, on right: 34 36 37 38 39 40 41
-expr_conditional (81)
-    on left: 42 43, on right: 35 36 37 38 39 40 41 43
-expr_boolean (82)
-    on left: 44, on right: 28 32 33 42 43
-expr_implies (83)
-    on left: 45 46, on right: 44 46
-expr_or (84)
-    on left: 47 48, on right: 45 46 48
-expr_and (85)
-    on left: 49 50, on right: 47 48 50
-expr_equality (86)
-    on left: 51 52 53, on right: 49 50 52 53
-expr_order (87)
-    on left: 54 55 56 57 58, on right: 51 52 53 55 56 57 58
-expr_additive (88)
-    on left: 59 60 61, on right: 54 55 56 57 58 60 61
-expr_multiplicative (89)
-    on left: 62 63 64 65, on right: 59 60 61 63 64 65
-expr_object_creation (90)
-    on left: 66 67, on right: 62 63 64 65
-expr_pre_additive_sign_and_not (91)
-    on left: 68 69 70 71 72 73, on right: 66
-expr_post_additive_or_access (92)
-    on left: 74 75 76 77 78, on right: 68 69 70 71 72 73 77 78
-property_access (93)
-    on left: 79, on right: 78
-method_call (94)
-    on left: 80, on right: 77
-expr_basic (95)
-    on left: 81 82 83, on right: 74 75 76 79
-built_in (96)
-    on left: 84 85 86 87, on right: 81
-type (97)
-    on left: 88 89 90 91, on right: 10 11 18 95
-parameters_def (98)
-    on left: 92 93 94, on right: 15 18 94
-parameter_def (99)
-    on left: 95, on right: 93 94
-parameters (100)
-    on left: 96 97 98, on right: 67 80 98
-parameter (101)
-    on left: 99, on right: 97 98
+    on left: 28, on right: 24
+instr_declaration (76)
+    on left: 29 30, on right: 25
+block_if (77)
+    on left: 31, on right: 27 33
+block_else (78)
+    on left: 32 33 34, on right: 31
+block_while (79)
+    on left: 35 36, on right: 28
+expr (80)
+    on left: 37, on right: 12 26 30 86 102
+expr_assignment (81)
+    on left: 38 39 40 41 42 43 44, on right: 37 39 40 41 42 43 44
+expr_conditional (82)
+    on left: 45 46, on right: 38 39 40 41 42 43 44 46
+expr_boolean (83)
+    on left: 47, on right: 31 35 36 45 46
+expr_implies (84)
+    on left: 48 49, on right: 47 49
+expr_or (85)
+    on left: 50 51, on right: 48 49 51
+expr_and (86)
+    on left: 52 53, on right: 50 51 53
+expr_equality (87)
+    on left: 54 55 56, on right: 52 53 55 56
+expr_order (88)
+    on left: 57 58 59 60 61, on right: 54 55 56 58 59 60 61
+expr_additive (89)
+    on left: 62 63 64, on right: 57 58 59 60 61 63 64
+expr_multiplicative (90)
+    on left: 65 66 67 68, on right: 62 63 64 66 67 68
+expr_object_creation (91)
+    on left: 69 70, on right: 65 66 67 68
+expr_pre_additive_sign_and_not (92)
+    on left: 71 72 73 74 75 76, on right: 69
+expr_post_additive_or_access (93)
+    on left: 77 78 79 80 81, on right: 71 72 73 74 75 76 80 81
+property_access (94)
+    on left: 82, on right: 81
+method_call (95)
+    on left: 83, on right: 80
+expr_basic (96)
+    on left: 84 85 86, on right: 77 78 79 82
+built_in (97)
+    on left: 87 88 89 90, on right: 84
+type (98)
+    on left: 91 92 93 94, on right: 10 11 18 29 30 98
+parameters_def (99)
+    on left: 95 96 97, on right: 15 18 97
+parameter_def (100)
+    on left: 98, on right: 96 97
+parameters (101)
+    on left: 99 100 101, on right: 70 83 101
+parameter (102)
+    on left: 102, on right: 100 101
 
 
 state 0
@@ -448,30 +454,30 @@ state 15
 
 state 16
 
-   88 type: TYPE_INT .
+   91 type: TYPE_INT .
 
-    $default  reduce using rule 88 (type)
+    $default  reduce using rule 91 (type)
 
 
 state 17
 
-   89 type: TYPE_BOOLEAN .
+   92 type: TYPE_BOOLEAN .
 
-    $default  reduce using rule 89 (type)
+    $default  reduce using rule 92 (type)
 
 
 state 18
 
-   90 type: TYPE_CHAR .
+   93 type: TYPE_CHAR .
 
-    $default  reduce using rule 90 (type)
+    $default  reduce using rule 93 (type)
 
 
 state 19
 
-   91 type: TYPE_STRING .
+   94 type: TYPE_STRING .
 
-    $default  reduce using rule 91 (type)
+    $default  reduce using rule 94 (type)
 
 
 state 20
@@ -521,6 +527,10 @@ state 24
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -537,24 +547,26 @@ state 24
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
 state 25
@@ -568,7 +580,7 @@ state 26
 
    15 class_constructor: IDENTIFIER . LPAR parameters_def RPAR LCUR instr_set RCUR
 
-    LPAR  shift, and go to state 69
+    LPAR  shift, and go to state 71
 
 
 state 27
@@ -583,11 +595,11 @@ state 28
     6 class_content: class_instance_properties class_constructors class_instance_methods .
    16 class_instance_methods: class_instance_methods . class_instance_method
 
-    METHOD  shift, and go to state 70
+    METHOD  shift, and go to state 72
 
     $default  reduce using rule 6 (class_content)
 
-    class_instance_method  go to state 71
+    class_instance_method  go to state 73
 
 
 state 29
@@ -595,7 +607,7 @@ state 29
    10 var_declaration: type IDENTIFIER .
    12 var_assignment: IDENTIFIER . OP_ASSIGN expr
 
-    OP_ASSIGN  shift, and go to state 72
+    OP_ASSIGN  shift, and go to state 74
 
     $default  reduce using rule 10 (var_declaration)
 
@@ -609,96 +621,64 @@ state 30
 
 state 31
 
-   84 built_in: INT .
-
-    $default  reduce using rule 84 (built_in)
-
-
-state 32
-
-   85 built_in: BOOLEAN .
-
-    $default  reduce using rule 85 (built_in)
-
-
-state 33
-
-   86 built_in: CHAR .
-
-    $default  reduce using rule 86 (built_in)
-
-
-state 34
-
-   87 built_in: STRING .
+   87 built_in: INT .
 
     $default  reduce using rule 87 (built_in)
 
 
+state 32
+
+   88 built_in: BOOLEAN .
+
+    $default  reduce using rule 88 (built_in)
+
+
+state 33
+
+   89 built_in: CHAR .
+
+    $default  reduce using rule 89 (built_in)
+
+
+state 34
+
+   90 built_in: STRING .
+
+    $default  reduce using rule 90 (built_in)
+
+
 state 35
 
-   82 expr_basic: IDENTIFIER .
+   85 expr_basic: IDENTIFIER .
 
-    $default  reduce using rule 82 (expr_basic)
+    $default  reduce using rule 85 (expr_basic)
 
 
 state 36
 
-   28 block_if: IF . LPAR expr_boolean RPAR LCUR instr_set RCUR block_else
+   31 block_if: IF . LPAR expr_boolean RPAR LCUR instr_set RCUR block_else
 
-    LPAR  shift, and go to state 73
+    LPAR  shift, and go to state 75
 
 
 state 37
 
-   32 block_while: WHILE . LPAR expr_boolean RPAR LCUR instr_set RCUR
-   33            | WHILE . LPAR expr_boolean RPAR instr
+   35 block_while: WHILE . LPAR expr_boolean RPAR LCUR instr_set RCUR
+   36            | WHILE . LPAR expr_boolean RPAR instr
 
-    LPAR  shift, and go to state 74
+    LPAR  shift, and go to state 76
 
 
 state 38
 
-   67 expr_object_creation: NEW . IDENTIFIER LPAR parameters RPAR
+   70 expr_object_creation: NEW . IDENTIFIER LPAR parameters RPAR
 
-    IDENTIFIER  shift, and go to state 75
+    IDENTIFIER  shift, and go to state 77
 
 
 state 39
 
-   71 expr_pre_additive_sign_and_not: OP_PLUS . expr_post_additive_or_access
-
-    INT         shift, and go to state 31
-    BOOLEAN     shift, and go to state 32
-    CHAR        shift, and go to state 33
-    STRING      shift, and go to state 34
-    IDENTIFIER  shift, and go to state 35
-    LPAR        shift, and go to state 44
-
-    expr_post_additive_or_access  go to state 76
-    expr_basic                    go to state 67
-    built_in                      go to state 68
-
-
-state 40
-
-   72 expr_pre_additive_sign_and_not: OP_MINUS . expr_post_additive_or_access
-
-    INT         shift, and go to state 31
-    BOOLEAN     shift, and go to state 32
-    CHAR        shift, and go to state 33
-    STRING      shift, and go to state 34
-    IDENTIFIER  shift, and go to state 35
-    LPAR        shift, and go to state 44
-
-    expr_post_additive_or_access  go to state 77
-    expr_basic                    go to state 67
-    built_in                      go to state 68
-
-
-state 41
-
-   69 expr_pre_additive_sign_and_not: OP_PLUS_PLUS . expr_post_additive_or_access
+   74 expr_pre_additive_sign_and_not: OP_PLUS . expr_post_additive_or_access
 
     INT         shift, and go to state 31
     BOOLEAN     shift, and go to state 32
@@ -708,13 +688,13 @@ state 41
     LPAR        shift, and go to state 44
 
     expr_post_additive_or_access  go to state 78
-    expr_basic                    go to state 67
-    built_in                      go to state 68
+    expr_basic                    go to state 68
+    built_in                      go to state 69
 
 
-state 42
+state 40
 
-   70 expr_pre_additive_sign_and_not: OP_MINUS_MINUS . expr_post_additive_or_access
+   75 expr_pre_additive_sign_and_not: OP_MINUS . expr_post_additive_or_access
 
     INT         shift, and go to state 31
     BOOLEAN     shift, and go to state 32
@@ -724,13 +704,13 @@ state 42
     LPAR        shift, and go to state 44
 
     expr_post_additive_or_access  go to state 79
-    expr_basic                    go to state 67
-    built_in                      go to state 68
+    expr_basic                    go to state 68
+    built_in                      go to state 69
 
 
-state 43
+state 41
 
-   73 expr_pre_additive_sign_and_not: OP_NOT . expr_post_additive_or_access
+   72 expr_pre_additive_sign_and_not: OP_PLUS_PLUS . expr_post_additive_or_access
 
     INT         shift, and go to state 31
     BOOLEAN     shift, and go to state 32
@@ -740,13 +720,45 @@ state 43
     LPAR        shift, and go to state 44
 
     expr_post_additive_or_access  go to state 80
-    expr_basic                    go to state 67
-    built_in                      go to state 68
+    expr_basic                    go to state 68
+    built_in                      go to state 69
+
+
+state 42
+
+   73 expr_pre_additive_sign_and_not: OP_MINUS_MINUS . expr_post_additive_or_access
+
+    INT         shift, and go to state 31
+    BOOLEAN     shift, and go to state 32
+    CHAR        shift, and go to state 33
+    STRING      shift, and go to state 34
+    IDENTIFIER  shift, and go to state 35
+    LPAR        shift, and go to state 44
+
+    expr_post_additive_or_access  go to state 81
+    expr_basic                    go to state 68
+    built_in                      go to state 69
+
+
+state 43
+
+   76 expr_pre_additive_sign_and_not: OP_NOT . expr_post_additive_or_access
+
+    INT         shift, and go to state 31
+    BOOLEAN     shift, and go to state 32
+    CHAR        shift, and go to state 33
+    STRING      shift, and go to state 34
+    IDENTIFIER  shift, and go to state 35
+    LPAR        shift, and go to state 44
+
+    expr_post_additive_or_access  go to state 82
+    expr_basic                    go to state 68
+    built_in                      go to state 69
 
 
 state 44
 
-   83 expr_basic: LPAR . expr RPAR
+   86 expr_basic: LPAR . expr RPAR
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -761,22 +773,22 @@ state 44
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr                            go to state 81
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr                            go to state 83
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 45
@@ -804,7 +816,7 @@ state 48
 
    22 instr: instr_simple . SEMC
 
-    SEMC  shift, and go to state 82
+    SEMC  shift, and go to state 84
 
 
 state 49
@@ -823,195 +835,210 @@ state 50
 
 state 51
 
-   26 instr_conditional: block_if .
-
-    $default  reduce using rule 26 (instr_conditional)
-
-
-state 52
-
-   27 instr_loop: block_while .
-
-    $default  reduce using rule 27 (instr_loop)
-
-
-state 53
-
-   25 instr_simple: expr .
+   25 instr_simple: instr_declaration .
 
     $default  reduce using rule 25 (instr_simple)
 
 
+state 52
+
+   27 instr_conditional: block_if .
+
+    $default  reduce using rule 27 (instr_conditional)
+
+
+state 53
+
+   28 instr_loop: block_while .
+
+    $default  reduce using rule 28 (instr_loop)
+
+
 state 54
 
-   34 expr: expr_assignment .
+   26 instr_simple: expr .
 
-    $default  reduce using rule 34 (expr)
+    $default  reduce using rule 26 (instr_simple)
 
 
 state 55
 
-   35 expr_assignment: expr_conditional .
-   36                | expr_conditional . OP_ASSIGN expr_assignment
-   37                | expr_conditional . OP_PLUS_SH expr_assignment
-   38                | expr_conditional . OP_MINUS_SH expr_assignment
-   39                | expr_conditional . OP_MULT_SH expr_assignment
-   40                | expr_conditional . OP_DIV_SH expr_assignment
-   41                | expr_conditional . OP_MOD_SH expr_assignment
+   37 expr: expr_assignment .
 
-    OP_ASSIGN    shift, and go to state 83
-    OP_PLUS_SH   shift, and go to state 84
-    OP_MINUS_SH  shift, and go to state 85
-    OP_MULT_SH   shift, and go to state 86
-    OP_DIV_SH    shift, and go to state 87
-    OP_MOD_SH    shift, and go to state 88
-
-    $default  reduce using rule 35 (expr_assignment)
+    $default  reduce using rule 37 (expr)
 
 
 state 56
 
-   42 expr_conditional: expr_boolean .
-   43                 | expr_boolean . COND_QUES expr_conditional COND_COLN expr_conditional
+   38 expr_assignment: expr_conditional .
+   39                | expr_conditional . OP_ASSIGN expr_assignment
+   40                | expr_conditional . OP_PLUS_SH expr_assignment
+   41                | expr_conditional . OP_MINUS_SH expr_assignment
+   42                | expr_conditional . OP_MULT_SH expr_assignment
+   43                | expr_conditional . OP_DIV_SH expr_assignment
+   44                | expr_conditional . OP_MOD_SH expr_assignment
 
-    COND_QUES  shift, and go to state 89
+    OP_ASSIGN    shift, and go to state 85
+    OP_PLUS_SH   shift, and go to state 86
+    OP_MINUS_SH  shift, and go to state 87
+    OP_MULT_SH   shift, and go to state 88
+    OP_DIV_SH    shift, and go to state 89
+    OP_MOD_SH    shift, and go to state 90
 
-    $default  reduce using rule 42 (expr_conditional)
+    $default  reduce using rule 38 (expr_assignment)
 
 
 state 57
 
-   44 expr_boolean: expr_implies .
-   46 expr_implies: expr_implies . OP_IMPLIES expr_or
+   45 expr_conditional: expr_boolean .
+   46                 | expr_boolean . COND_QUES expr_conditional COND_COLN expr_conditional
 
-    OP_IMPLIES  shift, and go to state 90
+    COND_QUES  shift, and go to state 91
 
-    $default  reduce using rule 44 (expr_boolean)
+    $default  reduce using rule 45 (expr_conditional)
 
 
 state 58
 
-   45 expr_implies: expr_or .
-   48 expr_or: expr_or . OP_OR expr_and
+   47 expr_boolean: expr_implies .
+   49 expr_implies: expr_implies . OP_IMPLIES expr_or
 
-    OP_OR  shift, and go to state 91
+    OP_IMPLIES  shift, and go to state 92
 
-    $default  reduce using rule 45 (expr_implies)
+    $default  reduce using rule 47 (expr_boolean)
 
 
 state 59
 
-   47 expr_or: expr_and .
-   50 expr_and: expr_and . OP_AND expr_equality
+   48 expr_implies: expr_or .
+   51 expr_or: expr_or . OP_OR expr_and
 
-    OP_AND  shift, and go to state 92
+    OP_OR  shift, and go to state 93
 
-    $default  reduce using rule 47 (expr_or)
+    $default  reduce using rule 48 (expr_implies)
 
 
 state 60
 
-   49 expr_and: expr_equality .
-   52 expr_equality: expr_equality . OP_EQ expr_order
-   53              | expr_equality . OP_NE expr_order
+   50 expr_or: expr_and .
+   53 expr_and: expr_and . OP_AND expr_equality
 
-    OP_EQ  shift, and go to state 93
-    OP_NE  shift, and go to state 94
+    OP_AND  shift, and go to state 94
 
-    $default  reduce using rule 49 (expr_and)
+    $default  reduce using rule 50 (expr_or)
 
 
 state 61
 
-   51 expr_equality: expr_order .
-   55 expr_order: expr_order . OP_GE expr_additive
-   56           | expr_order . OP_LE expr_additive
-   57           | expr_order . OP_GT expr_additive
-   58           | expr_order . OP_LT expr_additive
+   52 expr_and: expr_equality .
+   55 expr_equality: expr_equality . OP_EQ expr_order
+   56              | expr_equality . OP_NE expr_order
 
-    OP_GE  shift, and go to state 95
-    OP_LE  shift, and go to state 96
-    OP_GT  shift, and go to state 97
-    OP_LT  shift, and go to state 98
+    OP_EQ  shift, and go to state 95
+    OP_NE  shift, and go to state 96
 
-    $default  reduce using rule 51 (expr_equality)
+    $default  reduce using rule 52 (expr_and)
 
 
 state 62
 
-   54 expr_order: expr_additive .
-   60 expr_additive: expr_additive . OP_PLUS expr_multiplicative
-   61              | expr_additive . OP_MINUS expr_multiplicative
+   54 expr_equality: expr_order .
+   58 expr_order: expr_order . OP_GE expr_additive
+   59           | expr_order . OP_LE expr_additive
+   60           | expr_order . OP_GT expr_additive
+   61           | expr_order . OP_LT expr_additive
 
-    OP_PLUS   shift, and go to state 99
-    OP_MINUS  shift, and go to state 100
+    OP_GE  shift, and go to state 97
+    OP_LE  shift, and go to state 98
+    OP_GT  shift, and go to state 99
+    OP_LT  shift, and go to state 100
 
-    $default  reduce using rule 54 (expr_order)
+    $default  reduce using rule 54 (expr_equality)
 
 
 state 63
 
-   59 expr_additive: expr_multiplicative .
-   63 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
-   64                    | expr_multiplicative . OP_DIVITION expr_object_creation
-   65                    | expr_multiplicative . OP_MODULO expr_object_creation
+   57 expr_order: expr_additive .
+   63 expr_additive: expr_additive . OP_PLUS expr_multiplicative
+   64              | expr_additive . OP_MINUS expr_multiplicative
 
-    OP_MULTIPLICATION  shift, and go to state 101
-    OP_DIVITION        shift, and go to state 102
-    OP_MODULO          shift, and go to state 103
+    OP_PLUS   shift, and go to state 101
+    OP_MINUS  shift, and go to state 102
 
-    $default  reduce using rule 59 (expr_additive)
+    $default  reduce using rule 57 (expr_order)
 
 
 state 64
 
-   62 expr_multiplicative: expr_object_creation .
+   62 expr_additive: expr_multiplicative .
+   66 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
+   67                    | expr_multiplicative . OP_DIVITION expr_object_creation
+   68                    | expr_multiplicative . OP_MODULO expr_object_creation
 
-    $default  reduce using rule 62 (expr_multiplicative)
+    OP_MULTIPLICATION  shift, and go to state 103
+    OP_DIVITION        shift, and go to state 104
+    OP_MODULO          shift, and go to state 105
+
+    $default  reduce using rule 62 (expr_additive)
 
 
 state 65
 
-   66 expr_object_creation: expr_pre_additive_sign_and_not .
+   65 expr_multiplicative: expr_object_creation .
 
-    $default  reduce using rule 66 (expr_object_creation)
+    $default  reduce using rule 65 (expr_multiplicative)
 
 
 state 66
 
-   68 expr_pre_additive_sign_and_not: expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   69 expr_object_creation: expr_pre_additive_sign_and_not .
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
-
-    $default  reduce using rule 68 (expr_pre_additive_sign_and_not)
-
-    property_access  go to state 106
-    method_call      go to state 107
+    $default  reduce using rule 69 (expr_object_creation)
 
 
 state 67
 
-   74 expr_post_additive_or_access: expr_basic .
-   75                             | expr_basic . OP_PLUS_PLUS
-   76                             | expr_basic . OP_MINUS_MINUS
+   71 expr_pre_additive_sign_and_not: expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
 
-    OP_PLUS_PLUS    shift, and go to state 108
-    OP_MINUS_MINUS  shift, and go to state 109
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
 
-    $default  reduce using rule 74 (expr_post_additive_or_access)
+    $default  reduce using rule 71 (expr_pre_additive_sign_and_not)
+
+    property_access  go to state 108
+    method_call      go to state 109
 
 
 state 68
 
-   81 expr_basic: built_in .
+   77 expr_post_additive_or_access: expr_basic .
+   78                             | expr_basic . OP_PLUS_PLUS
+   79                             | expr_basic . OP_MINUS_MINUS
 
-    $default  reduce using rule 81 (expr_basic)
+    OP_PLUS_PLUS    shift, and go to state 110
+    OP_MINUS_MINUS  shift, and go to state 111
+
+    $default  reduce using rule 77 (expr_post_additive_or_access)
 
 
 state 69
+
+   84 expr_basic: built_in .
+
+    $default  reduce using rule 84 (expr_basic)
+
+
+state 70
+
+   29 instr_declaration: type . IDENTIFIER
+   30                  | type . IDENTIFIER OP_ASSIGN expr
+
+    IDENTIFIER  shift, and go to state 112
+
+
+state 71
 
    15 class_constructor: IDENTIFIER LPAR . parameters_def RPAR LCUR instr_set RCUR
 
@@ -1020,14 +1047,14 @@ state 69
     TYPE_CHAR     shift, and go to state 18
     TYPE_STRING   shift, and go to state 19
 
-    $default  reduce using rule 92 (parameters_def)
+    $default  reduce using rule 95 (parameters_def)
 
-    type            go to state 110
-    parameters_def  go to state 111
-    parameter_def   go to state 112
+    type            go to state 113
+    parameters_def  go to state 114
+    parameter_def   go to state 115
 
 
-state 70
+state 72
 
    18 class_instance_method: METHOD . type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
 
@@ -1036,17 +1063,17 @@ state 70
     TYPE_CHAR     shift, and go to state 18
     TYPE_STRING   shift, and go to state 19
 
-    type  go to state 113
+    type  go to state 116
 
 
-state 71
+state 73
 
    16 class_instance_methods: class_instance_methods class_instance_method .
 
     $default  reduce using rule 16 (class_instance_methods)
 
 
-state 72
+state 74
 
    12 var_assignment: IDENTIFIER OP_ASSIGN . expr
 
@@ -1063,290 +1090,188 @@ state 72
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr                            go to state 114
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 73
-
-   28 block_if: IF LPAR . expr_boolean RPAR LCUR instr_set RCUR block_else
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_boolean                    go to state 115
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 74
-
-   32 block_while: WHILE LPAR . expr_boolean RPAR LCUR instr_set RCUR
-   33            | WHILE LPAR . expr_boolean RPAR instr
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_boolean                    go to state 116
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr                            go to state 117
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 75
 
-   67 expr_object_creation: NEW IDENTIFIER . LPAR parameters RPAR
+   31 block_if: IF LPAR . expr_boolean RPAR LCUR instr_set RCUR block_else
 
-    LPAR  shift, and go to state 117
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_boolean                    go to state 118
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 76
 
-   71 expr_pre_additive_sign_and_not: OP_PLUS expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   35 block_while: WHILE LPAR . expr_boolean RPAR LCUR instr_set RCUR
+   36            | WHILE LPAR . expr_boolean RPAR instr
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
 
-    $default  reduce using rule 71 (expr_pre_additive_sign_and_not)
-
-    property_access  go to state 106
-    method_call      go to state 107
+    expr_boolean                    go to state 119
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 77
 
-   72 expr_pre_additive_sign_and_not: OP_MINUS expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   70 expr_object_creation: NEW IDENTIFIER . LPAR parameters RPAR
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
-
-    $default  reduce using rule 72 (expr_pre_additive_sign_and_not)
-
-    property_access  go to state 106
-    method_call      go to state 107
+    LPAR  shift, and go to state 120
 
 
 state 78
 
-   69 expr_pre_additive_sign_and_not: OP_PLUS_PLUS expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   74 expr_pre_additive_sign_and_not: OP_PLUS expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
 
-    $default  reduce using rule 69 (expr_pre_additive_sign_and_not)
+    $default  reduce using rule 74 (expr_pre_additive_sign_and_not)
 
-    property_access  go to state 106
-    method_call      go to state 107
+    property_access  go to state 108
+    method_call      go to state 109
 
 
 state 79
 
-   70 expr_pre_additive_sign_and_not: OP_MINUS_MINUS expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   75 expr_pre_additive_sign_and_not: OP_MINUS expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
 
-    $default  reduce using rule 70 (expr_pre_additive_sign_and_not)
+    $default  reduce using rule 75 (expr_pre_additive_sign_and_not)
 
-    property_access  go to state 106
-    method_call      go to state 107
+    property_access  go to state 108
+    method_call      go to state 109
 
 
 state 80
 
-   73 expr_pre_additive_sign_and_not: OP_NOT expr_post_additive_or_access .
-   77 expr_post_additive_or_access: expr_post_additive_or_access . method_call
-   78                             | expr_post_additive_or_access . property_access
+   72 expr_pre_additive_sign_and_not: OP_PLUS_PLUS expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
 
-    OP_PROP  shift, and go to state 104
-    LPAR     shift, and go to state 105
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
 
-    $default  reduce using rule 73 (expr_pre_additive_sign_and_not)
+    $default  reduce using rule 72 (expr_pre_additive_sign_and_not)
 
-    property_access  go to state 106
-    method_call      go to state 107
+    property_access  go to state 108
+    method_call      go to state 109
 
 
 state 81
 
-   83 expr_basic: LPAR expr . RPAR
+   73 expr_pre_additive_sign_and_not: OP_MINUS_MINUS expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
 
-    RPAR  shift, and go to state 118
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
+
+    $default  reduce using rule 73 (expr_pre_additive_sign_and_not)
+
+    property_access  go to state 108
+    method_call      go to state 109
 
 
 state 82
+
+   76 expr_pre_additive_sign_and_not: OP_NOT expr_post_additive_or_access .
+   80 expr_post_additive_or_access: expr_post_additive_or_access . method_call
+   81                             | expr_post_additive_or_access . property_access
+
+    OP_PROP  shift, and go to state 106
+    LPAR     shift, and go to state 107
+
+    $default  reduce using rule 76 (expr_pre_additive_sign_and_not)
+
+    property_access  go to state 108
+    method_call      go to state 109
+
+
+state 83
+
+   86 expr_basic: LPAR expr . RPAR
+
+    RPAR  shift, and go to state 121
+
+
+state 84
 
    22 instr: instr_simple SEMC .
 
     $default  reduce using rule 22 (instr)
 
 
-state 83
-
-   36 expr_assignment: expr_conditional OP_ASSIGN . expr_assignment
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_assignment                 go to state 119
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 84
-
-   37 expr_assignment: expr_conditional OP_PLUS_SH . expr_assignment
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_assignment                 go to state 120
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
 state 85
 
-   38 expr_assignment: expr_conditional OP_MINUS_SH . expr_assignment
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_assignment                 go to state 121
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 86
-
-   39 expr_assignment: expr_conditional OP_MULT_SH . expr_assignment
+   39 expr_assignment: expr_conditional OP_ASSIGN . expr_assignment
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1362,25 +1287,25 @@ state 86
     LPAR            shift, and go to state 44
 
     expr_assignment                 go to state 122
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
-state 87
+state 86
 
-   40 expr_assignment: expr_conditional OP_DIV_SH . expr_assignment
+   40 expr_assignment: expr_conditional OP_PLUS_SH . expr_assignment
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1396,25 +1321,25 @@ state 87
     LPAR            shift, and go to state 44
 
     expr_assignment                 go to state 123
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
-state 88
+state 87
 
-   41 expr_assignment: expr_conditional OP_MOD_SH . expr_assignment
+   41 expr_assignment: expr_conditional OP_MINUS_SH . expr_assignment
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1430,25 +1355,59 @@ state 88
     LPAR            shift, and go to state 44
 
     expr_assignment                 go to state 124
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 88
+
+   42 expr_assignment: expr_conditional OP_MULT_SH . expr_assignment
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_assignment                 go to state 125
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 89
 
-   43 expr_conditional: expr_boolean COND_QUES . expr_conditional COND_COLN expr_conditional
+   43 expr_assignment: expr_conditional OP_DIV_SH . expr_assignment
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1463,25 +1422,26 @@ state 89
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_conditional                go to state 125
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_assignment                 go to state 126
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 90
 
-   46 expr_implies: expr_implies OP_IMPLIES . expr_or
+   44 expr_assignment: expr_conditional OP_MOD_SH . expr_assignment
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1496,22 +1456,26 @@ state 90
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_or                         go to state 126
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_assignment                 go to state 127
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 91
 
-   48 expr_or: expr_or OP_OR . expr_and
+   46 expr_conditional: expr_boolean COND_QUES . expr_conditional COND_COLN expr_conditional
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1526,21 +1490,25 @@ state 91
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_and                        go to state 127
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_conditional                go to state 128
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 92
 
-   50 expr_and: expr_and OP_AND . expr_equality
+   49 expr_implies: expr_implies OP_IMPLIES . expr_or
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1555,20 +1523,22 @@ state 92
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_equality                   go to state 128
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_or                         go to state 129
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 93
 
-   52 expr_equality: expr_equality OP_EQ . expr_order
+   51 expr_or: expr_or OP_OR . expr_and
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1583,19 +1553,21 @@ state 93
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_order                      go to state 129
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_and                        go to state 130
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 94
 
-   53 expr_equality: expr_equality OP_NE . expr_order
+   53 expr_and: expr_and OP_AND . expr_equality
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1610,19 +1582,20 @@ state 94
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_order                      go to state 130
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_equality                   go to state 131
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 95
 
-   55 expr_order: expr_order OP_GE . expr_additive
+   55 expr_equality: expr_equality OP_EQ . expr_order
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1637,18 +1610,19 @@ state 95
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_additive                   go to state 131
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_order                      go to state 132
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 96
 
-   56 expr_order: expr_order OP_LE . expr_additive
+   56 expr_equality: expr_equality OP_NE . expr_order
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1663,44 +1637,19 @@ state 96
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_additive                   go to state 132
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_order                      go to state 133
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 97
 
-   57 expr_order: expr_order OP_GT . expr_additive
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_additive                   go to state 133
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 98
-
-   58 expr_order: expr_order OP_LT . expr_additive
+   58 expr_order: expr_order OP_GE . expr_additive
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1716,17 +1665,43 @@ state 98
     LPAR            shift, and go to state 44
 
     expr_additive                   go to state 134
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 98
+
+   59 expr_order: expr_order OP_LE . expr_additive
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_additive                   go to state 135
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 99
 
-   60 expr_additive: expr_additive OP_PLUS . expr_multiplicative
+   60 expr_order: expr_order OP_GT . expr_additive
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1741,17 +1716,18 @@ state 99
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_multiplicative             go to state 135
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_additive                   go to state 136
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 100
 
-   61 expr_additive: expr_additive OP_MINUS . expr_multiplicative
+   61 expr_order: expr_order OP_LT . expr_additive
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1766,17 +1742,18 @@ state 100
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_multiplicative             go to state 136
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_additive                   go to state 137
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 101
 
-   63 expr_multiplicative: expr_multiplicative OP_MULTIPLICATION . expr_object_creation
+   63 expr_additive: expr_additive OP_PLUS . expr_multiplicative
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1791,16 +1768,17 @@ state 101
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_object_creation            go to state 137
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_multiplicative             go to state 138
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 102
 
-   64 expr_multiplicative: expr_multiplicative OP_DIVITION . expr_object_creation
+   64 expr_additive: expr_additive OP_MINUS . expr_multiplicative
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1815,16 +1793,17 @@ state 102
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_object_creation            go to state 138
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_multiplicative             go to state 139
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 103
 
-   65 expr_multiplicative: expr_multiplicative OP_MODULO . expr_object_creation
+   66 expr_multiplicative: expr_multiplicative OP_MULTIPLICATION . expr_object_creation
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1839,16 +1818,64 @@ state 103
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    expr_object_creation            go to state 139
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    expr_object_creation            go to state 140
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
 
 
 state 104
 
-   79 property_access: OP_PROP . expr_basic
+   67 expr_multiplicative: expr_multiplicative OP_DIVITION . expr_object_creation
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_object_creation            go to state 141
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 105
+
+   68 expr_multiplicative: expr_multiplicative OP_MODULO . expr_object_creation
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_object_creation            go to state 142
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 106
+
+   82 property_access: OP_PROP . expr_basic
 
     INT         shift, and go to state 31
     BOOLEAN     shift, and go to state 32
@@ -1857,13 +1884,13 @@ state 104
     IDENTIFIER  shift, and go to state 35
     LPAR        shift, and go to state 44
 
-    expr_basic  go to state 140
-    built_in    go to state 68
+    expr_basic  go to state 143
+    built_in    go to state 69
 
 
-state 105
+state 107
 
-   80 method_call: LPAR . parameters RPAR
+   83 method_call: LPAR . parameters RPAR
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1878,111 +1905,121 @@ state 105
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    $default  reduce using rule 96 (parameters)
+    $default  reduce using rule 99 (parameters)
 
-    expr                            go to state 141
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-    parameters                      go to state 142
-    parameter                       go to state 143
-
-
-state 106
-
-   78 expr_post_additive_or_access: expr_post_additive_or_access property_access .
-
-    $default  reduce using rule 78 (expr_post_additive_or_access)
-
-
-state 107
-
-   77 expr_post_additive_or_access: expr_post_additive_or_access method_call .
-
-    $default  reduce using rule 77 (expr_post_additive_or_access)
+    expr                            go to state 144
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    parameters                      go to state 145
+    parameter                       go to state 146
 
 
 state 108
 
-   75 expr_post_additive_or_access: expr_basic OP_PLUS_PLUS .
+   81 expr_post_additive_or_access: expr_post_additive_or_access property_access .
 
-    $default  reduce using rule 75 (expr_post_additive_or_access)
+    $default  reduce using rule 81 (expr_post_additive_or_access)
 
 
 state 109
 
-   76 expr_post_additive_or_access: expr_basic OP_MINUS_MINUS .
+   80 expr_post_additive_or_access: expr_post_additive_or_access method_call .
 
-    $default  reduce using rule 76 (expr_post_additive_or_access)
+    $default  reduce using rule 80 (expr_post_additive_or_access)
 
 
 state 110
 
-   95 parameter_def: type . IDENTIFIER
+   78 expr_post_additive_or_access: expr_basic OP_PLUS_PLUS .
 
-    IDENTIFIER  shift, and go to state 144
+    $default  reduce using rule 78 (expr_post_additive_or_access)
 
 
 state 111
 
-   15 class_constructor: IDENTIFIER LPAR parameters_def . RPAR LCUR instr_set RCUR
-   94 parameters_def: parameters_def . COMA parameter_def
+   79 expr_post_additive_or_access: expr_basic OP_MINUS_MINUS .
 
-    RPAR  shift, and go to state 145
-    COMA  shift, and go to state 146
+    $default  reduce using rule 79 (expr_post_additive_or_access)
 
 
 state 112
 
-   93 parameters_def: parameter_def .
+   29 instr_declaration: type IDENTIFIER .
+   30                  | type IDENTIFIER . OP_ASSIGN expr
 
-    $default  reduce using rule 93 (parameters_def)
+    OP_ASSIGN  shift, and go to state 147
+
+    $default  reduce using rule 29 (instr_declaration)
 
 
 state 113
 
-   18 class_instance_method: METHOD type . IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
+   98 parameter_def: type . IDENTIFIER
 
-    IDENTIFIER  shift, and go to state 147
+    IDENTIFIER  shift, and go to state 148
 
 
 state 114
+
+   15 class_constructor: IDENTIFIER LPAR parameters_def . RPAR LCUR instr_set RCUR
+   97 parameters_def: parameters_def . COMA parameter_def
+
+    RPAR  shift, and go to state 149
+    COMA  shift, and go to state 150
+
+
+state 115
+
+   96 parameters_def: parameter_def .
+
+    $default  reduce using rule 96 (parameters_def)
+
+
+state 116
+
+   18 class_instance_method: METHOD type . IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
+
+    IDENTIFIER  shift, and go to state 151
+
+
+state 117
 
    12 var_assignment: IDENTIFIER OP_ASSIGN expr .
 
     $default  reduce using rule 12 (var_assignment)
 
 
-state 115
+state 118
 
-   28 block_if: IF LPAR expr_boolean . RPAR LCUR instr_set RCUR block_else
+   31 block_if: IF LPAR expr_boolean . RPAR LCUR instr_set RCUR block_else
 
-    RPAR  shift, and go to state 148
-
-
-state 116
-
-   32 block_while: WHILE LPAR expr_boolean . RPAR LCUR instr_set RCUR
-   33            | WHILE LPAR expr_boolean . RPAR instr
-
-    RPAR  shift, and go to state 149
+    RPAR  shift, and go to state 152
 
 
-state 117
+state 119
 
-   67 expr_object_creation: NEW IDENTIFIER LPAR . parameters RPAR
+   35 block_while: WHILE LPAR expr_boolean . RPAR LCUR instr_set RCUR
+   36            | WHILE LPAR expr_boolean . RPAR instr
+
+    RPAR  shift, and go to state 153
+
+
+state 120
+
+   70 expr_object_creation: NEW IDENTIFIER LPAR . parameters RPAR
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
@@ -1997,326 +2034,365 @@ state 117
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
 
-    $default  reduce using rule 96 (parameters)
+    $default  reduce using rule 99 (parameters)
 
-    expr                            go to state 141
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-    parameters                      go to state 150
-    parameter                       go to state 143
-
-
-state 118
-
-   83 expr_basic: LPAR expr RPAR .
-
-    $default  reduce using rule 83 (expr_basic)
-
-
-state 119
-
-   36 expr_assignment: expr_conditional OP_ASSIGN expr_assignment .
-
-    $default  reduce using rule 36 (expr_assignment)
-
-
-state 120
-
-   37 expr_assignment: expr_conditional OP_PLUS_SH expr_assignment .
-
-    $default  reduce using rule 37 (expr_assignment)
+    expr                            go to state 144
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    parameters                      go to state 154
+    parameter                       go to state 146
 
 
 state 121
 
-   38 expr_assignment: expr_conditional OP_MINUS_SH expr_assignment .
+   86 expr_basic: LPAR expr RPAR .
 
-    $default  reduce using rule 38 (expr_assignment)
+    $default  reduce using rule 86 (expr_basic)
 
 
 state 122
 
-   39 expr_assignment: expr_conditional OP_MULT_SH expr_assignment .
+   39 expr_assignment: expr_conditional OP_ASSIGN expr_assignment .
 
     $default  reduce using rule 39 (expr_assignment)
 
 
 state 123
 
-   40 expr_assignment: expr_conditional OP_DIV_SH expr_assignment .
+   40 expr_assignment: expr_conditional OP_PLUS_SH expr_assignment .
 
     $default  reduce using rule 40 (expr_assignment)
 
 
 state 124
 
-   41 expr_assignment: expr_conditional OP_MOD_SH expr_assignment .
+   41 expr_assignment: expr_conditional OP_MINUS_SH expr_assignment .
 
     $default  reduce using rule 41 (expr_assignment)
 
 
 state 125
 
-   43 expr_conditional: expr_boolean COND_QUES expr_conditional . COND_COLN expr_conditional
+   42 expr_assignment: expr_conditional OP_MULT_SH expr_assignment .
 
-    COND_COLN  shift, and go to state 151
+    $default  reduce using rule 42 (expr_assignment)
 
 
 state 126
 
-   46 expr_implies: expr_implies OP_IMPLIES expr_or .
-   48 expr_or: expr_or . OP_OR expr_and
+   43 expr_assignment: expr_conditional OP_DIV_SH expr_assignment .
 
-    OP_OR  shift, and go to state 91
-
-    $default  reduce using rule 46 (expr_implies)
+    $default  reduce using rule 43 (expr_assignment)
 
 
 state 127
 
-   48 expr_or: expr_or OP_OR expr_and .
-   50 expr_and: expr_and . OP_AND expr_equality
+   44 expr_assignment: expr_conditional OP_MOD_SH expr_assignment .
 
-    OP_AND  shift, and go to state 92
-
-    $default  reduce using rule 48 (expr_or)
+    $default  reduce using rule 44 (expr_assignment)
 
 
 state 128
 
-   50 expr_and: expr_and OP_AND expr_equality .
-   52 expr_equality: expr_equality . OP_EQ expr_order
-   53              | expr_equality . OP_NE expr_order
+   46 expr_conditional: expr_boolean COND_QUES expr_conditional . COND_COLN expr_conditional
 
-    OP_EQ  shift, and go to state 93
-    OP_NE  shift, and go to state 94
-
-    $default  reduce using rule 50 (expr_and)
+    COND_COLN  shift, and go to state 155
 
 
 state 129
 
-   52 expr_equality: expr_equality OP_EQ expr_order .
-   55 expr_order: expr_order . OP_GE expr_additive
-   56           | expr_order . OP_LE expr_additive
-   57           | expr_order . OP_GT expr_additive
-   58           | expr_order . OP_LT expr_additive
+   49 expr_implies: expr_implies OP_IMPLIES expr_or .
+   51 expr_or: expr_or . OP_OR expr_and
 
-    OP_GE  shift, and go to state 95
-    OP_LE  shift, and go to state 96
-    OP_GT  shift, and go to state 97
-    OP_LT  shift, and go to state 98
+    OP_OR  shift, and go to state 93
 
-    $default  reduce using rule 52 (expr_equality)
+    $default  reduce using rule 49 (expr_implies)
 
 
 state 130
 
-   53 expr_equality: expr_equality OP_NE expr_order .
-   55 expr_order: expr_order . OP_GE expr_additive
-   56           | expr_order . OP_LE expr_additive
-   57           | expr_order . OP_GT expr_additive
-   58           | expr_order . OP_LT expr_additive
+   51 expr_or: expr_or OP_OR expr_and .
+   53 expr_and: expr_and . OP_AND expr_equality
 
-    OP_GE  shift, and go to state 95
-    OP_LE  shift, and go to state 96
-    OP_GT  shift, and go to state 97
-    OP_LT  shift, and go to state 98
+    OP_AND  shift, and go to state 94
 
-    $default  reduce using rule 53 (expr_equality)
+    $default  reduce using rule 51 (expr_or)
 
 
 state 131
 
-   55 expr_order: expr_order OP_GE expr_additive .
-   60 expr_additive: expr_additive . OP_PLUS expr_multiplicative
-   61              | expr_additive . OP_MINUS expr_multiplicative
+   53 expr_and: expr_and OP_AND expr_equality .
+   55 expr_equality: expr_equality . OP_EQ expr_order
+   56              | expr_equality . OP_NE expr_order
 
-    OP_PLUS   shift, and go to state 99
-    OP_MINUS  shift, and go to state 100
+    OP_EQ  shift, and go to state 95
+    OP_NE  shift, and go to state 96
 
-    $default  reduce using rule 55 (expr_order)
+    $default  reduce using rule 53 (expr_and)
 
 
 state 132
 
-   56 expr_order: expr_order OP_LE expr_additive .
-   60 expr_additive: expr_additive . OP_PLUS expr_multiplicative
-   61              | expr_additive . OP_MINUS expr_multiplicative
+   55 expr_equality: expr_equality OP_EQ expr_order .
+   58 expr_order: expr_order . OP_GE expr_additive
+   59           | expr_order . OP_LE expr_additive
+   60           | expr_order . OP_GT expr_additive
+   61           | expr_order . OP_LT expr_additive
 
-    OP_PLUS   shift, and go to state 99
-    OP_MINUS  shift, and go to state 100
+    OP_GE  shift, and go to state 97
+    OP_LE  shift, and go to state 98
+    OP_GT  shift, and go to state 99
+    OP_LT  shift, and go to state 100
 
-    $default  reduce using rule 56 (expr_order)
+    $default  reduce using rule 55 (expr_equality)
 
 
 state 133
 
-   57 expr_order: expr_order OP_GT expr_additive .
-   60 expr_additive: expr_additive . OP_PLUS expr_multiplicative
-   61              | expr_additive . OP_MINUS expr_multiplicative
+   56 expr_equality: expr_equality OP_NE expr_order .
+   58 expr_order: expr_order . OP_GE expr_additive
+   59           | expr_order . OP_LE expr_additive
+   60           | expr_order . OP_GT expr_additive
+   61           | expr_order . OP_LT expr_additive
 
-    OP_PLUS   shift, and go to state 99
-    OP_MINUS  shift, and go to state 100
+    OP_GE  shift, and go to state 97
+    OP_LE  shift, and go to state 98
+    OP_GT  shift, and go to state 99
+    OP_LT  shift, and go to state 100
 
-    $default  reduce using rule 57 (expr_order)
+    $default  reduce using rule 56 (expr_equality)
 
 
 state 134
 
-   58 expr_order: expr_order OP_LT expr_additive .
-   60 expr_additive: expr_additive . OP_PLUS expr_multiplicative
-   61              | expr_additive . OP_MINUS expr_multiplicative
+   58 expr_order: expr_order OP_GE expr_additive .
+   63 expr_additive: expr_additive . OP_PLUS expr_multiplicative
+   64              | expr_additive . OP_MINUS expr_multiplicative
 
-    OP_PLUS   shift, and go to state 99
-    OP_MINUS  shift, and go to state 100
+    OP_PLUS   shift, and go to state 101
+    OP_MINUS  shift, and go to state 102
 
     $default  reduce using rule 58 (expr_order)
 
 
 state 135
 
-   60 expr_additive: expr_additive OP_PLUS expr_multiplicative .
-   63 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
-   64                    | expr_multiplicative . OP_DIVITION expr_object_creation
-   65                    | expr_multiplicative . OP_MODULO expr_object_creation
+   59 expr_order: expr_order OP_LE expr_additive .
+   63 expr_additive: expr_additive . OP_PLUS expr_multiplicative
+   64              | expr_additive . OP_MINUS expr_multiplicative
 
-    OP_MULTIPLICATION  shift, and go to state 101
-    OP_DIVITION        shift, and go to state 102
-    OP_MODULO          shift, and go to state 103
+    OP_PLUS   shift, and go to state 101
+    OP_MINUS  shift, and go to state 102
 
-    $default  reduce using rule 60 (expr_additive)
+    $default  reduce using rule 59 (expr_order)
 
 
 state 136
 
-   61 expr_additive: expr_additive OP_MINUS expr_multiplicative .
-   63 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
-   64                    | expr_multiplicative . OP_DIVITION expr_object_creation
-   65                    | expr_multiplicative . OP_MODULO expr_object_creation
+   60 expr_order: expr_order OP_GT expr_additive .
+   63 expr_additive: expr_additive . OP_PLUS expr_multiplicative
+   64              | expr_additive . OP_MINUS expr_multiplicative
 
-    OP_MULTIPLICATION  shift, and go to state 101
-    OP_DIVITION        shift, and go to state 102
-    OP_MODULO          shift, and go to state 103
+    OP_PLUS   shift, and go to state 101
+    OP_MINUS  shift, and go to state 102
 
-    $default  reduce using rule 61 (expr_additive)
+    $default  reduce using rule 60 (expr_order)
 
 
 state 137
 
-   63 expr_multiplicative: expr_multiplicative OP_MULTIPLICATION expr_object_creation .
+   61 expr_order: expr_order OP_LT expr_additive .
+   63 expr_additive: expr_additive . OP_PLUS expr_multiplicative
+   64              | expr_additive . OP_MINUS expr_multiplicative
 
-    $default  reduce using rule 63 (expr_multiplicative)
+    OP_PLUS   shift, and go to state 101
+    OP_MINUS  shift, and go to state 102
+
+    $default  reduce using rule 61 (expr_order)
 
 
 state 138
 
-   64 expr_multiplicative: expr_multiplicative OP_DIVITION expr_object_creation .
+   63 expr_additive: expr_additive OP_PLUS expr_multiplicative .
+   66 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
+   67                    | expr_multiplicative . OP_DIVITION expr_object_creation
+   68                    | expr_multiplicative . OP_MODULO expr_object_creation
 
-    $default  reduce using rule 64 (expr_multiplicative)
+    OP_MULTIPLICATION  shift, and go to state 103
+    OP_DIVITION        shift, and go to state 104
+    OP_MODULO          shift, and go to state 105
+
+    $default  reduce using rule 63 (expr_additive)
 
 
 state 139
 
-   65 expr_multiplicative: expr_multiplicative OP_MODULO expr_object_creation .
+   64 expr_additive: expr_additive OP_MINUS expr_multiplicative .
+   66 expr_multiplicative: expr_multiplicative . OP_MULTIPLICATION expr_object_creation
+   67                    | expr_multiplicative . OP_DIVITION expr_object_creation
+   68                    | expr_multiplicative . OP_MODULO expr_object_creation
 
-    $default  reduce using rule 65 (expr_multiplicative)
+    OP_MULTIPLICATION  shift, and go to state 103
+    OP_DIVITION        shift, and go to state 104
+    OP_MODULO          shift, and go to state 105
+
+    $default  reduce using rule 64 (expr_additive)
 
 
 state 140
 
-   79 property_access: OP_PROP expr_basic .
+   66 expr_multiplicative: expr_multiplicative OP_MULTIPLICATION expr_object_creation .
 
-    $default  reduce using rule 79 (property_access)
+    $default  reduce using rule 66 (expr_multiplicative)
 
 
 state 141
 
-   99 parameter: expr .
+   67 expr_multiplicative: expr_multiplicative OP_DIVITION expr_object_creation .
 
-    $default  reduce using rule 99 (parameter)
+    $default  reduce using rule 67 (expr_multiplicative)
 
 
 state 142
 
-   80 method_call: LPAR parameters . RPAR
-   98 parameters: parameters . COMA parameter
+   68 expr_multiplicative: expr_multiplicative OP_MODULO expr_object_creation .
 
-    RPAR  shift, and go to state 152
-    COMA  shift, and go to state 153
+    $default  reduce using rule 68 (expr_multiplicative)
 
 
 state 143
 
-   97 parameters: parameter .
+   82 property_access: OP_PROP expr_basic .
 
-    $default  reduce using rule 97 (parameters)
+    $default  reduce using rule 82 (property_access)
 
 
 state 144
 
-   95 parameter_def: type IDENTIFIER .
+  102 parameter: expr .
 
-    $default  reduce using rule 95 (parameter_def)
+    $default  reduce using rule 102 (parameter)
 
 
 state 145
 
-   15 class_constructor: IDENTIFIER LPAR parameters_def RPAR . LCUR instr_set RCUR
+   83 method_call: LPAR parameters . RPAR
+  101 parameters: parameters . COMA parameter
 
-    LCUR  shift, and go to state 154
+    RPAR  shift, and go to state 156
+    COMA  shift, and go to state 157
 
 
 state 146
 
-   94 parameters_def: parameters_def COMA . parameter_def
+  100 parameters: parameter .
 
-    TYPE_INT      shift, and go to state 16
-    TYPE_BOOLEAN  shift, and go to state 17
-    TYPE_CHAR     shift, and go to state 18
-    TYPE_STRING   shift, and go to state 19
-
-    type           go to state 110
-    parameter_def  go to state 155
+    $default  reduce using rule 100 (parameters)
 
 
 state 147
 
-   18 class_instance_method: METHOD type IDENTIFIER . LPAR parameters_def RPAR LCUR instr_set RCUR
-
-    LPAR  shift, and go to state 156
-
-
-state 148
-
-   28 block_if: IF LPAR expr_boolean RPAR . LCUR instr_set RCUR block_else
-
-    LCUR  shift, and go to state 157
-
-
-state 149
-
-   32 block_while: WHILE LPAR expr_boolean RPAR . LCUR instr_set RCUR
-   33            | WHILE LPAR expr_boolean RPAR . instr
+   30 instr_declaration: type IDENTIFIER OP_ASSIGN . expr
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr                            go to state 158
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 148
+
+   98 parameter_def: type IDENTIFIER .
+
+    $default  reduce using rule 98 (parameter_def)
+
+
+state 149
+
+   15 class_constructor: IDENTIFIER LPAR parameters_def RPAR . LCUR instr_set RCUR
+
+    LCUR  shift, and go to state 159
+
+
+state 150
+
+   97 parameters_def: parameters_def COMA . parameter_def
+
+    TYPE_INT      shift, and go to state 16
+    TYPE_BOOLEAN  shift, and go to state 17
+    TYPE_CHAR     shift, and go to state 18
+    TYPE_STRING   shift, and go to state 19
+
+    type           go to state 113
+    parameter_def  go to state 160
+
+
+state 151
+
+   18 class_instance_method: METHOD type IDENTIFIER . LPAR parameters_def RPAR LCUR instr_set RCUR
+
+    LPAR  shift, and go to state 161
+
+
+state 152
+
+   31 block_if: IF LPAR expr_boolean RPAR . LCUR instr_set RCUR block_else
+
+    LCUR  shift, and go to state 162
+
+
+state 153
+
+   35 block_while: WHILE LPAR expr_boolean RPAR . LCUR instr_set RCUR
+   36            | WHILE LPAR expr_boolean RPAR . instr
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2326,135 +2402,144 @@ state 149
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    LCUR            shift, and go to state 158
+    LCUR            shift, and go to state 163
     SEMC            shift, and go to state 46
 
-    instr                           go to state 159
+    instr                           go to state 164
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 150
-
-   67 expr_object_creation: NEW IDENTIFIER LPAR parameters . RPAR
-   98 parameters: parameters . COMA parameter
-
-    RPAR  shift, and go to state 160
-    COMA  shift, and go to state 153
-
-
-state 151
-
-   43 expr_conditional: expr_boolean COND_QUES expr_conditional COND_COLN . expr_conditional
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr_conditional                go to state 161
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-
-
-state 152
-
-   80 method_call: LPAR parameters RPAR .
-
-    $default  reduce using rule 80 (method_call)
-
-
-state 153
-
-   98 parameters: parameters COMA . parameter
-
-    INT             shift, and go to state 31
-    BOOLEAN         shift, and go to state 32
-    CHAR            shift, and go to state 33
-    STRING          shift, and go to state 34
-    IDENTIFIER      shift, and go to state 35
-    NEW             shift, and go to state 38
-    OP_PLUS         shift, and go to state 39
-    OP_MINUS        shift, and go to state 40
-    OP_PLUS_PLUS    shift, and go to state 41
-    OP_MINUS_MINUS  shift, and go to state 42
-    OP_NOT          shift, and go to state 43
-    LPAR            shift, and go to state 44
-
-    expr                            go to state 141
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
-    parameter                       go to state 162
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
 state 154
+
+   70 expr_object_creation: NEW IDENTIFIER LPAR parameters . RPAR
+  101 parameters: parameters . COMA parameter
+
+    RPAR  shift, and go to state 165
+    COMA  shift, and go to state 157
+
+
+state 155
+
+   46 expr_conditional: expr_boolean COND_QUES expr_conditional COND_COLN . expr_conditional
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr_conditional                go to state 166
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+
+
+state 156
+
+   83 method_call: LPAR parameters RPAR .
+
+    $default  reduce using rule 83 (method_call)
+
+
+state 157
+
+  101 parameters: parameters COMA . parameter
+
+    INT             shift, and go to state 31
+    BOOLEAN         shift, and go to state 32
+    CHAR            shift, and go to state 33
+    STRING          shift, and go to state 34
+    IDENTIFIER      shift, and go to state 35
+    NEW             shift, and go to state 38
+    OP_PLUS         shift, and go to state 39
+    OP_MINUS        shift, and go to state 40
+    OP_PLUS_PLUS    shift, and go to state 41
+    OP_MINUS_MINUS  shift, and go to state 42
+    OP_NOT          shift, and go to state 43
+    LPAR            shift, and go to state 44
+
+    expr                            go to state 144
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    parameter                       go to state 167
+
+
+state 158
+
+   30 instr_declaration: type IDENTIFIER OP_ASSIGN expr .
+
+    $default  reduce using rule 30 (instr_declaration)
+
+
+state 159
 
    15 class_constructor: IDENTIFIER LPAR parameters_def RPAR LCUR . instr_set RCUR
 
     $default  reduce using rule 20 (instr_set)
 
-    instr_set  go to state 163
+    instr_set  go to state 168
 
 
-state 155
+state 160
 
-   94 parameters_def: parameters_def COMA parameter_def .
+   97 parameters_def: parameters_def COMA parameter_def .
 
-    $default  reduce using rule 94 (parameters_def)
+    $default  reduce using rule 97 (parameters_def)
 
 
-state 156
+state 161
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR . parameters_def RPAR LCUR instr_set RCUR
 
@@ -2463,60 +2548,60 @@ state 156
     TYPE_CHAR     shift, and go to state 18
     TYPE_STRING   shift, and go to state 19
 
-    $default  reduce using rule 92 (parameters_def)
+    $default  reduce using rule 95 (parameters_def)
 
-    type            go to state 110
-    parameters_def  go to state 164
-    parameter_def   go to state 112
-
-
-state 157
-
-   28 block_if: IF LPAR expr_boolean RPAR LCUR . instr_set RCUR block_else
-
-    $default  reduce using rule 20 (instr_set)
-
-    instr_set  go to state 165
-
-
-state 158
-
-   32 block_while: WHILE LPAR expr_boolean RPAR LCUR . instr_set RCUR
-
-    $default  reduce using rule 20 (instr_set)
-
-    instr_set  go to state 166
-
-
-state 159
-
-   33 block_while: WHILE LPAR expr_boolean RPAR instr .
-
-    $default  reduce using rule 33 (block_while)
-
-
-state 160
-
-   67 expr_object_creation: NEW IDENTIFIER LPAR parameters RPAR .
-
-    $default  reduce using rule 67 (expr_object_creation)
-
-
-state 161
-
-   43 expr_conditional: expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional .
-
-    $default  reduce using rule 43 (expr_conditional)
+    type            go to state 113
+    parameters_def  go to state 169
+    parameter_def   go to state 115
 
 
 state 162
 
-   98 parameters: parameters COMA parameter .
+   31 block_if: IF LPAR expr_boolean RPAR LCUR . instr_set RCUR block_else
 
-    $default  reduce using rule 98 (parameters)
+    $default  reduce using rule 20 (instr_set)
+
+    instr_set  go to state 170
 
 
 state 163
+
+   35 block_while: WHILE LPAR expr_boolean RPAR LCUR . instr_set RCUR
+
+    $default  reduce using rule 20 (instr_set)
+
+    instr_set  go to state 171
+
+
+state 164
+
+   36 block_while: WHILE LPAR expr_boolean RPAR instr .
+
+    $default  reduce using rule 36 (block_while)
+
+
+state 165
+
+   70 expr_object_creation: NEW IDENTIFIER LPAR parameters RPAR .
+
+    $default  reduce using rule 70 (expr_object_creation)
+
+
+state 166
+
+   46 expr_conditional: expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional .
+
+    $default  reduce using rule 46 (expr_conditional)
+
+
+state 167
+
+  101 parameters: parameters COMA parameter .
+
+    $default  reduce using rule 101 (parameters)
+
+
+state 168
 
    15 class_constructor: IDENTIFIER LPAR parameters_def RPAR LCUR instr_set . RCUR
    19 instr_set: instr_set . instr
@@ -2526,6 +2611,10 @@ state 163
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2535,52 +2624,58 @@ state 163
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    RCUR            shift, and go to state 167
+    RCUR            shift, and go to state 172
     SEMC            shift, and go to state 46
 
     instr                           go to state 47
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
-state 164
+state 169
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR parameters_def . RPAR LCUR instr_set RCUR
-   94 parameters_def: parameters_def . COMA parameter_def
+   97 parameters_def: parameters_def . COMA parameter_def
 
-    RPAR  shift, and go to state 168
-    COMA  shift, and go to state 146
+    RPAR  shift, and go to state 173
+    COMA  shift, and go to state 150
 
 
-state 165
+state 170
 
    19 instr_set: instr_set . instr
-   28 block_if: IF LPAR expr_boolean RPAR LCUR instr_set . RCUR block_else
+   31 block_if: IF LPAR expr_boolean RPAR LCUR instr_set . RCUR block_else
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2590,43 +2685,49 @@ state 165
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    RCUR            shift, and go to state 169
+    RCUR            shift, and go to state 174
     SEMC            shift, and go to state 46
 
     instr                           go to state 47
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
-state 166
+state 171
 
    19 instr_set: instr_set . instr
-   32 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set . RCUR
+   35 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set . RCUR
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2636,93 +2737,95 @@ state 166
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    RCUR            shift, and go to state 170
+    RCUR            shift, and go to state 175
     SEMC            shift, and go to state 46
 
     instr                           go to state 47
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
-state 167
+state 172
 
    15 class_constructor: IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR .
 
     $default  reduce using rule 15 (class_constructor)
 
 
-state 168
+state 173
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR parameters_def RPAR . LCUR instr_set RCUR
 
-    LCUR  shift, and go to state 171
+    LCUR  shift, and go to state 176
 
 
-state 169
+state 174
 
-   28 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR . block_else
+   31 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR . block_else
 
-    ELSE  shift, and go to state 172
+    ELSE  shift, and go to state 177
 
-    $default  reduce using rule 31 (block_else)
+    $default  reduce using rule 34 (block_else)
 
-    block_else  go to state 173
-
-
-state 170
-
-   32 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR .
-
-    $default  reduce using rule 32 (block_while)
+    block_else  go to state 178
 
 
-state 171
+state 175
+
+   35 block_while: WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR .
+
+    $default  reduce using rule 35 (block_while)
+
+
+state 176
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR . instr_set RCUR
 
     $default  reduce using rule 20 (instr_set)
 
-    instr_set  go to state 174
+    instr_set  go to state 179
 
 
-state 172
+state 177
 
-   29 block_else: ELSE . LCUR instr_set RCUR
-   30           | ELSE . block_if
+   32 block_else: ELSE . LCUR instr_set RCUR
+   33           | ELSE . block_if
 
     IF    shift, and go to state 36
-    LCUR  shift, and go to state 175
+    LCUR  shift, and go to state 180
 
-    block_if  go to state 176
-
-
-state 173
-
-   28 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else .
-
-    $default  reduce using rule 28 (block_if)
+    block_if  go to state 181
 
 
-state 174
+state 178
+
+   31 block_if: IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else .
+
+    $default  reduce using rule 31 (block_if)
+
+
+state 179
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set . RCUR
    19 instr_set: instr_set . instr
@@ -2732,6 +2835,10 @@ state 174
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2741,66 +2848,72 @@ state 174
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    RCUR            shift, and go to state 177
+    RCUR            shift, and go to state 182
     SEMC            shift, and go to state 46
 
     instr                           go to state 47
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
-state 175
+state 180
 
-   29 block_else: ELSE LCUR . instr_set RCUR
+   32 block_else: ELSE LCUR . instr_set RCUR
 
     $default  reduce using rule 20 (instr_set)
 
-    instr_set  go to state 178
+    instr_set  go to state 183
 
 
-state 176
+state 181
 
-   30 block_else: ELSE block_if .
+   33 block_else: ELSE block_if .
 
-    $default  reduce using rule 30 (block_else)
+    $default  reduce using rule 33 (block_else)
 
 
-state 177
+state 182
 
    18 class_instance_method: METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR .
 
     $default  reduce using rule 18 (class_instance_method)
 
 
-state 178
+state 183
 
    19 instr_set: instr_set . instr
-   29 block_else: ELSE LCUR instr_set . RCUR
+   32 block_else: ELSE LCUR instr_set . RCUR
 
     INT             shift, and go to state 31
     BOOLEAN         shift, and go to state 32
     CHAR            shift, and go to state 33
     STRING          shift, and go to state 34
     IDENTIFIER      shift, and go to state 35
+    TYPE_INT        shift, and go to state 16
+    TYPE_BOOLEAN    shift, and go to state 17
+    TYPE_CHAR       shift, and go to state 18
+    TYPE_STRING     shift, and go to state 19
     IF              shift, and go to state 36
     WHILE           shift, and go to state 37
     NEW             shift, and go to state 38
@@ -2810,35 +2923,37 @@ state 178
     OP_MINUS_MINUS  shift, and go to state 42
     OP_NOT          shift, and go to state 43
     LPAR            shift, and go to state 44
-    RCUR            shift, and go to state 179
+    RCUR            shift, and go to state 184
     SEMC            shift, and go to state 46
 
     instr                           go to state 47
     instr_simple                    go to state 48
     instr_conditional               go to state 49
     instr_loop                      go to state 50
-    block_if                        go to state 51
-    block_while                     go to state 52
-    expr                            go to state 53
-    expr_assignment                 go to state 54
-    expr_conditional                go to state 55
-    expr_boolean                    go to state 56
-    expr_implies                    go to state 57
-    expr_or                         go to state 58
-    expr_and                        go to state 59
-    expr_equality                   go to state 60
-    expr_order                      go to state 61
-    expr_additive                   go to state 62
-    expr_multiplicative             go to state 63
-    expr_object_creation            go to state 64
-    expr_pre_additive_sign_and_not  go to state 65
-    expr_post_additive_or_access    go to state 66
-    expr_basic                      go to state 67
-    built_in                        go to state 68
+    instr_declaration               go to state 51
+    block_if                        go to state 52
+    block_while                     go to state 53
+    expr                            go to state 54
+    expr_assignment                 go to state 55
+    expr_conditional                go to state 56
+    expr_boolean                    go to state 57
+    expr_implies                    go to state 58
+    expr_or                         go to state 59
+    expr_and                        go to state 60
+    expr_equality                   go to state 61
+    expr_order                      go to state 62
+    expr_additive                   go to state 63
+    expr_multiplicative             go to state 64
+    expr_object_creation            go to state 65
+    expr_pre_additive_sign_and_not  go to state 66
+    expr_post_additive_or_access    go to state 67
+    expr_basic                      go to state 68
+    built_in                        go to state 69
+    type                            go to state 70
 
 
-state 179
+state 184
 
-   29 block_else: ELSE LCUR instr_set RCUR .
+   32 block_else: ELSE LCUR instr_set RCUR .
 
-    $default  reduce using rule 29 (block_else)
+    $default  reduce using rule 32 (block_else)
