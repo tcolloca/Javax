@@ -35,6 +35,7 @@ void _addElement(tList * list, void * data) {
 		list->last->next = node;
 	}
 	list->last = node;
+	free(data);
 }
 
 int _isEmpty(tList * list) {

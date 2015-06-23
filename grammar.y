@@ -62,8 +62,22 @@ sumInts(int a, int b) {
 %type <void_pointer> class_constructor 
 %type <void_pointer> class_instance_methods 
 %type <void_pointer> class_instance_method 
+%type <void_pointer> parameters_def
+%type <void_pointer> parameters_def_2
+%type <void_pointer> parameter_def
+%type <void_pointer> instr_set
+%type <void_pointer> instr 
+%type <void_pointer> instr_simple 
+%type <void_pointer> instr_conditional 
+%type <void_pointer> instr_loop
+%type <void_pointer> instr_declaration
+%type <void_pointer> instr_return
+%type <void_pointer> block_if
+%type <void_pointer> block_else
+%type <void_pointer> block_while
+
 %%
- 
+
  /*** Program definition ***/
 
 program:
@@ -152,7 +166,7 @@ class_constructors:
 
 class_constructor:
 	IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
-		tConstructor * constructor = newConstructor($1);
+		tConstructor * constructor = newConstructor($1, $3, $6);
 		$$ = constructor;
 	}
 	;
@@ -173,7 +187,7 @@ class_instance_methods:
 
 class_instance_method:
 	METHOD IDENTIFIER IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
-		tMethod * method = newMethod($2, $3);
+		tMethod * method = newMethod($2, $3, $5, $8);
 		$$ = method;
 	}
 	;
@@ -181,61 +195,128 @@ class_instance_method:
 /*** Instruction IDENTIFIERs definition ***/
 
 instr_set:
-	instr_set instr
+	instr_set instr {
+		_addElement($1, $2);
+		$$ = $1;
+	}
 	|
-	/* empty */
+	/* empty */ {
+		tList * instrs = newInstrs();
+		$$ = instrs;
+	}
 	;
 
 instr:
-	SEMC
+	SEMC {
+		tInstr * instr = newInstr(INSTR_NULL, NULL);
+		$$ = instr;
+	}
 	|
-	instr_simple SEMC
+	instr_simple SEMC {
+		$$ = $1;
+	}
 	|
-	instr_conditional
+	instr_conditional {
+		$$ = $1;
+	}
 	|
-	instr_loop
+	instr_loop {
+		$$ = $1;
+	}
 	;
 
 instr_simple:
-	instr_declaration
+	instr_declaration {
+		$$ = $1;
+	}
 	|
-	expr
+	instr_return {
+		$$ = $1;
+	}
+	|
+	expr {
+		tInstrSimple * instrSimple = newInstrSimple(NULL);
+		tInstr * instr = newInstr(INSTR_SIMPLE, instrSimple);
+		$$ = instr;
+	}
 	;
 
 instr_conditional:
-	block_if
+	block_if {
+		$$ = $1;
+	}
 	;
 
 instr_loop:
-	block_while
+	block_while {
+		$$ = $1;
+	}
 	;
 
 instr_declaration:
-	IDENTIFIER IDENTIFIER
+	IDENTIFIER IDENTIFIER {
+		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
+		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
+		$$ = instr;
+	}
 	|
-	IDENTIFIER IDENTIFIER OP_ASSIGN expr
+	IDENTIFIER IDENTIFIER OP_ASSIGN expr {
+		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
+		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
+		$$ = instr;
+	}
+	;
+
+instr_return:
+	RETURN expr {
+		tInstrReturn * instrReturn = newInstrReturn(NULL);
+		tInstr * instr = newInstr(INSTR_RETURN, instrReturn);
+		$$ = instr;
+	}
 	;
 
 /*** Conditional instructions definition ***/
 
 block_if: //TODO: One-line if
-	IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else
+	IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else {
+		tInstrIf * instrIf = newInstrIf(NULL, $6, $8);
+		tInstr * instr = newInstr(INSTR_IF, instrIf);
+		$$ = instr;
+	}
 	;
 
 block_else: //TODO: One-line else
-	ELSE LCUR instr_set RCUR
+	ELSE LCUR instr_set RCUR {
+		tInstrElse * instrElse = newInstrElse(NULL, $3);
+		$$ = instrElse;
+	}
 	|
-	ELSE block_if
+	ELSE block_if {
+		tInstrElse * instrElse = newInstrElse($2, NULL);
+		$$ = instrElse;
+	}
 	|
-	/* empty */
+	/* empty */ {
+		$$ = NULL;
+	}
 	;
 
 /*** Loop instructions definition ***/
 
 block_while:
-	WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR
+	WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR {
+		tInstrWhile * instrWhile = newInstrWhile(NULL, $6);
+		tInstr * instr = newInstr(INSTR_WHILE, instrWhile);
+		$$ = instr;
+	}
 	|
-	WHILE LPAR expr_boolean RPAR instr
+	WHILE LPAR expr_boolean RPAR instr {
+		tList * instrs = newInstrs();
+		_addElement(instrs, $5);
+		tInstrWhile * instrWhile = newInstrWhile(NULL, instrs);
+		tInstr * instr = newInstr(INSTR_WHILE, instrWhile);
+		$$ = instr;
+	}
 	;
 
 /*** Expressions definitions ***/
@@ -408,15 +489,34 @@ built_in:
 /*** Parameters ***/
 
 parameters_def:
-	/* empty */
+	/* empty */ {
+		tList * defParams = newDefParams();
+		$$ = defParams;
+	}
 	|
-	parameter_def
+	parameters_def_2 {
+		$$ = $1;
+	}
+	;
+
+parameters_def_2:
+	parameter_def {
+		tList * defParams = newDefParams();
+		_addElement(defParams, $1);
+		$$ = defParams;
+	}
 	|
-	parameters_def COMA parameter_def
+	parameters_def_2 COMA parameter_def {
+		_addElement($1, $3);
+		$$ = $1;
+	}
 	;
 
 parameter_def:
-	IDENTIFIER IDENTIFIER
+	IDENTIFIER IDENTIFIER {
+		tDefParam * defParam = newDefParam($1, $2);
+		$$ = defParam;
+	}
 	;
 
 parameters:

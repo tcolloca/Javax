@@ -7,10 +7,10 @@ class class1 {
 		prop1 = 3;
 	}
 
-	method int method1() {
+	method int method1(int param1, char param2) {
 	}
 
-	method char method2() {
+	method char method2(int para1) {
 
 		char var3 = prop2;
 	}
