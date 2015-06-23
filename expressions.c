@@ -4,6 +4,7 @@
 #include "expressions.h"
 #include "compiler_structs.h"
 #include "y.tab.h"
+#include "lib/uthash.h"
 
 char * _int = "int";
 char * _char = "char"; 
@@ -12,6 +13,14 @@ char * _string = "string";
 
 int _true = 1;
 int _false = 0;
+
+typedef struct class {
+	char * name; /* key */ /* owner */
+	tProperty * properties;
+	tConstructor * constructor;
+	tMethod * methods;
+	UT_hash_handle hh; /* hashable */
+} tClass;
 
 typedef struct expr {
 	int type;
@@ -41,6 +50,11 @@ typedef tExprBinary tExprOrder;
 
 typedef tExprBinary tExprArithmetic;
 
+typedef struct exprObjCreation {
+	char * identifier;
+	tParametersList * parameters;
+} tExprObjCreation;
+
 typedef struct exprIdentifier {
 	char * identifier;
 } tExprIdentifier;
@@ -54,6 +68,22 @@ typedef struct value {
 typedef tValue tLValue;
 
 typedef tValue tRValue;
+
+typedef struct object {
+	tObjProperty * properties; /* uthash able */
+} tObject;
+
+typedef tProperty tObjProperty;
+
+typedef struct parametersList {
+	tParameterNode * first;
+	tParameterNode * last;
+} tParametersList;
+
+typedef struct parameterNode {
+	tExpr * expr;
+	tParameterNode * next;
+} tParameterNode;
 
 // TODO: Use solveExprArithmetic
 tRValue * solveExprAssignment(tSymbolsTable * symbolsTable, tExprAssignment * expr, int type) {
@@ -295,12 +325,27 @@ tRValue * solveArithmetic(tSymbolsTable * symbolsTable, tExprArithmetic * expr, 
 	return rValue1;
 }
 
-tSymbol * solveSymbol(tSymbolsTable * symbolsTable, tExprIdentifier * expr) {
-	if(!hasSymbol(symbolsTable, expr->identifier)) {
+tRValue * solveObjCreation(tSymbolsTable * symbolsTable, tExprObjCreation * expr) {
+	tClass * class = getClass(expr->identifier);
+	if (class == NULL) {
+		// TODO: Unknown class.
+		return NULL;
+	}
+	tRValue * rValue = malloc(sizeof(tRValue));
+	tObject * object = malloc(sizeof(tObject));
+	object->properties = NULL;
+	rValue->type = class->name;
+	rValue->value =  NULL;
+	tConstructor * constructor = class->constructor;
+	callFunction(constructor->functionDef, expr->parametersList);
+}
+
+tSymbol * solveSymbol(tSymbolsTable * symbolsTable, char * identifier) {
+	if(!hasSymbol(symbolsTable, identifier)) {
 		// TODO: Unknown variable.
 		return NULL;
 	}
-	tSymbol * symbol = getSymbol(symbolsTable, expr->identifier);
+	tSymbol * symbol = getSymbol(symbolsTable, identifier);
 	return symbol;
 }
 
@@ -369,6 +414,13 @@ tRValue * solveRValue(tSymbolsTable * symbolsTable, tExpr * expr){
 		case E_OP_MOD:
 			return solveArithmetic(symbolsTable, (tExprArithmetic *) expr, E_OP_MOD);
 			break;
+		case E_OP_MOD:
+			return solveArithmetic(symbolsTable, (tExprArithmetic *) expr, E_OP_MOD);
+			break;
+		case E_OBJ_CREATION:
+			return solveObjCreation(symbolsTable, (tExprObjCreation *) expr);	
+			break;
+
 	}
 }
 
@@ -459,4 +511,85 @@ int isType(tRValue * rValue, char * type){
 int isTrue(tRValue * rValue){
 	return *((int *)rValue->value);
 } 
+
+/*** Parameters ***/
+
+/*
+typedef struct parametersList {
+	tParameterNode * first;
+	tParameterNode * last;
+} tParametersList;
+
+typedef struct parameterNode {
+	tExpr * expr;
+	tParameterNode * next;
+} tParameterNode;
+*/
+
+tParametersList * newParametersList() {
+	tParametersList * list = malloc(sizeof(tParametersList));
+	list->first = NULL;
+	list->last = NULL;
+	return list;
+}
+
+void addParameter(tParametersList * parametersList, tExpr * expr) {
+	tParameterNode * parameterNode = malloc(sizeof(tParameterNode));
+	parameterNode->expr = expr;
+	parameterNode->next = NULL;
+
+	if (isParametersListEmpty(parametersList)) {
+		parametersList->first = parameterNode;
+	} else {
+		parametersList->last->next = parameterNode;
+	}
+	parametersList->last = parameterNode;
+}
+
+int isParametersListEmpty(tParametersList * parametersList) {
+	return parametersList->first == NULL;
+}
+
+void deleteParametersList(tParametersList * parametersList) {
+	if (parametersList->first != NULL) {
+		deleteParameterNode(parametersList->first);
+	}
+	free(parametersList);
+}
+
+void deleteParameterNode(tDefParameterNode * parameterNode) {
+	if (parameterNode->next != NULL) {
+		deleteParameterNode(parameterNode->next);
+	}
+	free(parameterNode->name);
+	free(parameterNode);
+}
+
+void addObjProperty(tObjProperty ** properties, char * name, char * type, void * value, int bytes) {
+	tObjProperty * property = malloc(sizeof(tObjProperty));
+	
+	property->name = name;
+	property->type = type;
+
+	property->value = malloc(bytes);
+	property->value = memcpy(property->value, value, bytes);
+
+	property->bytes = bytes;
+	
+	HASH_ADD_KEYPTR(hh, *properties, property->name, nameLen, property);
+}
+
+void deleteObjProperties(tObjProperty * properties) {
+	tObjProperty * property, * tmp;
+
+  	HASH_ITER(hh, properties, property, tmp) {
+    	HASH_DEL(properties, property);
+    	deleteObjProperty(property);
+  	}
+}
+
+void deleteObjProperty(tObjProperty * property) {
+	free(property->value);
+	free(property);
+}
 

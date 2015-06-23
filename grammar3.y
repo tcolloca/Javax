@@ -3,7 +3,181 @@
 #include <string.h>
 #include "compiler_structs.h"
 #include "lib/uthash.h"
-#include "lib/list.h"
+
+// TODO: View how types/names are freed
+
+typedef struct _main {
+	tInstrSet * instrSet; 
+} tMain;
+
+/*
+typedef struct symbolType {
+	char * name; 
+	char * type;
+	UT_hash_handle hh; 
+} tSymbolType; */
+
+typedef struct symbol {
+	char * name; /* key */ /* owner */
+	char * type;
+	void * value; /* owner */
+	int bytes;
+	UT_hash_handle hh; /* hashable */
+} tSymbol;
+
+/*
+typedef struct symbolsList {
+	char * type; 
+	tSymbol * symbols; 
+	UT_hash_handle hh; 
+} tSymbolsList;*/
+
+typedef struct symbolsTable {
+	/*tSymbolType * symbolTypes; /* uthash table */
+	/*tSymbolsList * symbolsLists; /* uthash table */
+	tSymbol * symbols;
+} tSymbolsTable;
+
+typedef struct class {
+	char * name; /* key */ /* owner */
+	tProperty * properties;
+	tConstructor * constructor;
+	tMethod * methods;
+	UT_hash_handle hh; /* hashable */
+} tClass;
+
+typedef tSymbol tProperty;
+
+typedef struct constructor {
+	tFunctionDef * functionDef;
+} tConstructor;
+
+typedef struct method {
+	char * returnType;
+	char * name; /* key */ /* owner */
+	tFunctionDef * functionDef;
+	UT_hash_handle hh; /* hashable */
+} tMethod;
+
+typedef struct functionDef {
+	tDefParameterList * defParameterList;
+	tInstrSet * instrSet;
+} tFunctionDef;
+
+typedef struct defParameterList {
+	tDefParameterNode * first;
+	tDefParameterNode * last;
+} tDefParameterList;
+
+typedef struct defParameterNode {
+	char * type;
+	char * name; /* owner // TODO */
+	tDefParameterNode * next;
+} tDefParameterNode;
+
+typedef struct instrSet {
+	tSymbolsTable * symbolsTable; /* uthash table */
+	tInstrNode * instrFirst; 
+} tInstrSet;
+
+typedef struct instrNode {
+	int type;
+	void * instr;
+	tInstrNode * nextInstr;
+} tInstrNode;
+
+typedef tExpr tInstrSimple;
+
+typedef struct instrDeclaration {
+	char * type;
+	char * identifier; /* owner TODO */
+	tExpr * expr;
+} tInstrDeclaration;
+
+typedef struct instrIf {
+	tExpr * expr;
+	tInstrSet * instrSet;
+	tInstrElse * instrElse;
+} tInstrIf;
+
+typedef struct instrElse {
+	tInstrSet * instrSet;
+	tInstrIf * instrIf;
+} tInstrElse;
+
+typedef struct instrWhile {
+	tExpr * expr;
+	tInstrSet * instrSet;
+} tInstrWhile;
+
+typedef struct instrReturn {
+	tExpr * expr;
+} tInstrReturn;
+
+/*** Expression typedefs ***/
+
+typedef struct expr {
+	int type;
+	void * expression;
+} tExpr;
+
+typedef struct exprBinary {
+	tExpr * expr1;
+	tExpr * expr2;
+} tExprBinary;
+
+typedef struct exprTernary {
+	tExpr * expr1;
+	tExpr * expr2;
+	tExpr * expr3;
+} tExprTernary;
+
+typedef tExprBinary tExprAssignment;
+
+typedef tExprTernary tExprConditional;
+
+typedef tExprBinary tExprBoolean;
+
+typedef tExprBinary tExprEquality;
+
+typedef tExprBinary tExprOrder;
+
+typedef tExprBinary tExprArithmetic;
+
+typedef struct exprObjCreation {
+	char * identifier;
+	tParametersList * parametersList;
+} tExprObjCreation;
+
+typedef struct exprIdentifier {
+	char * identifier;
+} tExprIdentifier;
+
+typedef struct value {
+	char * type;
+	void * value;
+	int bytes;
+} tValue;
+
+typedef tValue tLValue;
+
+typedef tValue tRValue;
+
+typedef struct object {
+	tObjProperty * properties; /* uthash able */
+} tObject;
+
+typedef tProperty tObjProperty;
+
+typedef struct parametersList {
+	tParameterNode * first;
+	tParameterNode * last;
+} tParametersList;
+
+typedef struct parameterNode {
+	tExpr * expr;
+	tParameterNode * next;
+} tParameterNode;
 
 void yyerror(const char *str)
 {
@@ -40,6 +214,7 @@ sumInts(int a, int b) {
 %token <character> CHAR
 %token <string> STRING
 %token <string> IDENTIFIER
+%token TYPE_INT TYPE_BOOLEAN TYPE_CHAR TYPE_STRING
 %token IF ELSE FOR WHILE CONST NEW CLASS METHOD RETURN MAIN
 %token OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
 %token OP_PLUS_PLUS OP_MINUS_MINUS
@@ -51,61 +226,38 @@ sumInts(int a, int b) {
 %token SEMC COMA 
 %token COND_QUES COND_COLN
 
+%type <void_pointer> class_instance_properties
+%type <void_pointer> class_instance_property
+%type <void_pointer> class_constructors
+%type <void_pointer> class_instance_methods
+
 %start program
 
-%type <void_pointer> classes
-%type <void_pointer> main 
-%type <void_pointer> class 
-%type <void_pointer> class_instance_properties 
-%type <void_pointer> class_instance_property 
-%type <void_pointer> class_constructors 
-%type <void_pointer> class_constructor 
-%type <void_pointer> class_instance_methods 
-%type <void_pointer> class_instance_method 
 %%
  
  /*** Program definition ***/
 
 program:
-	classes main {
-		tProgram * program = newProgram();
-		addClasses(program, $1);
-		addMain(program, $2);
-		printProgram(program);
-		deleteProgram(program);
-	}
+	classes main
 	;
 
 classes:
-	classes class {
-		_addElement($1, $2);
-		$$ = $1;
-	}
+	classes class
 	|
-	/* empty */ {
-		tList * classes = newClasses();
-		$$ = classes;
-	}
+	/* empty */
 	; 
 
 main:
-	MAIN LPAR RPAR LCUR instr_set RCUR {
-		tMain * main = newMain("nombreMain");
-		$$ = main;
-	}
+	MAIN LPAR RPAR LCUR instr_set RCUR
 	;
 
  /*** Class definition ***/
 
 class:
 	CLASS IDENTIFIER LCUR class_instance_properties class_constructors class_instance_methods RCUR {
-		tClass * class = newClass($2, $4, $5, $6);
-		$$ = class;
-	}
-	|
-	CLASS IDENTIFIER LCUR class_instance_properties class_instance_methods RCUR {
-		tClass * class = newClass($2, $4, newConstructors(NULL), $5);
-		$$ = class;
+		addClass($2, $4, NULL, NULL);
+		printf("added class\n");
+		printf("class: %s\n", getClass($2)->name);
 	}
 	;
 
@@ -113,72 +265,70 @@ class:
 
 class_instance_properties:
 	class_instance_properties class_instance_property {
-		_addElement($1, $2);
-		$$ = $1;
+		tProperty * properties = $1;
+		addProperty(&properties, $2);
+		$$ = properties;
 	}
 	|
 	/* empty */ {
-		tList * properties = newProperties();
+		tProperty * properties = NULL;
 		$$ = properties;
 	}
 	; 
 
 class_instance_property:
-	IDENTIFIER IDENTIFIER SEMC {
-		tProperty * property = newProperty($1, $2, NULL);
-		$$ = property;
+	type IDENTIFIER SEMC {
+		newProperty($2, $1, NULL, 0);
 	}
+	| 
+	type IDENTIFIER OP_ASSIGN expr {
+		newProperty($2, $1, NULL, 0);
+	}
+	;
+
+var_declaration:
+	type IDENTIFIER
 	|
-	IDENTIFIER IDENTIFIER OP_ASSIGN expr SEMC {
-		tProperty * property = newProperty($1, $2, NULL);
-		$$ = property;
-	}
+	type var_assignment
+	;
+
+var_assignment:
+	IDENTIFIER OP_ASSIGN expr
 	;
 
 	/*** constructors ***/
 
 class_constructors:
 	class_constructors class_constructor {
-		_addElement($1, $2);
-		$$ = $1;
+		return NULL;
 	}
 	|
-	class_constructor {
-		tList * constructors = newConstructors();
-		_addElement(constructors, $1);
-		$$ = constructors;
+	/* empty */  {
+		return NULL;
 	}
 	; 
 
 class_constructor:
-	IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
-		tConstructor * constructor = newConstructor($1);
-		$$ = constructor;
-	}
+	IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
 	;
 
 	/*** methods ***/
 
 class_instance_methods:
 	class_instance_methods class_instance_method {
-		_addElement($1, $2);
-		$$ = $1;
+		return NULL;
 	}
 	|
 	/* empty */ {
-		tList * methods = newMethods();
-		$$ = methods;
+		return NULL;
 	}
 	; 
 
 class_instance_method:
-	METHOD IDENTIFIER IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
-		tMethod * method = newMethod($2, $3);
-		$$ = method;
-	}
+	METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR
 	;
 
-/*** Instruction IDENTIFIERs definition ***/
+/*** Instruction types definition ***/
 
 instr_set:
 	instr_set instr
@@ -211,9 +361,9 @@ instr_loop:
 	;
 
 instr_declaration:
-	IDENTIFIER IDENTIFIER
+	type IDENTIFIER
 	|
-	IDENTIFIER IDENTIFIER OP_ASSIGN expr
+	type IDENTIFIER OP_ASSIGN expr
 	;
 
 /*** Conditional instructions definition ***/
@@ -243,7 +393,7 @@ block_while:
 	/*** General expression ***/
 
 expr: 
-	//TODO BASE: Identifier, raw IDENTIFIER
+	//TODO BASE: Identifier, raw type
 	expr_assignment
 	;
 
@@ -400,9 +550,25 @@ built_in:
 	|
 	BOOLEAN
 	|
-	CHAR
+	CHAR {
+		printf("char: %c \n", $1);
+	}
 	|
-	STRING
+	STRING {
+		printf("string: %s \n", $1);
+	}
+	;
+
+/*** Types ***/
+
+type:
+	TYPE_INT
+	|
+	TYPE_BOOLEAN
+	|
+	TYPE_CHAR
+	|
+	TYPE_STRING
 	;
 
 /*** Parameters ***/
@@ -416,7 +582,7 @@ parameters_def:
 	;
 
 parameter_def:
-	IDENTIFIER IDENTIFIER
+	type IDENTIFIER
 	;
 
 parameters:

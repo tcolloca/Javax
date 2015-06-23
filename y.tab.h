@@ -42,55 +42,51 @@
      CHAR = 260,
      STRING = 261,
      IDENTIFIER = 262,
-     TYPE_INT = 263,
-     TYPE_BOOLEAN = 264,
-     TYPE_CHAR = 265,
-     TYPE_STRING = 266,
-     IF = 267,
-     ELSE = 268,
-     FOR = 269,
-     WHILE = 270,
-     CONST = 271,
-     NEW = 272,
-     CLASS = 273,
-     METHOD = 274,
-     RETURN = 275,
-     MAIN = 276,
-     OP_PLUS = 277,
-     OP_MINUS = 278,
-     OP_MULTIPLICATION = 279,
-     OP_DIVITION = 280,
-     OP_EXP = 281,
-     OP_MODULO = 282,
-     OP_PLUS_PLUS = 283,
-     OP_MINUS_MINUS = 284,
-     OP_EQ = 285,
-     OP_NE = 286,
-     OP_GE = 287,
-     OP_LE = 288,
-     OP_GT = 289,
-     OP_LT = 290,
-     OP_AND = 291,
-     OP_OR = 292,
-     OP_NOT = 293,
-     OP_IMPLIES = 294,
-     OP_ASSIGN = 295,
-     OP_PLUS_SH = 296,
-     OP_MINUS_SH = 297,
-     OP_MULT_SH = 298,
-     OP_DIV_SH = 299,
-     OP_MOD_SH = 300,
-     OP_PROP = 301,
-     LPAR = 302,
-     RPAR = 303,
-     LBRA = 304,
-     RBRA = 305,
-     LCUR = 306,
-     RCUR = 307,
-     SEMC = 308,
-     COMA = 309,
-     COND_QUES = 310,
-     COND_COLN = 311
+     IF = 263,
+     ELSE = 264,
+     FOR = 265,
+     WHILE = 266,
+     CONST = 267,
+     NEW = 268,
+     CLASS = 269,
+     METHOD = 270,
+     RETURN = 271,
+     MAIN = 272,
+     OP_PLUS = 273,
+     OP_MINUS = 274,
+     OP_MULTIPLICATION = 275,
+     OP_DIVITION = 276,
+     OP_EXP = 277,
+     OP_MODULO = 278,
+     OP_PLUS_PLUS = 279,
+     OP_MINUS_MINUS = 280,
+     OP_EQ = 281,
+     OP_NE = 282,
+     OP_GE = 283,
+     OP_LE = 284,
+     OP_GT = 285,
+     OP_LT = 286,
+     OP_AND = 287,
+     OP_OR = 288,
+     OP_NOT = 289,
+     OP_IMPLIES = 290,
+     OP_ASSIGN = 291,
+     OP_PLUS_SH = 292,
+     OP_MINUS_SH = 293,
+     OP_MULT_SH = 294,
+     OP_DIV_SH = 295,
+     OP_MOD_SH = 296,
+     OP_PROP = 297,
+     LPAR = 298,
+     RPAR = 299,
+     LBRA = 300,
+     RBRA = 301,
+     LCUR = 302,
+     RCUR = 303,
+     SEMC = 304,
+     COMA = 305,
+     COND_QUES = 306,
+     COND_COLN = 307
    };
 #endif
 /* Tokens.  */
@@ -99,55 +95,51 @@
 #define CHAR 260
 #define STRING 261
 #define IDENTIFIER 262
-#define TYPE_INT 263
-#define TYPE_BOOLEAN 264
-#define TYPE_CHAR 265
-#define TYPE_STRING 266
-#define IF 267
-#define ELSE 268
-#define FOR 269
-#define WHILE 270
-#define CONST 271
-#define NEW 272
-#define CLASS 273
-#define METHOD 274
-#define RETURN 275
-#define MAIN 276
-#define OP_PLUS 277
-#define OP_MINUS 278
-#define OP_MULTIPLICATION 279
-#define OP_DIVITION 280
-#define OP_EXP 281
-#define OP_MODULO 282
-#define OP_PLUS_PLUS 283
-#define OP_MINUS_MINUS 284
-#define OP_EQ 285
-#define OP_NE 286
-#define OP_GE 287
-#define OP_LE 288
-#define OP_GT 289
-#define OP_LT 290
-#define OP_AND 291
-#define OP_OR 292
-#define OP_NOT 293
-#define OP_IMPLIES 294
-#define OP_ASSIGN 295
-#define OP_PLUS_SH 296
-#define OP_MINUS_SH 297
-#define OP_MULT_SH 298
-#define OP_DIV_SH 299
-#define OP_MOD_SH 300
-#define OP_PROP 301
-#define LPAR 302
-#define RPAR 303
-#define LBRA 304
-#define RBRA 305
-#define LCUR 306
-#define RCUR 307
-#define SEMC 308
-#define COMA 309
-#define COND_QUES 310
-#define COND_COLN 311
+#define IF 263
+#define ELSE 264
+#define FOR 265
+#define WHILE 266
+#define CONST 267
+#define NEW 268
+#define CLASS 269
+#define METHOD 270
+#define RETURN 271
+#define MAIN 272
+#define OP_PLUS 273
+#define OP_MINUS 274
+#define OP_MULTIPLICATION 275
+#define OP_DIVITION 276
+#define OP_EXP 277
+#define OP_MODULO 278
+#define OP_PLUS_PLUS 279
+#define OP_MINUS_MINUS 280
+#define OP_EQ 281
+#define OP_NE 282
+#define OP_GE 283
+#define OP_LE 284
+#define OP_GT 285
+#define OP_LT 286
+#define OP_AND 287
+#define OP_OR 288
+#define OP_NOT 289
+#define OP_IMPLIES 290
+#define OP_ASSIGN 291
+#define OP_PLUS_SH 292
+#define OP_MINUS_SH 293
+#define OP_MULT_SH 294
+#define OP_DIV_SH 295
+#define OP_MOD_SH 296
+#define OP_PROP 297
+#define LPAR 298
+#define RPAR 299
+#define LBRA 300
+#define RBRA 301
+#define LCUR 302
+#define RCUR 303
+#define SEMC 304
+#define COMA 305
+#define COND_QUES 306
+#define COND_COLN 307
 
 
 
@@ -157,17 +149,18 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 28 "grammar.y"
+#line 30 "grammar.y"
 
         int integer;
         int boolean;
         char * string;
         char character;
+        void * void_pointer;
 
 
 
 /* Line 2068 of yacc.c  */
-#line 171 "y.tab.h"
+#line 164 "y.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

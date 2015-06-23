@@ -1,26 +1,13 @@
 #ifndef def_compiler_structs
 #define def_compiler_structs
 
-#include "expressions.h"
+#include "lib/list.h"
 
-#define INSTR_SIMPLE		0
-#define INSTR_DECLARATION	1
-#define INSTR_IF			2
-#define INSTR_WHILE			3
+typedef struct program tProgram;
 
-/*** Typedefs ***/
-
-typedef struct _main tMain;
+typedef struct main tMain;
 
 typedef struct class tClass;
-
-/*typedef struct symbolType tSymbolType;*/
-
-typedef struct symbol tSymbol;
-
-/*typedef struct symbolsList tSymbolsList;*/
-
-typedef struct symbolsTable tSymbolsTable;
 
 typedef struct property tProperty;
 
@@ -28,123 +15,88 @@ typedef struct constructor tConstructor;
 
 typedef struct method tMethod;
 
-typedef struct defParameterList tDefParameterList;
+typedef struct expr tExpr;
 
-typedef struct defParameterNode tDefParameterNode;
+/*** Program ***/
 
-typedef struct instrSet tInstrSet;
+tProgram * newProgram();
 
-typedef struct instrNode tInstrNode;
+void printProgram(tProgram * program);
 
-typedef tExpr tInstrSimple;
+void addClasses(tProgram * program, tList * classes);
 
-typedef struct instrDeclaration tInstrDeclaration;
+void addMain(tProgram * program, tMain * main);
 
-typedef struct instrIf tInstrIf;
-
-typedef struct instrElse tInstrElse;
-
-typedef struct instrWhile tInstrWhile;
+void deleteProgram(tProgram * program);
 
 /*** Main ***/
 
-void solveMain();
+tMain * newMain(char * name);
 
-void deleteMain();
+void printMain(tMain * main);
 
-/*** Symbols ***/
+void deleteMain(tMain * main);
 
-int addSymbol(tSymbolsTable * symbolsTable, char * name, char * type, void * content, int bytes);
+/*** Class ***/
 
-int hasSymbol(tSymbolsTable * symbolsTable, char * name);
+tClass * newClass(char * name, tList * properties, tList * constructors, tList * methods);
 
-tSymbol * getSymbol(tSymbolsTable * symbolsTable, char * name);
+void printClasses(tList * classes);
 
-void deleteSymbolsTable(tSymbolsTable * symbolsTable);
+void printClass(tClass * class);
 
-void deleteSymbols(tSymbol * symbols);
-
-void deleteSymbol(tSymbol * symbol);
-
-void addAll(tSymbolsTable * symbolsTableDest, tSymbolsTable * symbolsTableSrc);
-
-/*** Classes ***/
-
-int addClass(char * name, tProperty * properties, tConstructor * constructor, tMethod * methods);
-
-tClass * getClass(char * name);
+void deleteClasses(tList * classes);
 
 void deleteClass(tClass * class);
 
-/*** Properties ***/
+tList * newClasses();
 
-int addProperty(tProperty ** properties, char * name, char * type, void * content, int bytes);
+/*** Property ***/
 
-tProperty * getProperty(tProperty * properties, char * name);
+tProperty * newProperty(char * type, char * name, tExpr * expr);
 
-void deleteProperties(tProperty * properties);
+void printProperties(tList * properties);
+
+void printProperty(tProperty * property);
+
+void deleteProperties(tList * properties);
 
 void deleteProperty(tProperty * property);
 
-/*** Constructors ***/
+tList * newProperties();
+
+/*** Constructor ***/
+
+tConstructor * newConstructor(char * name);
+
+void printConstructors(tList * constructors);
+
+void printConstructor(tConstructor * constructor);
+
+void deleteConstructors(tList * constructors);
 
 void deleteConstructor(tConstructor * constructor);
 
-/*** Methods ***/
+tList * newConstructors();
 
-int addMethod(tMethod ** methods, char * returnType, char * name, 
-	tDefParameterList * defParameterList, tInstrSet * instrSet);
+/*** Method ***/
 
-tMethod * getMethod(tMethod * methods, char * name);
+tMethod * newMethod(char * returnType, char * name);
 
-void deleteMethods(tMethod * methods);
+void printMethods(tList * methods);
+
+void printMethod(tMethod * method);
+
+void deleteMethods(tList * methods);
 
 void deleteMethod(tMethod * method);
 
-/*** DefParameters ***/
+tList * newMethods();
 
-tDefParameterList * newDefParamsList();
+/*** Expr ***/
 
-void addDefParameter(tDefParameterList * defParameterList, char * type, char * name);
+void printExpr();
 
-int isEmpty(tDefParameterList * defParameterList);
-
-void deleteDefParameterList(tDefParameterList * defParameterList);
-
-void deleteDefParameterNode(tDefParameterNode * defParameterNode);
-
-/*** Instructions ***/
-
-void solveInstrSet(tSymbolsTable * symbolsTable, tInstrSet * instrSet);
-
-void deleteInstrSet(tInstrSet * instrSet);
-
-void solveInstrNode(tSymbolsTable * symbolsTable, tInstrNode * instrNode);
-
-void deleteInstrNode(tInstrNode * instrNode);
-
-void solveInstr(tSymbolsTable * symbolsTable, int type, void * instr);
-
-void deleteInstr(int type, void * instr);
-
-void solveInstrDeclaration(tSymbolsTable * symbolsTable, tInstrDeclaration * instr);
-
-void deleteInstrDeclaration(tInstrDeclaration * instr);
-
-void solveInstrSimple(tSymbolsTable * symbolsTable, tInstrSimple * instr);
-
-void deleteInstrSimple(tInstrSimple * instr);
-
-void solveInstrIf(tSymbolsTable * symbolsTable, tInstrIf * instr);
-
-void deleteInstrIf(tInstrIf * instr);
-
-void solveInstrElse(tSymbolsTable * symbolsTable, tInstrElse * instr);
-
-void deleteInstrElse(tInstrElse * instr);
-
-void solveInstrWhile(tSymbolsTable * symbolsTable, tInstrWhile * instr);
-
-void deleteInstrWhile(tInstrWhile * instr);
+void deleteExpr();
 
 #endif

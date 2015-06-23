@@ -36,12 +36,6 @@ false SAVE_BOOLEAN(FALSE); return BOOLEAN;
 '[[:print:]]{-}[\']' SAVE_CHAR; return CHAR; 
 \"([[:print:]]{-}[\"])*\" SAVE_STRING_VAL; return STRING; //"
 
-int return TYPE_INT;
-boolean return TYPE_BOOLEAN;
-char return TYPE_CHAR;
-string return TYPE_STRING;
-
-
 if return IF;
 else return ELSE;
 for return FOR;

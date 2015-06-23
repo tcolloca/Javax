@@ -1,0 +1,29 @@
+class class1 {
+	int prop1 = 2;
+	char prop2;
+	string prop3;
+
+	class1() {
+		prop1 = 3;
+	}
+
+	method int method1() {
+	}
+
+	method char method2() {
+
+		char var3 = prop2;
+	}
+}
+
+class class2 {
+
+}
+
+main () {
+	class1 person = new class1();
+	while(person.prop1 > 2) {
+		prop1--;
+	}
+}
+
