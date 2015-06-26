@@ -41,11 +41,11 @@ sumInts(int a, int b) {
 %token <string> STRING
 %token <string> IDENTIFIER
 %token IF ELSE FOR WHILE CONST NEW CLASS METHOD RETURN MAIN
-%token OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
-%token OP_PLUS_PLUS OP_MINUS_MINUS
-%token OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
-%token OP_AND OP_OR OP_NOT OP_IMPLIES
-%token OP_ASSIGN OP_PLUS_SH OP_MINUS_SH OP_MULT_SH OP_DIV_SH OP_MOD_SH
+%token <string> OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
+%token <string> OP_PLUS_PLUS OP_MINUS_MINUS
+%token <string> OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
+%token <string> OP_AND OP_OR OP_NOT OP_IMPLIES
+%token <string> OP_ASSIGN OP_PLUS_SH OP_MINUS_SH OP_MULT_SH OP_DIV_SH OP_MOD_SH
 %token OP_PROP
 %token LPAR RPAR LBRA RBRA LCUR RCUR
 %token SEMC COMA 
@@ -75,6 +75,9 @@ sumInts(int a, int b) {
 %type <void_pointer> block_if
 %type <void_pointer> block_else
 %type <void_pointer> block_while
+%type <void_pointer> built_in expr_basic expr_post_additive_or_access expr_pre_additive_sign_and_not expr_equality
+%type <void_pointer> expr_object_creation expr_multiplicative expr_additive expr_order expr_and expr_or
+%type <void_pointer> expr expr_implies expr_boolean expr_conditional expr_assignment parameters parameter
 
 %%
 
@@ -104,7 +107,7 @@ classes:
 
 main:
 	MAIN LPAR RPAR LCUR instr_set RCUR {
-		tMain * main = newMain("nombreMain");
+		tMain * main = newMain($5);
 		$$ = main;
 	}
 	;
@@ -144,7 +147,7 @@ class_instance_property:
 	}
 	|
 	IDENTIFIER IDENTIFIER OP_ASSIGN expr SEMC {
-		tProperty * property = newProperty($1, $2, NULL);
+		tProperty * property = newProperty($1, $2, $4);
 		$$ = property;
 	}
 	;
@@ -235,7 +238,7 @@ instr_simple:
 	}
 	|
 	expr {
-		tInstrSimple * instrSimple = newInstrSimple(NULL);
+		tInstrSimple * instrSimple = newInstrSimple($1);
 		tInstr * instr = newInstr(INSTR_SIMPLE, instrSimple);
 		$$ = instr;
 	}
@@ -243,13 +246,15 @@ instr_simple:
 
 instr_conditional:
 	block_if {
-		$$ = $1;
+		tInstr * instr = newInstr(INSTR_IF, $1);
+		$$ = instr;
 	}
 	;
 
 instr_loop:
 	block_while {
-		$$ = $1;
+		tInstr * instr = newInstr(INSTR_WHILE, $1);
+		$$ = instr;
 	}
 	;
 
@@ -261,7 +266,7 @@ instr_declaration:
 	}
 	|
 	IDENTIFIER IDENTIFIER OP_ASSIGN expr {
-		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
+		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, $4);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
 		$$ = instr;
 	}
@@ -269,7 +274,7 @@ instr_declaration:
 
 instr_return:
 	RETURN expr {
-		tInstrReturn * instrReturn = newInstrReturn(NULL);
+		tInstrReturn * instrReturn = newInstrReturn($2);
 		tInstr * instr = newInstr(INSTR_RETURN, instrReturn);
 		$$ = instr;
 	}
@@ -279,9 +284,8 @@ instr_return:
 
 block_if: //TODO: One-line if
 	IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else {
-		tInstrIf * instrIf = newInstrIf(NULL, $6, $8);
-		tInstr * instr = newInstr(INSTR_IF, instrIf);
-		$$ = instr;
+		tInstrIf * instrIf = newInstrIf($3, $6, $8);
+		$$ = instrIf;
 	}
 	;
 
@@ -305,17 +309,15 @@ block_else: //TODO: One-line else
 
 block_while:
 	WHILE LPAR expr_boolean RPAR LCUR instr_set RCUR {
-		tInstrWhile * instrWhile = newInstrWhile(NULL, $6);
-		tInstr * instr = newInstr(INSTR_WHILE, instrWhile);
-		$$ = instr;
+		tInstrWhile * instrWhile = newInstrWhile($3, $6);
+		$$ = instrWhile;
 	}
 	|
 	WHILE LPAR expr_boolean RPAR instr {
 		tList * instrs = newInstrs();
 		_addElement(instrs, $5);
-		tInstrWhile * instrWhile = newInstrWhile(NULL, instrs);
-		tInstr * instr = newInstr(INSTR_WHILE, instrWhile);
-		$$ = instr;
+		tInstrWhile * instrWhile = newInstrWhile($3, instrs);
+		$$ = instrWhile;
 	}
 	;
 
@@ -325,31 +327,61 @@ block_while:
 
 expr: 
 	//TODO BASE: Identifier, raw IDENTIFIER
-	expr_assignment
+	expr_assignment {
+		$$ = $1;
+	}
 	;
 
 	/*** Assignment expressions (=, +=, -=, *=, /=, %=) ***/
 
 expr_assignment:
-	expr_conditional
+	expr_conditional {
+		$$ = $1;
+	}
+	|//TODO: puse IDENTIFIER a la izq Tom, esta bien?
+	IDENTIFIER OP_ASSIGN expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	|
-	expr_conditional OP_ASSIGN expr_assignment
+	IDENTIFIER OP_PLUS_SH expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	|
-	expr_conditional OP_PLUS_SH expr_assignment
+	IDENTIFIER OP_MINUS_SH expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	|
-	expr_conditional OP_MINUS_SH expr_assignment
+	IDENTIFIER OP_MULT_SH expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	|
-	expr_conditional OP_MULT_SH expr_assignment
+	IDENTIFIER OP_DIV_SH expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	|
-	expr_conditional OP_DIV_SH expr_assignment
-	|
-	expr_conditional OP_MOD_SH expr_assignment
+	IDENTIFIER OP_MOD_SH expr_assignment { 
+		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
+		$$ = expr;
+	}
 	;
 
 	/*** Conditional expression (?:) ***/
 
 expr_conditional:
-	expr_boolean
+	expr_boolean {
+		$$ = $1;
+	}
 	|
 	expr_boolean COND_QUES expr_conditional COND_COLN expr_conditional
 	;
@@ -357,23 +389,31 @@ expr_conditional:
 	/*** Boolean expressions (implies, or, and) ***/
 
 expr_boolean:
-	expr_implies
+	expr_implies {
+		$$ = $1;
+	}
 	;
 
 expr_implies:
-	expr_or
+	expr_or {
+		$$ = $1;
+	}
 	|
 	expr_implies OP_IMPLIES expr_or
 	;
 
 expr_or:
-	expr_and
+	expr_and {
+		$$ = $1;
+	}
 	|
 	expr_or OP_OR expr_and
 	;
 
 expr_and:
-	expr_equality
+	expr_equality {
+		$$ = $1;
+	}
 	|
 	expr_and OP_AND expr_equality
 	;
@@ -381,15 +421,27 @@ expr_and:
 	/*** Relation expressions (==, !=, <=, >=, <, >) ***/
 
 expr_equality:
-	expr_order
+	expr_order {
+		$$ = $1;
+	}
 	|
-	expr_equality OP_EQ expr_order
+	expr_equality OP_EQ expr_order {
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		$$ = expr;
+	}
 	|
-	expr_equality OP_NE expr_order
+	expr_equality OP_NE expr_order {
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		$$ = expr;
+	}
 	;
 
 expr_order:
-	expr_additive
+	expr_additive {
+		$$ = $1;
+	}
 	|
 	expr_order OP_GE expr_additive
 	|
@@ -403,87 +455,153 @@ expr_order:
 	/*** Arithmetic expressions (+,-,*,/,%) ***/
 
 expr_additive:
-	expr_multiplicative
+	expr_multiplicative {
+		$$ = $1;
+	}
 	|
-	expr_additive OP_PLUS expr_multiplicative
+	expr_additive OP_PLUS expr_multiplicative {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_additive OP_MINUS expr_multiplicative
+	expr_additive OP_MINUS expr_multiplicative {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	;
 
 expr_multiplicative:
-	expr_object_creation
+	expr_object_creation {
+		$$ = $1;
+	}
 	|
-	expr_multiplicative OP_MULTIPLICATION expr_object_creation
+	expr_multiplicative OP_MULTIPLICATION expr_object_creation {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_multiplicative OP_DIVITION expr_object_creation
+	expr_multiplicative OP_DIVITION expr_object_creation {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_multiplicative OP_MODULO expr_object_creation
+	expr_multiplicative OP_MODULO expr_object_creation {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	;
 
 	/*** Object creation expression (new) ***/
 
 expr_object_creation:
-	expr_pre_additive_sign_and_not
+	expr_pre_additive_sign_and_not {
+		$$ = $1;
+	}
 	|
-	NEW IDENTIFIER LPAR parameters RPAR
+	NEW IDENTIFIER LPAR parameters RPAR {
+		tObjectCreation * objCreation = newObjCreation($2, $4);
+		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
+		$$ = expr;
+	}
 	;
 
 	/*** Pre additives, sign and not expressions ***/
 
 expr_pre_additive_sign_and_not:
-	expr_post_additive_or_access
+	expr_post_additive_or_access {
+		$$ = $1;
+	}
 	|
-	OP_PLUS_PLUS expr_post_additive_or_access
+	OP_PLUS_PLUS expr_post_additive_or_access {
+	}
 	|
-	OP_MINUS_MINUS expr_post_additive_or_access
+	OP_MINUS_MINUS expr_post_additive_or_access {
+	}
 	|
-	OP_PLUS expr_post_additive_or_access
+	OP_PLUS expr_post_additive_or_access {
+	}
 	|
-	OP_MINUS expr_post_additive_or_access
+	OP_MINUS expr_post_additive_or_access {
+	}
 	|
-	OP_NOT expr_post_additive_or_access
+	OP_NOT expr_post_additive_or_access {
+	}
 	;
 
 	/*** Post additives and access expressions ***/
 
 expr_post_additive_or_access:
-	expr_basic
+	expr_basic {
+		$$ = $1;
+	}
+	| //TODO: Cambie expr_basic por IDENTIFIER (estaba permitiendo cosas como 4++ o "text"++, que creo que no se puede)
+	IDENTIFIER OP_PLUS_PLUS  {
+	}
 	|
-	expr_basic OP_PLUS_PLUS
-	|
-	expr_basic OP_MINUS_MINUS
-	|
+	IDENTIFIER OP_MINUS_MINUS {
+	}
+	| //TODO: Esto permite hacer coas que no se pueden hacer, habria uqe moverlo me parece
 	expr_post_additive_or_access method_call
 	|
 	expr_post_additive_or_access property_access
 	;
 
-property_access:
-	OP_PROP expr_basic
+property_access: //TODO: Cambie cosas aca, esta bien?
+	OP_PROP IDENTIFIER
 	;
 
 method_call:
-	LPAR parameters RPAR
+	OP_PROP IDENTIFIER LPAR parameters RPAR
 	;
 
 	/*** Basic expressions ***/
 
-expr_basic:
-	built_in
+expr_basic: 
+	built_in {
+		tBuiltInExpr * builtIn = $1;
+		tExpr * expr = newExpr(EXPR_BUILT_IN, $1);
+		$$ = expr;
+	}
 	|
-	IDENTIFIER
+	IDENTIFIER {
+		tIdentifier * identifier = newIdentifier($1);
+		tExpr * expr = newExpr(EXPR_IDENTIFIER, identifier);
+		$$ = expr;
+	}
 	|
-	LPAR expr RPAR
+	LPAR expr RPAR {
+		tParenthesisExpr * parenthesisExpr = newParenthesisExpr($2);
+		tExpr * expr = newExpr(EXPR_PARENTHESIS, parenthesisExpr);
+		$$ = expr;
+	}
 	;
 
 built_in:
-	INT
+	INT {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_INT, &$1, sizeof(int));
+		$$ = builtIn;
+	}
 	|
-	BOOLEAN
+	BOOLEAN {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_BOOLEAN, &$1, sizeof(int));
+		$$ = builtIn;
+	}
 	|
-	CHAR
+	CHAR {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_CHAR, &$1, sizeof(char));
+		$$ = builtIn;
+	}
 	|
-	STRING
+	STRING {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_STRING, $1, strlen($1) + 1);
+		free($1);
+		$$ = builtIn;
+	}
 	;
 
 /*** Parameters ***/
@@ -520,15 +638,28 @@ parameter_def:
 	;
 
 parameters:
-	/* empty */
+	/* empty */ {
+		tList * params = newParams();
+		$$ = params;
+	}
 	|
-	parameter
+	parameter {
+		tList * params = newParams();
+		_addElement(params, $1);
+		$$ = params;
+	}
 	|
-	parameters COMA parameter
+	parameters COMA parameter {
+		_addElement($1, $3);
+		$$ = $1;
+	}
 	;
 
 parameter:
-	expr
+	expr {
+		tParam * param = newParam($1);
+		$$ = param;
+	}
 	;
 
 

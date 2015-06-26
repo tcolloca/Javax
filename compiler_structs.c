@@ -10,7 +10,7 @@ typedef struct program {
 } tProgram;
 
 typedef struct main {
-	char * name;
+	tList * instrs;
 } tMain;
 
 typedef struct class {
@@ -44,6 +44,8 @@ typedef struct defParam {
 	char * name;
 } tDefParam;
 
+typedef tExpr tParam;
+
 typedef struct instr {
 	int type;
 	void * instr;
@@ -73,7 +75,43 @@ typedef struct instrWhile {
 
 typedef struct expr {
 	int type;
+	void * expr;
 } tExpr;
+
+typedef struct builtInExpr {
+	int type;
+	void * variable;
+} tBuiltInExpr;
+
+typedef struct assignmentExpr { //TODO: Tom, cambie esto, esta bien?
+	//int type;
+	char * variable;
+	char * op;
+	tExpr * expr;
+} tAssignmentExpr;
+
+typedef struct equalityExpr {
+	tExpr * first;
+	char * op;
+	tExpr * second;
+} tEqualityExpr;
+
+typedef tExpr tParenthesisExpr;
+
+typedef struct identifier {
+	char * name;
+} tIdentifier;
+
+typedef struct objectCreation {
+	char * name;
+	tList * params;
+} tObjectCreation;
+
+typedef struct operationExpr {
+	tExpr * first;
+	char * op;
+	tExpr * second;
+} tOperationExpr;
 
 /*** Program ***/
 
@@ -87,6 +125,7 @@ tProgram * newProgram() {
 void printProgram(tProgram * program) {
 	if (program->classes != NULL) {
 		printClasses(program->classes);
+		printf("\n");
 	}
 	if (program->main != NULL) {
 		printMain(program->main);
@@ -113,19 +152,20 @@ void deleteProgram(tProgram * program) {
 
 /*** Main ***/
 
-tMain * newMain(char * name) {
+tMain * newMain(tList * instrs) {
 	tMain * main = malloc(sizeof(tMain));
-	main->name = strdup(name);
-	free(name);
+	main->instrs = instrs;
 	return main;
 }
 
 void printMain(tMain * main) {
-	printf("main: %s \n", main->name);
+	printf("int main() { \n");
+	printInstrs(main->instrs);
+	printf("}\n");
 }
 
 void deleteMain(tMain * main) {
-	free(main->name);
+	deleteInstrs(main->instrs);
 	free(main);
 }
 
@@ -145,6 +185,7 @@ void printClasses(tList * classes) {
 	_reset(classes);
 	tClass * class;
 	while ((class = _next(classes)) != NULL) {
+		printf("\n");
 		printClass(class);
 	}
 	_reset(classes);
@@ -152,7 +193,7 @@ void printClasses(tList * classes) {
 
 
 void printClass(tClass * class) {
-	printf("class %s {\n", class->name);
+	printf("class %s {\n\n", class->name);
 	printProperties(class->properties);
 	printConstructors(class->constructors);
 	printMethods(class->methods);
@@ -203,7 +244,7 @@ void printProperties(tList * properties) {
 }
 
 void printProperty(tProperty * property) {
-	printf("%s %s", property->type, property->name);
+	printf("\t%s %s", property->type, property->name);
 	if (property->expr != NULL) {
 		printf(" = ");
 		printExpr(property->expr);
@@ -247,17 +288,18 @@ void printConstructors(tList * constructors) {
 	_reset(constructors);
 	tConstructor * constructor;
 	while ((constructor = _next(constructors)) != NULL) {
+		printf("\n");
 		printConstructor(constructor);
 	}
 	_reset(constructors);
 }
 
 void printConstructor(tConstructor * constructor) {
-	printf("%s(", constructor->name);
+	printf("\t%s(", constructor->name);
 	printDefParams(constructor->defParams);
 	printf(") {\n");
 	printInstrs(constructor->instrs);
-	printf("}\n");
+	printf("\t}\n");
 }
 
 void deleteConstructors(tList * constructors) {
@@ -299,17 +341,18 @@ void printMethods(tList * methods) {
 	_reset(methods);
 	tMethod * method;
 	while ((method = _next(methods)) != NULL) {
+		printf("\n");
 		printMethod(method);
 	}
 	_reset(methods);
 }
 
 void printMethod(tMethod * method) {
-	printf("%s %s(", method->returnType, method->name);
+	printf("\t%s %s(", method->returnType, method->name);
 	printDefParams(method->defParams);
 	printf(") {\n");
 	printInstrs(method->instrs);
-	printf("}\n");
+	printf("\t}\n");
 }
 
 void deleteMethods(tList * methods) {
@@ -381,6 +424,40 @@ void deleteDefParam(tDefParam * defParam) {
 
 tList * newDefParams() {
 	return _newList(sizeof(tDefParam));
+}
+
+/*** Params ***/
+
+tParam * newParam(tExpr * expr) {
+	return expr;
+}
+
+void printParams(tList * params) {
+	if (_isEmpty(params)) {
+		return;
+	}
+	_reset(params);
+	tParam * param = _next(params);
+	printExpr(param);
+	while ((param = _next(params)) != NULL) {
+		printf(", ");
+		printExpr(param);
+	}
+	_reset(params);
+}
+
+void deleteParams(tList * params) {
+	_reset(params);
+	tParam * param;
+	while ((param = _next(params)) != NULL) {
+		deleteExpr(param);
+	}
+	_reset(params);
+	_deleteList(params);
+}
+
+tList * newParams() {
+	return _newList(sizeof(tParam));
 }
 
 /*** Instr ***/
@@ -480,8 +557,9 @@ tInstrReturn * newInstrReturn(tExpr * expr) {
 }
 
 void printInstrReturn(tInstrReturn * instrReturn) {
-	printf("return ");
+	printf("\t return ");
 	printExpr(instrReturn);
+	printf(";\n");
 }
 
 void deleteInstrReturn(tInstrReturn * instrReturn) {
@@ -495,8 +573,9 @@ tInstrSimple * newInstrSimple(tExpr * expr) {
 }
 
 void printInstrSimple(tInstrSimple * instrSimple) {
-	printf("return ");
+	printf("\t");
 	printExpr(instrSimple);
+	printf(";\n");
 }
 
 void deleteInstrSimple(tInstrSimple * instrSimple) {
@@ -514,13 +593,15 @@ tInstrIf * newInstrIf(tExpr * expr, tList * instrs, tInstrElse * instrElse) {
 }
 
 void printInstrIf(tInstrIf * instrIf) {
-	printf("if (");
+	printf("\tif (");
 	printExpr(instrIf->expr);
 	printf(") {\n");
 	printInstrs(instrIf->instrs);
-	printf("}\n");
+	printf("\t}");
 	if (instrIf->instrElse != NULL) {
 		printInstrElse(instrIf->instrElse);
+	} else {
+		printf("\n");
 	}
 }
 
@@ -549,7 +630,7 @@ void printInstrElse(tInstrElse * instrElse) {
 	} else {
 		printf("{\n");
 		printInstrs(instrElse->instrs);
-		printf("}\n");
+		printf("\t}\n");
 	}
 }
 
@@ -572,11 +653,11 @@ tInstrWhile * newInstrWhile(tExpr * expr, tList * instrs) {
 }
 
 void printInstrWhile(tInstrWhile * instrWhile) {
-	printf("while (");
-	printExpr(instrWhile->expr);
+	printf("\twhile (");
+	//printExpr(instrWhile->expr); //TODO: Descomentar linea cuando funcionen expresiones
 	printf(") {\n");
 	printInstrs(instrWhile->instrs);
-	printf("}\n");
+	printf("\t}\n");
 }
 
 void deleteInstrWhile(tInstrWhile * instrWhile) {
@@ -587,6 +668,226 @@ void deleteInstrWhile(tInstrWhile * instrWhile) {
 
 /*** Expr ***/
 
-void printExpr(tExpr * expr){}
+tExpr * newExpr(int type, void * expr) {
+	tExpr * newExpr = malloc(sizeof(tExpr));
+	newExpr->type = type;
+	newExpr->expr = expr;
+	return newExpr;
+}
 
-void deleteExpr(tExpr * expr){}
+void printExpr(tExpr * expr) {
+	switch (expr->type) {
+		case EXPR_BUILT_IN:
+			printBuiltIn(expr->expr);
+			break;	
+		case EXPR_ASSIGNMENT:
+			printAssignmentExpr(expr->expr);
+			break;
+		case EXPR_PARENTHESIS:
+			printParenthesisExpr(expr->expr);
+			break;
+		case EXPR_IDENTIFIER:
+			printIdentifier(expr->expr);
+			break;
+		case EXPR_EQUALITY:
+			printEqualityExpr(expr->expr);
+			break;
+		case EXPR_OBJ_CREATION:
+			printObjCreation(expr->expr);
+			break;
+		case EXPR_OPERATION:
+			printOperationExpr(expr->expr);
+			break;
+	}
+}
+
+void deleteExpr(tExpr * expr) {
+	switch (expr->type) {
+		case EXPR_BUILT_IN:
+			deleteBuiltIn(expr->expr);
+			break;	
+		case EXPR_ASSIGNMENT:
+			deleteAssignmentExpr(expr->expr);
+			break;
+		case EXPR_PARENTHESIS:
+			deleteParenthesisExpr(expr->expr);
+			break;
+		case EXPR_IDENTIFIER:
+			deleteIdentifier(expr->expr);
+			break;
+		case EXPR_EQUALITY:
+			deleteEqualityExpr(expr->expr);
+			break;
+		case EXPR_OBJ_CREATION:
+			deleteObjCreation(expr->expr);
+			break;
+		case EXPR_OPERATION:
+			deleteOperationExpr(expr->expr);
+			break;
+	}
+}
+
+
+/*** BuiltInExpr ***/
+
+tBuiltInExpr * newBuiltIn(int type, void * variable, int bytes) {
+	tBuiltInExpr * builtIn = malloc(sizeof(tBuiltInExpr));
+	builtIn->type = type;
+	builtIn->variable = malloc(bytes);
+	builtIn->variable = memcpy(builtIn->variable, variable, bytes);
+	return builtIn;
+}
+
+void printBuiltIn(tBuiltInExpr * builtIn) {
+	switch (builtIn->type) {
+		case INPUT_INT:
+			printf("%d", *(int *) builtIn->variable);
+			break;	
+		case INPUT_BOOLEAN:
+			printf("%s",(*(int *) builtIn->variable) ? "true" : "false");
+			break;
+		case INPUT_CHAR:
+			printf("\'%c\'",*(char *) builtIn->variable);
+			break;
+		case INPUT_STRING:
+			printf("\"%s\"",(char *) builtIn->variable);
+			break;
+	}
+}
+
+void deleteBuiltIn(tBuiltInExpr * builtIn) {
+	if (builtIn->type == INPUT_STRING) free((char *) builtIn->variable);
+}
+
+/*** AssignmentExpr ***/
+
+tAssignmentExpr * newAssignmentExpr(char * variable, char * op, tExpr * expr) {
+	tAssignmentExpr * assignmentExpr = malloc(sizeof(tAssignmentExpr));
+	assignmentExpr->variable = strdup(variable);
+	free(variable);
+	assignmentExpr->op = strdup(op);
+	free(op);
+	assignmentExpr->expr = expr;
+	return assignmentExpr;
+}
+
+void printAssignmentExpr(tAssignmentExpr * assignmentExpr) {
+	printf("%s %s ", assignmentExpr->variable, assignmentExpr->op);
+	printExpr(assignmentExpr->expr);
+}
+
+void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr) {
+	free(assignmentExpr->variable);
+	free(assignmentExpr->op);
+	deleteExpr(assignmentExpr->expr);
+	free(assignmentExpr);
+}
+
+/*** Equality ***/
+
+tEqualityExpr * newEqualityExpr(tExpr * first, char * op, tExpr * second) {
+	tEqualityExpr * equalityExpr = malloc(sizeof(tEqualityExpr));
+	equalityExpr->first = first;
+	equalityExpr->op = strdup(op);
+	free(op);
+	equalityExpr->second = second;
+	return equalityExpr;
+}
+
+void printEqualityExpr(tEqualityExpr * equalityExpr) {
+	printExpr(equalityExpr->first);
+	printf(" %s ", equalityExpr->op);
+	printExpr(equalityExpr->second);
+}
+
+void deleteEqualityExpr(tEqualityExpr * equalityExpr) {
+	deleteExpr(equalityExpr->first);
+	free(equalityExpr->op);
+	deleteExpr(equalityExpr->second);
+	free(equalityExpr);
+}
+
+/*** Identifier ***/
+
+tIdentifier * newIdentifier(char * name) {
+	tIdentifier * identifier = malloc(sizeof(tIdentifier));
+	identifier->name = strdup(name);
+	free(name);
+	return identifier;
+}
+
+void printIdentifier(tIdentifier * identifier) {
+	printf("%s", identifier->name);
+}
+
+void deleteIdentifier(tIdentifier * identifier) {
+	free(identifier->name);
+	free(identifier);
+}
+
+/*** ParenthesisExpr ***/
+
+tParenthesisExpr * newParenthesisExpr(tExpr * expr) {
+	tParenthesisExpr * parenthesisExpr = malloc(sizeof(tParenthesisExpr));
+	parenthesisExpr->expr = expr;
+	return parenthesisExpr;
+}
+
+void printParenthesisExpr(tParenthesisExpr * parenthesisExpr) {
+	printf("(");
+	printExpr(parenthesisExpr->expr);
+	printf(")");
+}
+
+void deleteParenthesisExpr(tParenthesisExpr * parenthesisExpr) {
+	deleteExpr(parenthesisExpr->expr);
+	free(parenthesisExpr);
+}
+
+/*** Object Creation ***/
+
+tObjectCreation * newObjCreation(char * name, tList * params) {
+	tObjectCreation * objCreation = malloc(sizeof(tObjectCreation));
+	objCreation->name = strdup(name);
+	free(name);
+	objCreation->params = params;
+	return objCreation;
+}
+
+void printObjCreation(tObjectCreation * objCreation) {
+	printf("new %s(", objCreation->name);
+	printParams(objCreation->params);
+	printf(")");
+}
+
+void deleteObjCreation(tObjectCreation * objCreation) {
+	deleteDefParams(objCreation->params);
+	free(objCreation);
+}
+
+/*** Operation Expr ***/
+
+tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second) {
+	tOperationExpr * operationExpr = malloc(sizeof(tOperationExpr));
+	operationExpr->first = first;
+	operationExpr->op = strdup(op);
+	free(op);
+	operationExpr->second = second;
+	return operationExpr;
+}
+
+void printOperationExpr(tOperationExpr * operationExpr) {
+	printExpr(operationExpr->first);
+	printf(" %s ", operationExpr->op);
+	printExpr(operationExpr->second);
+}
+
+void deleteOperationExpr(tOperationExpr * operationExpr) {
+	deleteExpr(operationExpr->first);
+	free(operationExpr->op);
+	deleteExpr(operationExpr->second);
+	free(operationExpr);
+}
+
+
+

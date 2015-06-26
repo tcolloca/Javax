@@ -3,12 +3,25 @@
 
 #include "lib/list.h"
 
-#define INSTR_NULL			0
-#define INSTR_DECLARATION	1
-#define INSTR_RETURN		2
-#define INSTR_SIMPLE		3
-#define INSTR_IF			4
-#define INSTR_WHILE			5
+#define INSTR_NULL				0
+#define INSTR_DECLARATION		1
+#define INSTR_RETURN			2
+#define INSTR_SIMPLE			3
+#define INSTR_IF				4
+#define INSTR_WHILE				5
+
+#define INPUT_INT 			0
+#define INPUT_BOOLEAN 		1
+#define INPUT_CHAR 			2
+#define INPUT_STRING 		3
+
+#define EXPR_BUILT_IN			0
+#define EXPR_ASSIGNMENT			1
+#define EXPR_PARENTHESIS		2
+#define EXPR_IDENTIFIER			3
+#define EXPR_EQUALITY			4
+#define EXPR_OBJ_CREATION		5
+#define EXPR_OPERATION			6
 
 typedef struct program tProgram;
 
@@ -30,6 +43,8 @@ typedef tProperty tInstrDeclaration;
 
 typedef struct expr tExpr;
 
+typedef tExpr tParam;
+
 typedef tExpr tInstrReturn;
 
 typedef tExpr tInstrSimple;
@@ -39,6 +54,20 @@ typedef struct instrIf tInstrIf;
 typedef struct instrElse tInstrElse;
 
 typedef struct instrWhile tInstrWhile;
+
+typedef struct builtInExpr tBuiltInExpr;
+
+typedef struct assignmentExpr tAssignmentExpr;
+
+typedef struct equalityExpr tEqualityExpr;
+
+typedef tExpr tParenthesisExpr;
+
+typedef struct identifier tIdentifier;
+
+typedef struct objectCreation tObjectCreation;
+
+typedef struct operationExpr tOperationExpr;
 
 /*** Program ***/
 
@@ -54,7 +83,7 @@ void deleteProgram(tProgram * program);
 
 /*** Main ***/
 
-tMain * newMain(char * name);
+tMain * newMain(tList * instrs);
 
 void printMain(tMain * main);
 
@@ -131,6 +160,16 @@ void deleteDefParam(tDefParam * defparam);
 
 tList * newDefParams();
 
+/*** Params ***/
+
+tParam * newParam(tExpr * expr);
+
+void printParams(tList * params);
+
+void deleteParams(tList * params);
+
+tList * newParams();
+
 /*** Instr ***/
 
 tInstr * newInstr(int type, void * instrTrue);
@@ -195,8 +234,66 @@ void deleteInstrWhile(tInstrWhile * instrWhile);
 
 /*** Expr ***/
 
+tExpr * newExpr(int type, void * expr);
+
 void printExpr(tExpr * expr);
 
 void deleteExpr(tExpr * expr);
+
+/*** BuiltInExpr ***/
+
+tBuiltInExpr * newBuiltIn(int type, void * variable, int bytes);
+
+void printBuiltIn(tBuiltInExpr * builtIn);
+
+void deleteBuiltIn(tBuiltInExpr * builtIn) ;
+
+/*** AssignmentExpr ***/
+
+tAssignmentExpr * newAssignmentExpr(char * variable, char * op, tExpr * expr);
+
+void printAssignmentExpr(tAssignmentExpr * assignmentExpr);
+
+void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr);
+
+/*** EqualityExpr ***/
+
+tEqualityExpr * newEqualityExpr(tExpr * first, char * op, tExpr * second);
+
+void printEqualityExpr(tEqualityExpr * equalityExpr);
+
+void deleteEqualityExpr(tEqualityExpr * equalityExpr) ;
+
+/*** Identifier ***/
+
+tIdentifier * newIdentifier(char * name);
+
+void printIdentifier(tIdentifier * identifier);
+
+void deleteIdentifier(tIdentifier * identifier);
+
+/*** ParenthesisExpr ***/
+
+tParenthesisExpr * newParenthesisExpr(tExpr * expr);
+
+void printParenthesisExpr(tParenthesisExpr * parenthesisExpr);
+
+void deleteParenthesisExpr(tParenthesisExpr * parenthesisExpr);
+
+/*** Object Creation ***/
+
+tObjectCreation * newObjCreation(char * name, tList * params);
+
+void printObjCreation(tObjectCreation * objCreation);
+
+void deleteObjCreation(tObjectCreation * objCreation);
+
+/*** Operation Expr ***/
+
+tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second);
+
+void printOperationExpr(tOperationExpr * operationExpr);
+
+void deleteOperationExpr(tOperationExpr * operationExpr);
 
 #endif

@@ -1,13 +1,20 @@
 class class1 {
-	int prop1 = 2;
-	char prop2;
-	string prop3;
 
-	class1() {
-		prop1 = 3;
+	int prop1 = 2;
+	char prop2 = 'c';
+	String prop3 = "ASD";
+	boolean b1 = (true);
+	boolean b2 = false;
+	asd asd = zxc;
+
+	class1(int prop2) {
+		prop1 = (7 + 8 * 2) % 4;
+		prop1 += prop1.getName();
+		prop2++;
 	}
 
 	method int method1(int param1, char param2) {
+		return param1;
 	}
 
 	method char method2(int para1) {
@@ -21,7 +28,15 @@ class class2 {
 }
 
 main () {
-	class1 person = new class1();
+	new person(age, sth);
+	class1 person = new class1("asd", true);
+	if (true == false) {
+		int a = 3;
+	} else if("asd" == "qwe") {
+		c = 'd';
+	} else {
+		person.getOther(param);
+	} 
 	while(person.prop1 > 2) {
 		prop1--;
 	}

@@ -559,19 +559,18 @@ extern YYSTYPE yylval;
 #define SAVE_STRING_VAL yylval.string = getString(yytext)
 
 char getChar(char * string) {
-	char * ans = malloc(1);
-	memcpy(ans, string + 1, 1);
-	return ans[0];
+	return string[1];
 }
 
 char * getString(char * string) {
 	int len = strlen(string);
 	char * ans = malloc(len-2);
-	memcpy(ans, string + 1, len - 2);
+	memcpy(ans, string + 1, len - 1);
+	ans[len-2] = '\0';
 	return ans;
 }
 
-#line 575 "lex.yy.c"
+#line 574 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -758,9 +757,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 32 "tokens.l"
+#line 31 "tokens.l"
 
-#line 764 "lex.yy.c"
+#line 763 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -845,303 +844,303 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "tokens.l"
+#line 32 "tokens.l"
 SAVE_INT; return INT;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "tokens.l"
+#line 33 "tokens.l"
 SAVE_BOOLEAN(TRUE); return BOOLEAN;
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "tokens.l"
+#line 34 "tokens.l"
 SAVE_BOOLEAN(FALSE); return BOOLEAN;
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "tokens.l"
+#line 35 "tokens.l"
 SAVE_CHAR; return CHAR; 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 37 "tokens.l"
+#line 36 "tokens.l"
 SAVE_STRING_VAL; return STRING; //"
 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 39 "tokens.l"
+#line 38 "tokens.l"
 return IF;
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 40 "tokens.l"
+#line 39 "tokens.l"
 return ELSE;
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 41 "tokens.l"
+#line 40 "tokens.l"
 return FOR;
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 42 "tokens.l"
+#line 41 "tokens.l"
 return WHILE;
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 43 "tokens.l"
+#line 42 "tokens.l"
 return CONST;
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 44 "tokens.l"
+#line 43 "tokens.l"
 return NEW;
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 45 "tokens.l"
+#line 44 "tokens.l"
 return CLASS;
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 46 "tokens.l"
+#line 45 "tokens.l"
 return METHOD;
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 47 "tokens.l"
+#line 46 "tokens.l"
 return MAIN;
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 48 "tokens.l"
+#line 47 "tokens.l"
 return RETURN;
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 50 "tokens.l"
+#line 49 "tokens.l"
 return OP_PLUS_PLUS;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 51 "tokens.l"
+#line 50 "tokens.l"
 return OP_MINUS_MINUS;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 53 "tokens.l"
-return OP_PLUS;
+#line 52 "tokens.l"
+SAVE_STRING; return OP_PLUS;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 54 "tokens.l"
-return OP_MINUS;
+#line 53 "tokens.l"
+SAVE_STRING; return OP_MINUS;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 55 "tokens.l"
-return OP_MULTIPLICATION;
+#line 54 "tokens.l"
+SAVE_STRING; return OP_MULTIPLICATION;
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 56 "tokens.l"
-return OP_DIVITION;
+#line 55 "tokens.l"
+SAVE_STRING; return OP_DIVITION;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 57 "tokens.l"
-return OP_EXP;
+#line 56 "tokens.l"
+SAVE_STRING; return OP_EXP;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 58 "tokens.l"
-return OP_MODULO;
+#line 57 "tokens.l"
+SAVE_STRING; return OP_MODULO;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 60 "tokens.l"
-return OP_EQ;
+#line 59 "tokens.l"
+SAVE_STRING; return OP_EQ;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 61 "tokens.l"
-return OP_NE;
+#line 60 "tokens.l"
+SAVE_STRING; return OP_NE;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 62 "tokens.l"
-return OP_GE;
+#line 61 "tokens.l"
+SAVE_STRING; return OP_GE;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 63 "tokens.l"
-return OP_GE;
+#line 62 "tokens.l"
+SAVE_STRING; return OP_GE;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 64 "tokens.l"
-return OP_LE;
+#line 63 "tokens.l"
+SAVE_STRING; return OP_LE;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 65 "tokens.l"
-return OP_LE;
+#line 64 "tokens.l"
+SAVE_STRING; return OP_LE;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 66 "tokens.l"
-return OP_GT;
+#line 65 "tokens.l"
+SAVE_STRING; return OP_GT;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 67 "tokens.l"
-return OP_LT;
+#line 66 "tokens.l"
+SAVE_STRING; return OP_LT;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 69 "tokens.l"
-return OP_AND;
+#line 68 "tokens.l"
+SAVE_STRING; return OP_AND;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 70 "tokens.l"
-return OP_OR;
+#line 69 "tokens.l"
+SAVE_STRING; return OP_OR;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 71 "tokens.l"
-return OP_AND;
+#line 70 "tokens.l"
+SAVE_STRING; return OP_AND;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 72 "tokens.l"
-return OP_OR;
+#line 71 "tokens.l"
+SAVE_STRING; return OP_OR;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 73 "tokens.l"
-return OP_NOT;
+#line 72 "tokens.l"
+SAVE_STRING; return OP_NOT;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 74 "tokens.l"
-return OP_IMPLIES;
+#line 73 "tokens.l"
+SAVE_STRING; return OP_IMPLIES;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 75 "tokens.l"
-return OP_IMPLIES;
+#line 74 "tokens.l"
+SAVE_STRING; return OP_IMPLIES;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 77 "tokens.l"
-return OP_ASSIGN;
+#line 76 "tokens.l"
+SAVE_STRING; return OP_ASSIGN;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 78 "tokens.l"
-return OP_PLUS_SH;
+#line 77 "tokens.l"
+SAVE_STRING; return OP_PLUS_SH;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 79 "tokens.l"
-return OP_MINUS_SH;
+#line 78 "tokens.l"
+SAVE_STRING; return OP_MINUS_SH;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 80 "tokens.l"
-return OP_MULT_SH;
+#line 79 "tokens.l"
+SAVE_STRING; return OP_MULT_SH;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 81 "tokens.l"
-return OP_DIV_SH;
+#line 80 "tokens.l"
+SAVE_STRING; return OP_DIV_SH;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 82 "tokens.l"
-return OP_MOD_SH;
+#line 81 "tokens.l"
+SAVE_STRING; return OP_MOD_SH;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 84 "tokens.l"
+#line 83 "tokens.l"
 return COND_QUES;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 85 "tokens.l"
+#line 84 "tokens.l"
 return COND_COLN;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 87 "tokens.l"
+#line 86 "tokens.l"
 return OP_PROP;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 89 "tokens.l"
+#line 88 "tokens.l"
 return LPAR;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 90 "tokens.l"
+#line 89 "tokens.l"
 return RPAR;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 91 "tokens.l"
+#line 90 "tokens.l"
 return LBRA;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 92 "tokens.l"
+#line 91 "tokens.l"
 return RBRA;
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 93 "tokens.l"
+#line 92 "tokens.l"
 return LCUR;
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 94 "tokens.l"
+#line 93 "tokens.l"
 return RCUR;
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 96 "tokens.l"
+#line 95 "tokens.l"
 return SEMC;
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 97 "tokens.l"
+#line 96 "tokens.l"
 return COMA;
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 99 "tokens.l"
+#line 98 "tokens.l"
 SAVE_STRING; return IDENTIFIER;
 	YY_BREAK
 case 57:
 /* rule 57 can match eol */
 YY_RULE_SETUP
-#line 101 "tokens.l"
+#line 100 "tokens.l"
 ;
 	YY_BREAK
 case 58:
 /* rule 58 can match eol */
 YY_RULE_SETUP
-#line 102 "tokens.l"
+#line 101 "tokens.l"
 ; 
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 104 "tokens.l"
+#line 103 "tokens.l"
 ECHO;
 	YY_BREAK
-#line 1145 "lex.yy.c"
+#line 1144 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2139,7 +2138,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 104 "tokens.l"
+#line 103 "tokens.l"
 
 
 

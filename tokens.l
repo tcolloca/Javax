@@ -15,15 +15,14 @@ extern YYSTYPE yylval;
 #define SAVE_STRING_VAL yylval.string = getString(yytext)
 
 char getChar(char * string) {
-	char * ans = malloc(1);
-	memcpy(ans, string + 1, 1);
-	return ans[0];
+	return string[1];
 }
 
 char * getString(char * string) {
 	int len = strlen(string);
 	char * ans = malloc(len-2);
-	memcpy(ans, string + 1, len - 2);
+	memcpy(ans, string + 1, len - 1);
+	ans[len-2] = '\0';
 	return ans;
 }
 
@@ -50,36 +49,36 @@ main return MAIN;
 \+\+ return OP_PLUS_PLUS;
 \-\- return OP_MINUS_MINUS;
 
-\+ return OP_PLUS;
-- return OP_MINUS;
-\* return OP_MULTIPLICATION;
-\/ return OP_DIVITION;
-\^ return OP_EXP;
-\% return OP_MODULO;
+\+ SAVE_STRING; return OP_PLUS;
+- SAVE_STRING; return OP_MINUS;
+\* SAVE_STRING; return OP_MULTIPLICATION;
+\/ SAVE_STRING; return OP_DIVITION;
+\^ SAVE_STRING; return OP_EXP;
+\% SAVE_STRING; return OP_MODULO;
 
-\=\= return OP_EQ;
-!\= return OP_NE;
-\>\= return OP_GE;
-\=\> return OP_GE;
-\<\= return OP_LE;
-\=\< return OP_LE;
-\> return OP_GT;
-\< return OP_LT;
+\=\= SAVE_STRING; return OP_EQ;
+!\= SAVE_STRING; return OP_NE;
+\>\= SAVE_STRING; return OP_GE;
+\=\> SAVE_STRING; return OP_GE;
+\<\= SAVE_STRING; return OP_LE;
+\=\< SAVE_STRING; return OP_LE;
+\> SAVE_STRING; return OP_GT;
+\< SAVE_STRING; return OP_LT;
 
-&& return OP_AND;
-\|\| return OP_OR;
-and return OP_AND;
-or return OP_OR;
-\! return OP_NOT;
-implies return OP_IMPLIES;
--\> return OP_IMPLIES;
+&& SAVE_STRING; return OP_AND;
+\|\| SAVE_STRING; return OP_OR;
+and SAVE_STRING; return OP_AND;
+or SAVE_STRING; return OP_OR;
+\! SAVE_STRING; return OP_NOT;
+implies SAVE_STRING; return OP_IMPLIES;
+-\> SAVE_STRING; return OP_IMPLIES;
 
-\= return OP_ASSIGN;
-\+\= return OP_PLUS_SH;
--\= return OP_MINUS_SH;
-\*\= return OP_MULT_SH;
-\/\= return OP_DIV_SH;
-\%\= return OP_MOD_SH;
+\= SAVE_STRING; return OP_ASSIGN;
+\+\= SAVE_STRING; return OP_PLUS_SH;
+-\= SAVE_STRING; return OP_MINUS_SH;
+\*\= SAVE_STRING; return OP_MULT_SH;
+\/\= SAVE_STRING; return OP_DIV_SH;
+\%\= SAVE_STRING; return OP_MOD_SH;
 
 \? return COND_QUES;
 \: return COND_COLN;
