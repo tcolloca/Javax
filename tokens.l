@@ -13,6 +13,7 @@ extern YYSTYPE yylval;
 #define SAVE_BOOLEAN(x) yylval.boolean = x 
 #define SAVE_CHAR yylval.character = getChar(yytext)
 #define SAVE_STRING_VAL yylval.string = getString(yytext)
+#define SAVE_STRING_2 yylval.string = strdup(yytext)
 
 char getChar(char * string) {
 	return string[1];
@@ -20,7 +21,7 @@ char getChar(char * string) {
 
 char * getString(char * string) {
 	int len = strlen(string);
-	char * ans = malloc(len-2);
+	char * ans = malloc(len - 1);
 	memcpy(ans, string + 1, len - 1);
 	ans[len-2] = '\0';
 	return ans;
@@ -95,7 +96,7 @@ implies SAVE_STRING; return OP_IMPLIES;
 \; return SEMC;
 \, return COMA;
 
-(?:[a-zA-Z_][a-zA-Z_0-9]*) SAVE_STRING; return IDENTIFIER;
+(?:[a-zA-Z_][a-zA-Z_0-9]*) SAVE_STRING_2; return IDENTIFIER;
 
 \n ;
 [ \t\n]+ ; 

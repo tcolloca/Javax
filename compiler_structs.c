@@ -521,7 +521,7 @@ void deleteInstrs(tList * instrs) {
 	_deleteList(instrs);
 }
 
-void deleteInstr(tInstr * instr){
+void deleteInstr(tInstr * instr) {
 	switch (instr->type) {
 		case INSTR_NULL:
 			return;
@@ -541,6 +541,7 @@ void deleteInstr(tInstr * instr){
 			deleteInstrWhile(instr->instr);
 			break;
 	}
+	free(instr);
 }
 
 tList * newInstrs() {
@@ -748,6 +749,7 @@ void deleteExpr(tExpr * expr) {
 			deleteObjAccessExpr(expr->expr);
 			break;
 	}
+	free(expr);
 }
 
 
@@ -779,7 +781,8 @@ void printBuiltIn(tBuiltInExpr * builtIn) {
 }
 
 void deleteBuiltIn(tBuiltInExpr * builtIn) {
-	if (builtIn->type == INPUT_STRING) free((char *) builtIn->variable);
+	free(builtIn->variable);
+	free(builtIn);
 }
 
 /*** AssignmentExpr ***/
@@ -885,14 +888,17 @@ void printObjCreation(tObjectCreation * objCreation) {
 
 void deleteObjCreation(tObjectCreation * objCreation) {
 	deleteParams(objCreation->params);
+	free(objCreation->name);
 	free(objCreation);
 }
 
 /*** Operation Expr ***/
 
+// TODO: por qué op podría ser NULL?
 tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second) {
 	tOperationExpr * operationExpr = malloc(sizeof(tOperationExpr));
 	operationExpr->first = first;
+	operationExpr->op = NULL;
 	if (op != NULL) {
 		operationExpr->op = strdup(op);
 		free(op);
@@ -903,13 +909,17 @@ tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second) {
 
 void printOperationExpr(tOperationExpr * operationExpr) {
 	printExpr(operationExpr->first);
-	if (operationExpr->op != NULL) printf(" %s ", operationExpr->op);
+	if (operationExpr->op != NULL) {
+		printf(" %s ", operationExpr->op);
+	}
 	printExpr(operationExpr->second);
 }
 
 void deleteOperationExpr(tOperationExpr * operationExpr) {
 	deleteExpr(operationExpr->first);
-	if (operationExpr->op != NULL) free(operationExpr->op);
+	if (operationExpr->op != NULL) {
+		free(operationExpr->op);
+	}
 	deleteExpr(operationExpr->second);
 	free(operationExpr);
 }
@@ -919,10 +929,12 @@ void deleteOperationExpr(tOperationExpr * operationExpr) {
 tModifExpr * newModifExpr(char * prevOp, tExpr * expr, char * postOp) {
 	tModifExpr * modifExpr = malloc(sizeof(tModifExpr));
 	modifExpr->expr = expr;
+	modifExpr->prevOp = NULL;
 	if (prevOp != NULL) {
 		modifExpr->prevOp = strdup(prevOp);
 		free(prevOp);
 	}
+	modifExpr->postOp = NULL;
 	if (postOp != NULL) {
 		modifExpr->postOp = strdup(postOp);
 		free(postOp);
@@ -931,15 +943,23 @@ tModifExpr * newModifExpr(char * prevOp, tExpr * expr, char * postOp) {
 }
 
 void printModifExpr(tModifExpr * modifExpr) {
-	if (modifExpr->prevOp != NULL) printf("%s", modifExpr->prevOp);
+	if (modifExpr->prevOp != NULL) {
+		printf("%s", modifExpr->prevOp);
+	}
 	printExpr(modifExpr->expr);
-	if (modifExpr->postOp != NULL) printf("%s", modifExpr->postOp);
+	if (modifExpr->postOp != NULL) {
+		printf("%s", modifExpr->postOp);
+	}
 }
 
 void deleteModifExpr(tModifExpr * modifExpr) {
-	if (modifExpr->prevOp != NULL) free(modifExpr->prevOp);
+	if (modifExpr->prevOp != NULL) {
+		free(modifExpr->prevOp);
+	}
 	deleteExpr(modifExpr->expr);
-	if (modifExpr->postOp != NULL) free(modifExpr->postOp);
+	if (modifExpr->postOp != NULL) {
+		free(modifExpr->postOp);
+	}
 	free(modifExpr);
 }
 
@@ -964,7 +984,9 @@ void printObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 
 void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 	free(objAccessExpr->name);
-	if (objAccessExpr->params != NULL) deleteParams(objAccessExpr->params);
+	if (objAccessExpr->params != NULL) {
+		deleteParams(objAccessExpr->params);
+	}
 	free(objAccessExpr);
 }
 

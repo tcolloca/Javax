@@ -267,6 +267,7 @@ instr_declaration:
 	}
 	|
 	IDENTIFIER IDENTIFIER OP_ASSIGN expr {
+		free($3);
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, $4);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
 		$$ = instr;
@@ -400,7 +401,11 @@ expr_implies:
 		$$ = $1;
 	}
 	|
-	expr_implies OP_IMPLIES expr_or
+	expr_implies OP_IMPLIES expr_or {
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		$$ = expr;
+	}
 	;
 
 expr_or:
