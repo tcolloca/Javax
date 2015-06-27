@@ -1,25 +1,9 @@
 class class1 {
 
-	int prop1 = 2;
-	char prop2 = 'c';
-	String prop3 = "ASD";
-	boolean b1 = (true);
-	boolean b2 = false;
-	asd asd = zxc;
-
 	class1(int prop2) {
 		prop1 = (7 + 8 * 2) % 4;
-		prop1 += prop1.getName();
+		prop1 += prop1.getName().var.othervar.getsth(with,some,params);
 		prop2++;
-	}
-
-	method int method1(int param1, char param2) {
-		return param1;
-	}
-
-	method char method2(int para1) {
-
-		char var3 = prop2;
 	}
 }
 
@@ -37,8 +21,9 @@ main () {
 	} else {
 		person.getOther(param);
 	} 
-	while(person.prop1 > 2) {
+	while(person.prop1 >= 2) {
 		prop1--;
+		--prop1;
 	}
 }
 

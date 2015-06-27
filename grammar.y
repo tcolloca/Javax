@@ -78,6 +78,7 @@ sumInts(int a, int b) {
 %type <void_pointer> built_in expr_basic expr_post_additive_or_access expr_pre_additive_sign_and_not expr_equality
 %type <void_pointer> expr_object_creation expr_multiplicative expr_additive expr_order expr_and expr_or
 %type <void_pointer> expr expr_implies expr_boolean expr_conditional expr_assignment parameters parameter
+%type <void_pointer> method_call property_access
 
 %%
 
@@ -407,7 +408,11 @@ expr_or:
 		$$ = $1;
 	}
 	|
-	expr_or OP_OR expr_and
+	expr_or OP_OR expr_and  {
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		$$ = expr;
+	}
 	;
 
 expr_and:
@@ -415,7 +420,11 @@ expr_and:
 		$$ = $1;
 	}
 	|
-	expr_and OP_AND expr_equality
+	expr_and OP_AND expr_equality {
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		$$ = expr;
+	}
 	;
 
 	/*** Relation expressions (==, !=, <=, >=, <, >) ***/
@@ -443,13 +452,29 @@ expr_order:
 		$$ = $1;
 	}
 	|
-	expr_order OP_GE expr_additive
+	expr_order OP_GE expr_additive {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_order OP_LE expr_additive
+	expr_order OP_LE expr_additive {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_order OP_GT expr_additive
+	expr_order OP_GT expr_additive {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_order OP_LT expr_additive
+	expr_order OP_LT expr_additive {
+		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	;
 
 	/*** Arithmetic expressions (+,-,*,/,%) ***/
@@ -517,19 +542,34 @@ expr_pre_additive_sign_and_not:
 		$$ = $1;
 	}
 	|
-	OP_PLUS_PLUS expr_post_additive_or_access {
+	OP_PLUS_PLUS expr_post_additive_or_access  {
+		tModifExpr * modifExpr = newModifExpr($1, $2, NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	|
-	OP_MINUS_MINUS expr_post_additive_or_access {
+	OP_MINUS_MINUS expr_post_additive_or_access  {
+		tModifExpr * modifExpr = newModifExpr($1, $2, NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	|
-	OP_PLUS expr_post_additive_or_access {
+	OP_PLUS expr_post_additive_or_access  {
+		tModifExpr * modifExpr = newModifExpr($1, $2, NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	|
-	OP_MINUS expr_post_additive_or_access {
+	OP_MINUS expr_post_additive_or_access  {
+		tModifExpr * modifExpr = newModifExpr($1, $2, NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	|
-	OP_NOT expr_post_additive_or_access {
+	OP_NOT expr_post_additive_or_access  {
+		tModifExpr * modifExpr = newModifExpr($1, $2, NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	;
 
@@ -539,24 +579,46 @@ expr_post_additive_or_access:
 	expr_basic {
 		$$ = $1;
 	}
-	| //TODO: Cambie expr_basic por IDENTIFIER (estaba permitiendo cosas como 4++ o "text"++, que creo que no se puede)
-	IDENTIFIER OP_PLUS_PLUS  {
+	|
+	expr_basic OP_PLUS_PLUS  {
+		tModifExpr * modifExpr = newModifExpr(NULL, $1, $2);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_MINUS_MINUS {
+	expr_basic OP_MINUS_MINUS  {
+		tModifExpr * modifExpr = newModifExpr(NULL, $1, $2);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		$$ = expr;
 	}
 	| //TODO: Esto permite hacer coas que no se pueden hacer, habria uqe moverlo me parece
-	expr_post_additive_or_access method_call
+	expr_post_additive_or_access method_call {
+		tOperationExpr * operationExpr = newOperationExpr($1, NULL, $2);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	|
-	expr_post_additive_or_access property_access
+	expr_post_additive_or_access property_access {
+		tOperationExpr * operationExpr = newOperationExpr($1, NULL, $2);
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		$$ = expr;
+	}
 	;
 
-property_access: //TODO: Cambie cosas aca, esta bien?
-	OP_PROP IDENTIFIER
+property_access:
+	OP_PROP IDENTIFIER {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr($2, NULL);
+		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
+		$$ = expr;
+	}
 	;
 
 method_call:
-	OP_PROP IDENTIFIER LPAR parameters RPAR
+	OP_PROP IDENTIFIER LPAR parameters RPAR {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr($2, $4);
+		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
+		$$ = expr;
+	}
 	;
 
 	/*** Basic expressions ***/

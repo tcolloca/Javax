@@ -556,17 +556,17 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    87,    87,    97,   102,   109,   118,   123,   132,   137,
-     144,   149,   158,   163,   171,   180,   185,   192,   201,   206,
-     213,   218,   222,   226,   232,   236,   240,   248,   255,   262,
-     268,   276,   286,   293,   298,   303,   311,   316,   330,   338,
-     342,   348,   354,   360,   366,   372,   382,   386,   392,   398,
-     402,   406,   410,   414,   418,   424,   428,   434,   442,   446,
-     448,   450,   452,   458,   462,   468,   476,   480,   486,   492,
-     502,   506,   516,   520,   523,   526,   529,   532,   539,   543,
-     546,   549,   551,   555,   559,   565,   571,   577,   585,   590,
-     595,   600,   610,   615,   621,   627,   634,   641,   646,   652,
-     659
+       0,    88,    88,    98,   103,   110,   119,   124,   133,   138,
+     145,   150,   159,   164,   172,   181,   186,   193,   202,   207,
+     214,   219,   223,   227,   233,   237,   241,   249,   256,   263,
+     269,   277,   287,   294,   299,   304,   312,   317,   331,   339,
+     343,   349,   355,   361,   367,   373,   383,   387,   393,   399,
+     403,   407,   411,   419,   423,   433,   437,   443,   451,   455,
+     461,   467,   473,   483,   487,   493,   501,   505,   511,   517,
+     527,   531,   541,   545,   551,   557,   563,   569,   579,   583,
+     589,   595,   601,   609,   617,   627,   633,   639,   647,   652,
+     657,   662,   672,   677,   683,   689,   696,   703,   708,   714,
+     721
 };
 #endif
 
@@ -613,10 +613,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -99
+#define YYPACT_NINF -97
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-99)))
+  (!!((Yystate) == (-97)))
 
 #define YYTABLE_NINF -1
 
@@ -627,25 +627,25 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-     -99,    24,    66,   -99,    19,    -3,   -99,   -99,   -17,    -8,
-     -99,     1,    43,   -99,    -4,   -99,    57,   -99,   -13,     4,
-     -31,    72,    41,   -99,   -11,    90,   -99,   -99,   -99,   -99,
-     -99,   -99,    75,    59,    63,   116,   260,    62,    62,    62,
-      62,    62,   260,   -99,   -99,   -99,    83,   -99,   -99,   -99,
-     -99,   -99,   -99,   -99,   -99,   -99,    91,   106,   111,   117,
-      44,   124,    -5,    11,   -99,   -99,   123,   -99,   -99,   260,
-     -99,   157,   134,   118,   -99,   -99,   160,   140,   -99,   -99,
-     260,   260,   260,   260,   260,   260,   283,   283,   154,   122,
-     -99,    93,   123,   123,   123,   123,   123,   139,   -99,   283,
+     -97,    16,    31,   -97,    14,   -39,   -97,   -97,   -21,   -14,
+     -97,   -10,    39,   -97,     6,   -97,    61,   -97,   -13,     4,
+     -22,    92,    54,   -97,   -12,   103,   -97,   -97,   -97,   -97,
+     -97,   -97,    89,    69,    70,   108,   260,    36,    36,    36,
+      36,    36,   260,   -97,   -97,   -97,    38,   -97,   -97,   -97,
+     -97,   -97,   -97,   -97,   -97,   -97,    91,   109,   116,   120,
+      24,    90,    42,    11,   -97,   -97,   122,    41,   -97,   260,
+     -97,   158,   123,   118,   -97,   -97,   169,   147,   260,   260,
+     260,   260,   260,   260,   283,   283,   135,    52,   -97,   -97,
+     122,   122,   122,   122,   122,   143,   -97,   283,   283,   283,
      283,   283,   283,   283,   283,   283,   283,   283,   283,   283,
-     283,   283,   283,   283,   191,   -99,   -99,   150,   -99,   163,
-      72,   158,   260,   -99,   -99,   -99,   -99,   -99,   -99,   168,
-     173,   260,   -99,   169,   111,   117,    44,   124,   124,    -5,
-      -5,    -5,    -5,    11,    11,   -99,   -99,   -99,   159,   -99,
-     -99,   -99,    72,   -99,   175,    38,   -99,   -25,   -99,   283,
-     260,    85,   176,   -99,   -99,   -99,   -99,   260,   -99,   -23,
-     -99,   179,   132,   166,   -99,   -99,   -99,   214,   -99,   200,
-       8,   -99,   -99,   -99,   -99,   234,   -99
+     283,   283,   179,   -97,   -97,   -97,   -97,   139,   -97,   145,
+      92,   146,   260,   -97,   -97,   -97,   -97,   -97,   -97,   149,
+     150,   260,   -97,   144,   116,   120,    24,    90,    90,    42,
+      42,    42,    42,    11,    11,   -97,   -97,   -97,   152,   -97,
+     -97,   -97,    92,   -97,   151,    51,   -97,   -26,   -97,   283,
+     260,    98,   153,   -97,   -97,   -97,   -97,   260,   -97,   -25,
+     -97,   154,   132,   166,   -97,   -97,   -97,   190,   -97,   200,
+      -3,   -97,   -97,   -97,   -97,   234,   -97
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -660,11 +660,11 @@ static const yytype_uint8 yydefact[] =
        0,     0,     0,     5,    20,    18,     0,    22,    23,    24,
       25,    27,    28,    26,    38,    39,    46,    48,    49,    51,
       53,    55,    58,    63,    66,    70,    72,    78,    85,     0,
-      10,     0,     0,    93,    94,     6,     0,    29,    79,    80,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    86,
-      31,    86,    75,    76,    73,    74,    77,     0,    21,     0,
+      10,     0,     0,    93,    94,     6,     0,    29,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    86,    31,    86,
+      75,    76,    73,    74,    77,     0,    21,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    82,    81,     0,    96,     0,
+       0,     0,     0,    82,    81,    79,    80,     0,    96,     0,
        0,     0,     0,    40,    41,    42,    43,    44,    45,     0,
        0,    97,    87,     0,    50,    52,    54,    56,    57,    59,
       60,    61,    62,    64,    65,    67,    68,    69,    83,    11,
@@ -677,11 +677,11 @@ static const yytype_uint8 yydefact[] =
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -99,   -99,   -99,   -99,   -99,   -99,   -99,   -99,   211,   212,
-     -99,   -56,    74,   -99,   -99,   -99,   -99,   -99,    50,   -99,
-     -99,   -36,    -7,   -98,    35,   -99,   131,   135,   130,    22,
-      81,    20,   -53,   -99,   155,   -99,   -99,   -99,   -99,    92,
-     -99,   113,    86,    68
+     -97,   -97,   -97,   -97,   -97,   -97,   -97,   -97,   186,   194,
+     -97,   142,    57,   -97,   -97,   -97,   -97,   -97,    37,   -97,
+     -97,   -36,    80,   -96,    -7,   -97,   124,   121,   126,    32,
+     -32,     0,    44,   -97,    43,   -97,   -97,   -97,   -97,    71,
+     -97,   101,    67,    62
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
@@ -690,7 +690,7 @@ static const yytype_int16 yydefgoto[] =
       -1,     1,     2,     6,     7,    12,    15,    16,    17,    18,
       27,    19,    45,    46,    47,    48,    49,    50,    51,   181,
       52,    53,    54,    55,    56,    57,    58,    59,    60,    61,
-      62,    63,    64,    65,    66,   115,   116,    67,    68,    72,
+      62,    63,    64,    65,    66,   113,   114,    67,    68,    72,
       73,    74,   157,   158
 };
 
@@ -699,76 +699,76 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      90,   133,    25,    20,    25,    69,    97,    28,    29,    30,
-      31,    32,    33,   109,   110,    34,    33,    35,    70,   166,
-      36,   175,    37,    38,     3,   167,     8,   167,    39,    40,
-      10,   111,   112,   117,   113,    26,    11,    75,    41,    21,
-       9,    28,    29,    30,    31,    32,    33,    42,    13,    34,
-      14,    35,    43,    44,    36,   183,    37,    38,   145,   146,
-     147,   168,    39,    40,    22,    28,    29,    30,    31,    91,
-     103,   104,    41,   123,   124,   125,   126,   127,   128,    71,
-       4,    42,    77,     5,    21,   164,   153,    44,    28,    29,
-      30,    31,    32,    33,   161,   156,    34,    76,    35,    78,
-      79,    36,    86,    37,    38,    42,    87,   172,   173,    39,
-      40,    80,    81,    82,    83,    84,    85,    78,    79,    41,
-     179,   129,   130,    88,   156,   137,   138,   185,    42,   143,
-     144,   156,    98,   170,    44,    28,    29,    30,    31,    32,
-      33,   100,    99,    34,   101,    35,    78,    79,    36,   102,
-      37,    38,   105,   106,   107,   108,    39,    40,    80,    81,
-      82,    83,    84,    85,   118,   114,    41,   121,   120,    28,
-      29,    30,    31,    32,    33,    42,   122,    34,   119,    35,
-     177,    44,    36,   132,    37,    38,   139,   140,   141,   142,
-      39,    40,    92,    93,    94,    95,    96,   131,   148,   149,
-      41,   152,   160,    28,    29,    30,    31,    32,    33,    42,
-     150,    34,   154,    35,   178,    44,    36,   155,    37,    38,
-     171,   159,   163,   180,    39,    40,   176,    23,    24,   165,
-     184,   134,   136,   151,    41,   174,   135,    28,    29,    30,
-      31,    32,    33,    42,   162,    34,   169,    35,   182,    44,
+      88,   133,    25,    25,     9,    33,    95,    28,    29,    30,
+      31,    32,    33,    20,    69,    34,     3,    35,   166,   175,
+      36,     8,    37,    38,   167,   167,    10,    70,    39,    40,
+      11,   109,   110,   117,   111,    26,    75,    13,    41,    28,
+      29,    30,    31,    89,   183,     4,    14,    42,     5,    21,
+     101,   102,    43,    44,    28,    29,    30,    31,    32,    33,
+     107,   108,    34,   168,    35,   115,   116,    36,    22,    37,
+      38,   139,   140,   141,   142,    39,    40,   129,   130,    42,
+      90,    91,    92,    93,    94,    41,   153,    96,    78,    79,
+      80,    81,    82,    83,    42,   156,    77,    21,   164,    71,
+      44,    28,    29,    30,    31,    32,    33,   143,   144,    34,
+      76,    35,    84,    85,    36,    86,    37,    38,   103,   104,
+     105,   106,    39,    40,   156,    78,    79,    80,    81,    82,
+      83,   156,    41,   137,   138,    28,    29,    30,    31,    32,
+      33,    42,    97,    34,    98,    35,   170,    44,    36,    99,
+      37,    38,   100,   145,   146,   147,    39,    40,   123,   124,
+     125,   126,   127,   128,   112,   118,    41,   119,   120,    28,
+      29,    30,    31,    32,    33,    42,   121,    34,   131,    35,
+     177,    44,    36,   122,    37,    38,   148,   132,   149,   152,
+      39,    40,   150,   154,   155,   160,   159,   171,   163,   180,
+      41,   176,    23,    28,    29,    30,    31,    32,    33,    42,
+      24,    34,   165,    35,   178,    44,    36,   184,    37,    38,
+     135,   151,   134,   162,    39,    40,   136,   169,     0,   174,
+       0,     0,     0,     0,    41,     0,     0,    28,    29,    30,
+      31,    32,    33,    42,     0,    34,     0,    35,   182,    44,
       36,     0,    37,    38,     0,     0,     0,     0,    39,    40,
-       0,     0,     0,    28,    29,    30,    31,    89,    41,     0,
+       0,     0,     0,    28,    29,    30,    31,    87,    41,     0,
        0,     0,     0,    35,     0,     0,     0,    42,    37,    38,
        0,     0,   186,    44,    39,    40,    28,    29,    30,    31,
-      91,     0,     0,     0,    41,     0,    35,     0,     0,     0,
-       0,    37,    38,    42,     0,     0,     0,    39,    40,     0,
-       0,     0,     0,     0,     0,     0,     0,    41,     0,     0,
-       0,     0,     0,     0,     0,     0,    42
+      89,     0,   161,     0,    41,     0,    35,     0,     0,     0,
+       0,    37,    38,    42,     0,   172,   173,    39,    40,     0,
+       0,     0,     0,     0,     0,     0,     0,    41,   179,     0,
+       0,     0,     0,     0,     0,   185,    42
 };
 
 static const yytype_int16 yycheck[] =
 {
-      36,    99,    15,     7,    15,    36,    42,     3,     4,     5,
-       6,     7,     8,    18,    19,    11,     8,    13,    49,    44,
-      16,    44,    18,    19,     0,    50,     7,    50,    24,    25,
-      47,    20,    21,    69,    23,    48,    44,    48,    34,    43,
-      43,     3,     4,     5,     6,     7,     8,    43,    47,    11,
-       7,    13,    48,    49,    16,    47,    18,    19,   111,   112,
-     113,   159,    24,    25,     7,     3,     4,     5,     6,     7,
-      26,    27,    34,    80,    81,    82,    83,    84,    85,     7,
-      14,    43,     7,    17,    43,    47,   122,    49,     3,     4,
-       5,     6,     7,     8,   150,   131,    11,     7,    13,    24,
-      25,    16,    43,    18,    19,    43,    43,   163,   164,    24,
-      25,    36,    37,    38,    39,    40,    41,    24,    25,    34,
-     176,    86,    87,     7,   160,   103,   104,   183,    43,   109,
-     110,   167,    49,    48,    49,     3,     4,     5,     6,     7,
-       8,    35,    51,    11,    33,    13,    24,    25,    16,    32,
-      18,    19,    28,    29,    30,    31,    24,    25,    36,    37,
-      38,    39,    40,    41,     7,    42,    34,     7,    50,     3,
-       4,     5,     6,     7,     8,    43,    36,    11,    44,    13,
-      48,    49,    16,    44,    18,    19,   105,   106,   107,   108,
-      24,    25,    37,    38,    39,    40,    41,    43,     7,    49,
-      34,    43,    43,     3,     4,     5,     6,     7,     8,    43,
-      47,    11,    44,    13,    48,    49,    16,    44,    18,    19,
-      44,    52,    47,     9,    24,    25,    47,    16,    16,   155,
-     180,   100,   102,   120,    34,   167,   101,     3,     4,     5,
-       6,     7,     8,    43,   152,    11,   160,    13,    48,    49,
+      36,    97,    15,    15,    43,     8,    42,     3,     4,     5,
+       6,     7,     8,     7,    36,    11,     0,    13,    44,    44,
+      16,     7,    18,    19,    50,    50,    47,    49,    24,    25,
+      44,    20,    21,    69,    23,    48,    48,    47,    34,     3,
+       4,     5,     6,     7,    47,    14,     7,    43,    17,    43,
+      26,    27,    48,    49,     3,     4,     5,     6,     7,     8,
+      18,    19,    11,   159,    13,    24,    25,    16,     7,    18,
+      19,   103,   104,   105,   106,    24,    25,    84,    85,    43,
+      37,    38,    39,    40,    41,    34,   122,    49,    36,    37,
+      38,    39,    40,    41,    43,   131,     7,    43,    47,     7,
+      49,     3,     4,     5,     6,     7,     8,   107,   108,    11,
+       7,    13,    43,    43,    16,     7,    18,    19,    28,    29,
+      30,    31,    24,    25,   160,    36,    37,    38,    39,    40,
+      41,   167,    34,   101,   102,     3,     4,     5,     6,     7,
+       8,    43,    51,    11,    35,    13,    48,    49,    16,    33,
+      18,    19,    32,   109,   110,   111,    24,    25,    78,    79,
+      80,    81,    82,    83,    42,     7,    34,    44,    50,     3,
+       4,     5,     6,     7,     8,    43,     7,    11,    43,    13,
+      48,    49,    16,    36,    18,    19,     7,    44,    49,    43,
+      24,    25,    47,    44,    44,    43,    52,    44,    47,     9,
+      34,    47,    16,     3,     4,     5,     6,     7,     8,    43,
+      16,    11,   155,    13,    48,    49,    16,   180,    18,    19,
+      99,   120,    98,   152,    24,    25,   100,   160,    -1,   167,
+      -1,    -1,    -1,    -1,    34,    -1,    -1,     3,     4,     5,
+       6,     7,     8,    43,    -1,    11,    -1,    13,    48,    49,
       16,    -1,    18,    19,    -1,    -1,    -1,    -1,    24,    25,
       -1,    -1,    -1,     3,     4,     5,     6,     7,    34,    -1,
       -1,    -1,    -1,    13,    -1,    -1,    -1,    43,    18,    19,
       -1,    -1,    48,    49,    24,    25,     3,     4,     5,     6,
-       7,    -1,    -1,    -1,    34,    -1,    13,    -1,    -1,    -1,
-      -1,    18,    19,    43,    -1,    -1,    -1,    24,    25,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    -1,    34,    -1,    -1,
-      -1,    -1,    -1,    -1,    -1,    -1,    43
+       7,    -1,   150,    -1,    34,    -1,    13,    -1,    -1,    -1,
+      -1,    18,    19,    43,    -1,   163,   164,    24,    25,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    -1,    34,   176,    -1,
+      -1,    -1,    -1,    -1,    -1,   183,    43
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -782,11 +782,11 @@ static const yytype_uint8 yystos[] =
       25,    34,    43,    48,    49,    65,    66,    67,    68,    69,
       70,    71,    73,    74,    75,    76,    77,    78,    79,    80,
       81,    82,    83,    84,    85,    86,    87,    90,    91,    36,
-      49,     7,    92,    93,    94,    48,     7,     7,    24,    25,
-      36,    37,    38,    39,    40,    41,    43,    43,     7,     7,
-      74,     7,    87,    87,    87,    87,    87,    74,    49,    51,
-      35,    33,    32,    26,    27,    28,    29,    30,    31,    18,
-      19,    20,    21,    23,    42,    88,    89,    74,     7,    44,
+      49,     7,    92,    93,    94,    48,     7,     7,    36,    37,
+      38,    39,    40,    41,    43,    43,     7,     7,    74,     7,
+      87,    87,    87,    87,    87,    74,    49,    51,    35,    33,
+      32,    26,    27,    28,    29,    30,    31,    18,    19,    20,
+      21,    23,    42,    88,    89,    24,    25,    74,     7,    44,
       50,     7,    36,    75,    75,    75,    75,    75,    75,    77,
       77,    43,    44,    76,    79,    80,    81,    82,    82,    83,
       83,    83,    83,    84,    84,    85,    85,    85,     7,    49,
@@ -1502,7 +1502,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 87 "grammar.y" /* yacc.c:1646  */
+#line 88 "grammar.y" /* yacc.c:1646  */
     {
 		tProgram * program = newProgram();
 		addClasses(program, (yyvsp[-1].void_pointer));
@@ -1514,7 +1514,7 @@ yyreduce:
     break;
 
   case 3:
-#line 97 "grammar.y" /* yacc.c:1646  */
+#line 98 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-1].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
@@ -1523,7 +1523,7 @@ yyreduce:
     break;
 
   case 4:
-#line 102 "grammar.y" /* yacc.c:1646  */
+#line 103 "grammar.y" /* yacc.c:1646  */
     {
 		tList * classes = newClasses();
 		(yyval.void_pointer) = classes;
@@ -1532,7 +1532,7 @@ yyreduce:
     break;
 
   case 5:
-#line 109 "grammar.y" /* yacc.c:1646  */
+#line 110 "grammar.y" /* yacc.c:1646  */
     {
 		tMain * main = newMain((yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = main;
@@ -1541,7 +1541,7 @@ yyreduce:
     break;
 
   case 6:
-#line 118 "grammar.y" /* yacc.c:1646  */
+#line 119 "grammar.y" /* yacc.c:1646  */
     {
 		tClass * class = newClass((yyvsp[-5].string), (yyvsp[-3].void_pointer), (yyvsp[-2].void_pointer), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = class;
@@ -1550,7 +1550,7 @@ yyreduce:
     break;
 
   case 7:
-#line 123 "grammar.y" /* yacc.c:1646  */
+#line 124 "grammar.y" /* yacc.c:1646  */
     {
 		tClass * class = newClass((yyvsp[-4].string), (yyvsp[-2].void_pointer), newConstructors(NULL), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = class;
@@ -1559,7 +1559,7 @@ yyreduce:
     break;
 
   case 8:
-#line 132 "grammar.y" /* yacc.c:1646  */
+#line 133 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-1].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
@@ -1568,7 +1568,7 @@ yyreduce:
     break;
 
   case 9:
-#line 137 "grammar.y" /* yacc.c:1646  */
+#line 138 "grammar.y" /* yacc.c:1646  */
     {
 		tList * properties = newProperties();
 		(yyval.void_pointer) = properties;
@@ -1577,7 +1577,7 @@ yyreduce:
     break;
 
   case 10:
-#line 144 "grammar.y" /* yacc.c:1646  */
+#line 145 "grammar.y" /* yacc.c:1646  */
     {
 		tProperty * property = newProperty((yyvsp[-2].string), (yyvsp[-1].string), NULL);
 		(yyval.void_pointer) = property;
@@ -1586,7 +1586,7 @@ yyreduce:
     break;
 
   case 11:
-#line 149 "grammar.y" /* yacc.c:1646  */
+#line 150 "grammar.y" /* yacc.c:1646  */
     {
 		tProperty * property = newProperty((yyvsp[-4].string), (yyvsp[-3].string), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = property;
@@ -1595,7 +1595,7 @@ yyreduce:
     break;
 
   case 12:
-#line 158 "grammar.y" /* yacc.c:1646  */
+#line 159 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-1].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
@@ -1604,7 +1604,7 @@ yyreduce:
     break;
 
   case 13:
-#line 163 "grammar.y" /* yacc.c:1646  */
+#line 164 "grammar.y" /* yacc.c:1646  */
     {
 		tList * constructors = newConstructors();
 		_addElement(constructors, (yyvsp[0].void_pointer));
@@ -1614,7 +1614,7 @@ yyreduce:
     break;
 
   case 14:
-#line 171 "grammar.y" /* yacc.c:1646  */
+#line 172 "grammar.y" /* yacc.c:1646  */
     {
 		tConstructor * constructor = newConstructor((yyvsp[-6].string), (yyvsp[-4].void_pointer), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = constructor;
@@ -1623,7 +1623,7 @@ yyreduce:
     break;
 
   case 15:
-#line 180 "grammar.y" /* yacc.c:1646  */
+#line 181 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-1].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
@@ -1632,7 +1632,7 @@ yyreduce:
     break;
 
   case 16:
-#line 185 "grammar.y" /* yacc.c:1646  */
+#line 186 "grammar.y" /* yacc.c:1646  */
     {
 		tList * methods = newMethods();
 		(yyval.void_pointer) = methods;
@@ -1641,7 +1641,7 @@ yyreduce:
     break;
 
   case 17:
-#line 192 "grammar.y" /* yacc.c:1646  */
+#line 193 "grammar.y" /* yacc.c:1646  */
     {
 		tMethod * method = newMethod((yyvsp[-7].string), (yyvsp[-6].string), (yyvsp[-4].void_pointer), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = method;
@@ -1650,7 +1650,7 @@ yyreduce:
     break;
 
   case 18:
-#line 201 "grammar.y" /* yacc.c:1646  */
+#line 202 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-1].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
@@ -1659,7 +1659,7 @@ yyreduce:
     break;
 
   case 19:
-#line 206 "grammar.y" /* yacc.c:1646  */
+#line 207 "grammar.y" /* yacc.c:1646  */
     {
 		tList * instrs = newInstrs();
 		(yyval.void_pointer) = instrs;
@@ -1668,7 +1668,7 @@ yyreduce:
     break;
 
   case 20:
-#line 213 "grammar.y" /* yacc.c:1646  */
+#line 214 "grammar.y" /* yacc.c:1646  */
     {
 		tInstr * instr = newInstr(INSTR_NULL, NULL);
 		(yyval.void_pointer) = instr;
@@ -1677,7 +1677,7 @@ yyreduce:
     break;
 
   case 21:
-#line 218 "grammar.y" /* yacc.c:1646  */
+#line 219 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[-1].void_pointer);
 	}
@@ -1685,7 +1685,7 @@ yyreduce:
     break;
 
   case 22:
-#line 222 "grammar.y" /* yacc.c:1646  */
+#line 223 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1693,7 +1693,7 @@ yyreduce:
     break;
 
   case 23:
-#line 226 "grammar.y" /* yacc.c:1646  */
+#line 227 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1701,7 +1701,7 @@ yyreduce:
     break;
 
   case 24:
-#line 232 "grammar.y" /* yacc.c:1646  */
+#line 233 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1709,7 +1709,7 @@ yyreduce:
     break;
 
   case 25:
-#line 236 "grammar.y" /* yacc.c:1646  */
+#line 237 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1717,7 +1717,7 @@ yyreduce:
     break;
 
   case 26:
-#line 240 "grammar.y" /* yacc.c:1646  */
+#line 241 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrSimple * instrSimple = newInstrSimple((yyvsp[0].void_pointer));
 		tInstr * instr = newInstr(INSTR_SIMPLE, instrSimple);
@@ -1727,7 +1727,7 @@ yyreduce:
     break;
 
   case 27:
-#line 248 "grammar.y" /* yacc.c:1646  */
+#line 249 "grammar.y" /* yacc.c:1646  */
     {
 		tInstr * instr = newInstr(INSTR_IF, (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = instr;
@@ -1736,7 +1736,7 @@ yyreduce:
     break;
 
   case 28:
-#line 255 "grammar.y" /* yacc.c:1646  */
+#line 256 "grammar.y" /* yacc.c:1646  */
     {
 		tInstr * instr = newInstr(INSTR_WHILE, (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = instr;
@@ -1745,7 +1745,7 @@ yyreduce:
     break;
 
   case 29:
-#line 262 "grammar.y" /* yacc.c:1646  */
+#line 263 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration((yyvsp[-1].string), (yyvsp[0].string), NULL);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -1755,7 +1755,7 @@ yyreduce:
     break;
 
   case 30:
-#line 268 "grammar.y" /* yacc.c:1646  */
+#line 269 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration((yyvsp[-3].string), (yyvsp[-2].string), (yyvsp[0].void_pointer));
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -1765,7 +1765,7 @@ yyreduce:
     break;
 
   case 31:
-#line 276 "grammar.y" /* yacc.c:1646  */
+#line 277 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrReturn * instrReturn = newInstrReturn((yyvsp[0].void_pointer));
 		tInstr * instr = newInstr(INSTR_RETURN, instrReturn);
@@ -1775,7 +1775,7 @@ yyreduce:
     break;
 
   case 32:
-#line 286 "grammar.y" /* yacc.c:1646  */
+#line 287 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrIf * instrIf = newInstrIf((yyvsp[-5].void_pointer), (yyvsp[-2].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = instrIf;
@@ -1784,7 +1784,7 @@ yyreduce:
     break;
 
   case 33:
-#line 293 "grammar.y" /* yacc.c:1646  */
+#line 294 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrElse * instrElse = newInstrElse(NULL, (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = instrElse;
@@ -1793,7 +1793,7 @@ yyreduce:
     break;
 
   case 34:
-#line 298 "grammar.y" /* yacc.c:1646  */
+#line 299 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrElse * instrElse = newInstrElse((yyvsp[0].void_pointer), NULL);
 		(yyval.void_pointer) = instrElse;
@@ -1802,7 +1802,7 @@ yyreduce:
     break;
 
   case 35:
-#line 303 "grammar.y" /* yacc.c:1646  */
+#line 304 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = NULL;
 	}
@@ -1810,7 +1810,7 @@ yyreduce:
     break;
 
   case 36:
-#line 311 "grammar.y" /* yacc.c:1646  */
+#line 312 "grammar.y" /* yacc.c:1646  */
     {
 		tInstrWhile * instrWhile = newInstrWhile((yyvsp[-4].void_pointer), (yyvsp[-1].void_pointer));
 		(yyval.void_pointer) = instrWhile;
@@ -1819,7 +1819,7 @@ yyreduce:
     break;
 
   case 37:
-#line 316 "grammar.y" /* yacc.c:1646  */
+#line 317 "grammar.y" /* yacc.c:1646  */
     {
 		tList * instrs = newInstrs();
 		_addElement(instrs, (yyvsp[0].void_pointer));
@@ -1830,7 +1830,7 @@ yyreduce:
     break;
 
   case 38:
-#line 330 "grammar.y" /* yacc.c:1646  */
+#line 331 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1838,7 +1838,7 @@ yyreduce:
     break;
 
   case 39:
-#line 338 "grammar.y" /* yacc.c:1646  */
+#line 339 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1846,7 +1846,7 @@ yyreduce:
     break;
 
   case 40:
-#line 342 "grammar.y" /* yacc.c:1646  */
+#line 343 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1856,7 +1856,7 @@ yyreduce:
     break;
 
   case 41:
-#line 348 "grammar.y" /* yacc.c:1646  */
+#line 349 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1866,7 +1866,7 @@ yyreduce:
     break;
 
   case 42:
-#line 354 "grammar.y" /* yacc.c:1646  */
+#line 355 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1876,7 +1876,7 @@ yyreduce:
     break;
 
   case 43:
-#line 360 "grammar.y" /* yacc.c:1646  */
+#line 361 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1886,7 +1886,7 @@ yyreduce:
     break;
 
   case 44:
-#line 366 "grammar.y" /* yacc.c:1646  */
+#line 367 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1896,7 +1896,7 @@ yyreduce:
     break;
 
   case 45:
-#line 372 "grammar.y" /* yacc.c:1646  */
+#line 373 "grammar.y" /* yacc.c:1646  */
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[-2].string), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -1906,7 +1906,7 @@ yyreduce:
     break;
 
   case 46:
-#line 382 "grammar.y" /* yacc.c:1646  */
+#line 383 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1914,7 +1914,7 @@ yyreduce:
     break;
 
   case 48:
-#line 392 "grammar.y" /* yacc.c:1646  */
+#line 393 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1922,7 +1922,7 @@ yyreduce:
     break;
 
   case 49:
-#line 398 "grammar.y" /* yacc.c:1646  */
+#line 399 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
@@ -1930,357 +1930,478 @@ yyreduce:
     break;
 
   case 51:
-#line 406 "grammar.y" /* yacc.c:1646  */
+#line 407 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
 #line 1938 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 52:
+#line 411 "grammar.y" /* yacc.c:1646  */
+    {
+		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 1948 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 53:
-#line 414 "grammar.y" /* yacc.c:1646  */
+#line 419 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 1946 "y.tab.c" /* yacc.c:1646  */
+#line 1956 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 54:
+#line 423 "grammar.y" /* yacc.c:1646  */
+    {
+		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 1966 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 424 "grammar.y" /* yacc.c:1646  */
+#line 433 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
-	}
-#line 1954 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 56:
-#line 428 "grammar.y" /* yacc.c:1646  */
-    {
-		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
-		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
-		(yyval.void_pointer) = expr;
-	}
-#line 1964 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 57:
-#line 434 "grammar.y" /* yacc.c:1646  */
-    {
-		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
-		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
-		(yyval.void_pointer) = expr;
 	}
 #line 1974 "y.tab.c" /* yacc.c:1646  */
     break;
 
+  case 56:
+#line 437 "grammar.y" /* yacc.c:1646  */
+    {
+		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 1984 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 57:
+#line 443 "grammar.y" /* yacc.c:1646  */
+    {
+		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 1994 "y.tab.c" /* yacc.c:1646  */
+    break;
+
   case 58:
-#line 442 "grammar.y" /* yacc.c:1646  */
+#line 451 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 1982 "y.tab.c" /* yacc.c:1646  */
+#line 2002 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 455 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2012 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 60:
+#line 461 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2022 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 61:
+#line 467 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2032 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 62:
+#line 473 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2042 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 458 "grammar.y" /* yacc.c:1646  */
+#line 483 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 1990 "y.tab.c" /* yacc.c:1646  */
+#line 2050 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 462 "grammar.y" /* yacc.c:1646  */
+#line 487 "grammar.y" /* yacc.c:1646  */
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2000 "y.tab.c" /* yacc.c:1646  */
+#line 2060 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 468 "grammar.y" /* yacc.c:1646  */
+#line 493 "grammar.y" /* yacc.c:1646  */
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2010 "y.tab.c" /* yacc.c:1646  */
+#line 2070 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 476 "grammar.y" /* yacc.c:1646  */
+#line 501 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 2018 "y.tab.c" /* yacc.c:1646  */
+#line 2078 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 480 "grammar.y" /* yacc.c:1646  */
+#line 505 "grammar.y" /* yacc.c:1646  */
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2028 "y.tab.c" /* yacc.c:1646  */
+#line 2088 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 486 "grammar.y" /* yacc.c:1646  */
+#line 511 "grammar.y" /* yacc.c:1646  */
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2038 "y.tab.c" /* yacc.c:1646  */
+#line 2098 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 492 "grammar.y" /* yacc.c:1646  */
+#line 517 "grammar.y" /* yacc.c:1646  */
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-2].void_pointer), (yyvsp[-1].string), (yyvsp[0].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2048 "y.tab.c" /* yacc.c:1646  */
+#line 2108 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 502 "grammar.y" /* yacc.c:1646  */
+#line 527 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 2056 "y.tab.c" /* yacc.c:1646  */
+#line 2116 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 506 "grammar.y" /* yacc.c:1646  */
+#line 531 "grammar.y" /* yacc.c:1646  */
     {
 		tObjectCreation * objCreation = newObjCreation((yyvsp[-3].string), (yyvsp[-1].void_pointer));
 		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
 		(yyval.void_pointer) = expr;
 	}
-#line 2066 "y.tab.c" /* yacc.c:1646  */
+#line 2126 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 516 "grammar.y" /* yacc.c:1646  */
+#line 541 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 2074 "y.tab.c" /* yacc.c:1646  */
+#line 2134 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 520 "grammar.y" /* yacc.c:1646  */
+#line 545 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr((yyvsp[-1].string), (yyvsp[0].void_pointer), NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2081 "y.tab.c" /* yacc.c:1646  */
+#line 2144 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 523 "grammar.y" /* yacc.c:1646  */
+#line 551 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr((yyvsp[-1].string), (yyvsp[0].void_pointer), NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2088 "y.tab.c" /* yacc.c:1646  */
+#line 2154 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 526 "grammar.y" /* yacc.c:1646  */
+#line 557 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr((yyvsp[-1].string), (yyvsp[0].void_pointer), NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2095 "y.tab.c" /* yacc.c:1646  */
+#line 2164 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 529 "grammar.y" /* yacc.c:1646  */
+#line 563 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr((yyvsp[-1].string), (yyvsp[0].void_pointer), NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2102 "y.tab.c" /* yacc.c:1646  */
+#line 2174 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 532 "grammar.y" /* yacc.c:1646  */
+#line 569 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr((yyvsp[-1].string), (yyvsp[0].void_pointer), NULL);
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2109 "y.tab.c" /* yacc.c:1646  */
+#line 2184 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 539 "grammar.y" /* yacc.c:1646  */
+#line 579 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 2117 "y.tab.c" /* yacc.c:1646  */
+#line 2192 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 543 "grammar.y" /* yacc.c:1646  */
+#line 583 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr(NULL, (yyvsp[-1].void_pointer), (yyvsp[0].string));
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2124 "y.tab.c" /* yacc.c:1646  */
+#line 2202 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 546 "grammar.y" /* yacc.c:1646  */
+#line 589 "grammar.y" /* yacc.c:1646  */
     {
+		tModifExpr * modifExpr = newModifExpr(NULL, (yyvsp[-1].void_pointer), (yyvsp[0].string));
+		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
+		(yyval.void_pointer) = expr;
 	}
-#line 2131 "y.tab.c" /* yacc.c:1646  */
+#line 2212 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 81:
+#line 595 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-1].void_pointer), NULL, (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2222 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 82:
+#line 601 "grammar.y" /* yacc.c:1646  */
+    {
+		tOperationExpr * operationExpr = newOperationExpr((yyvsp[-1].void_pointer), NULL, (yyvsp[0].void_pointer));
+		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		(yyval.void_pointer) = expr;
+	}
+#line 2232 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 83:
+#line 609 "grammar.y" /* yacc.c:1646  */
+    {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr((yyvsp[0].string), NULL);
+		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
+		(yyval.void_pointer) = expr;
+	}
+#line 2242 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 84:
+#line 617 "grammar.y" /* yacc.c:1646  */
+    {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr((yyvsp[-3].string), (yyvsp[-1].void_pointer));
+		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
+		(yyval.void_pointer) = expr;
+	}
+#line 2252 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 565 "grammar.y" /* yacc.c:1646  */
+#line 627 "grammar.y" /* yacc.c:1646  */
     {
 		tBuiltInExpr * builtIn = (yyvsp[0].void_pointer);
 		tExpr * expr = newExpr(EXPR_BUILT_IN, (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = expr;
 	}
-#line 2141 "y.tab.c" /* yacc.c:1646  */
+#line 2262 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 571 "grammar.y" /* yacc.c:1646  */
+#line 633 "grammar.y" /* yacc.c:1646  */
     {
 		tIdentifier * identifier = newIdentifier((yyvsp[0].string));
 		tExpr * expr = newExpr(EXPR_IDENTIFIER, identifier);
 		(yyval.void_pointer) = expr;
 	}
-#line 2151 "y.tab.c" /* yacc.c:1646  */
+#line 2272 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 577 "grammar.y" /* yacc.c:1646  */
+#line 639 "grammar.y" /* yacc.c:1646  */
     {
 		tParenthesisExpr * parenthesisExpr = newParenthesisExpr((yyvsp[-1].void_pointer));
 		tExpr * expr = newExpr(EXPR_PARENTHESIS, parenthesisExpr);
 		(yyval.void_pointer) = expr;
 	}
-#line 2161 "y.tab.c" /* yacc.c:1646  */
+#line 2282 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 585 "grammar.y" /* yacc.c:1646  */
+#line 647 "grammar.y" /* yacc.c:1646  */
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_INT, &(yyvsp[0].integer), sizeof(int));
 		(yyval.void_pointer) = builtIn;
 	}
-#line 2170 "y.tab.c" /* yacc.c:1646  */
+#line 2291 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 590 "grammar.y" /* yacc.c:1646  */
+#line 652 "grammar.y" /* yacc.c:1646  */
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_BOOLEAN, &(yyvsp[0].boolean), sizeof(int));
 		(yyval.void_pointer) = builtIn;
 	}
-#line 2179 "y.tab.c" /* yacc.c:1646  */
+#line 2300 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 595 "grammar.y" /* yacc.c:1646  */
+#line 657 "grammar.y" /* yacc.c:1646  */
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_CHAR, &(yyvsp[0].character), sizeof(char));
 		(yyval.void_pointer) = builtIn;
 	}
-#line 2188 "y.tab.c" /* yacc.c:1646  */
+#line 2309 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 600 "grammar.y" /* yacc.c:1646  */
+#line 662 "grammar.y" /* yacc.c:1646  */
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_STRING, (yyvsp[0].string), strlen((yyvsp[0].string)) + 1);
 		free((yyvsp[0].string));
 		(yyval.void_pointer) = builtIn;
 	}
-#line 2198 "y.tab.c" /* yacc.c:1646  */
+#line 2319 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 610 "grammar.y" /* yacc.c:1646  */
+#line 672 "grammar.y" /* yacc.c:1646  */
     {
 		tList * defParams = newDefParams();
 		(yyval.void_pointer) = defParams;
 	}
-#line 2207 "y.tab.c" /* yacc.c:1646  */
+#line 2328 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 615 "grammar.y" /* yacc.c:1646  */
+#line 677 "grammar.y" /* yacc.c:1646  */
     {
 		(yyval.void_pointer) = (yyvsp[0].void_pointer);
 	}
-#line 2215 "y.tab.c" /* yacc.c:1646  */
+#line 2336 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 621 "grammar.y" /* yacc.c:1646  */
+#line 683 "grammar.y" /* yacc.c:1646  */
     {
 		tList * defParams = newDefParams();
 		_addElement(defParams, (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = defParams;
 	}
-#line 2225 "y.tab.c" /* yacc.c:1646  */
+#line 2346 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 627 "grammar.y" /* yacc.c:1646  */
+#line 689 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-2].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-2].void_pointer);
 	}
-#line 2234 "y.tab.c" /* yacc.c:1646  */
+#line 2355 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 634 "grammar.y" /* yacc.c:1646  */
+#line 696 "grammar.y" /* yacc.c:1646  */
     {
 		tDefParam * defParam = newDefParam((yyvsp[-1].string), (yyvsp[0].string));
 		(yyval.void_pointer) = defParam;
 	}
-#line 2243 "y.tab.c" /* yacc.c:1646  */
+#line 2364 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 641 "grammar.y" /* yacc.c:1646  */
+#line 703 "grammar.y" /* yacc.c:1646  */
     {
 		tList * params = newParams();
 		(yyval.void_pointer) = params;
 	}
-#line 2252 "y.tab.c" /* yacc.c:1646  */
+#line 2373 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 646 "grammar.y" /* yacc.c:1646  */
+#line 708 "grammar.y" /* yacc.c:1646  */
     {
 		tList * params = newParams();
 		_addElement(params, (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = params;
 	}
-#line 2262 "y.tab.c" /* yacc.c:1646  */
+#line 2383 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 652 "grammar.y" /* yacc.c:1646  */
+#line 714 "grammar.y" /* yacc.c:1646  */
     {
 		_addElement((yyvsp[-2].void_pointer), (yyvsp[0].void_pointer));
 		(yyval.void_pointer) = (yyvsp[-2].void_pointer);
 	}
-#line 2271 "y.tab.c" /* yacc.c:1646  */
+#line 2392 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 659 "grammar.y" /* yacc.c:1646  */
+#line 721 "grammar.y" /* yacc.c:1646  */
     {
 		tParam * param = newParam((yyvsp[0].void_pointer));
 		(yyval.void_pointer) = param;
 	}
-#line 2280 "y.tab.c" /* yacc.c:1646  */
+#line 2401 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2284 "y.tab.c" /* yacc.c:1646  */
+#line 2405 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2508,5 +2629,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 666 "grammar.y" /* yacc.c:1906  */
+#line 728 "grammar.y" /* yacc.c:1906  */
 	

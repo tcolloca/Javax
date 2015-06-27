@@ -46,8 +46,8 @@ method return METHOD;
 main return MAIN;
 (return) return RETURN;
 
-\+\+ return OP_PLUS_PLUS;
-\-\- return OP_MINUS_MINUS;
+\+\+ SAVE_STRING; return OP_PLUS_PLUS;
+\-\- SAVE_STRING; return OP_MINUS_MINUS;
 
 \+ SAVE_STRING; return OP_PLUS;
 - SAVE_STRING; return OP_MINUS;

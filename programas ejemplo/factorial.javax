@@ -1,0 +1,6 @@
+main() {
+	int n = getchar() - '0';
+	int ans = 1;
+	while (n > 0) ans *= n--;	
+	System.out.println("Factorial de %d es %d", n, ans);
+}

@@ -113,6 +113,17 @@ typedef struct operationExpr {
 	tExpr * second;
 } tOperationExpr;
 
+typedef struct modifExpr {
+	char * prevOp;
+	tExpr * expr;
+	char * postOp;
+} tModifExpr;
+
+typedef struct objAccess {
+	char * name;
+	tList * params;
+} tObjAccessExpr;
+
 /*** Program ***/
 
 tProgram * newProgram() {
@@ -654,7 +665,7 @@ tInstrWhile * newInstrWhile(tExpr * expr, tList * instrs) {
 
 void printInstrWhile(tInstrWhile * instrWhile) {
 	printf("\twhile (");
-	//printExpr(instrWhile->expr); //TODO: Descomentar linea cuando funcionen expresiones
+	printExpr(instrWhile->expr); 
 	printf(") {\n");
 	printInstrs(instrWhile->instrs);
 	printf("\t}\n");
@@ -698,6 +709,12 @@ void printExpr(tExpr * expr) {
 		case EXPR_OPERATION:
 			printOperationExpr(expr->expr);
 			break;
+		case EXPR_MODIF:
+			printModifExpr(expr->expr);
+			break;
+		case EXPR_OBJ_ACCESS:
+			printObjAccessExpr(expr->expr);
+			break;
 	}
 }
 
@@ -723,6 +740,12 @@ void deleteExpr(tExpr * expr) {
 			break;
 		case EXPR_OPERATION:
 			deleteOperationExpr(expr->expr);
+			break;
+		case EXPR_MODIF:
+			deleteModifExpr(expr->expr);
+			break;
+		case EXPR_OBJ_ACCESS:
+			deleteObjAccessExpr(expr->expr);
 			break;
 	}
 }
@@ -861,7 +884,7 @@ void printObjCreation(tObjectCreation * objCreation) {
 }
 
 void deleteObjCreation(tObjectCreation * objCreation) {
-	deleteDefParams(objCreation->params);
+	deleteParams(objCreation->params);
 	free(objCreation);
 }
 
@@ -870,23 +893,79 @@ void deleteObjCreation(tObjectCreation * objCreation) {
 tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second) {
 	tOperationExpr * operationExpr = malloc(sizeof(tOperationExpr));
 	operationExpr->first = first;
-	operationExpr->op = strdup(op);
-	free(op);
+	if (op != NULL) {
+		operationExpr->op = strdup(op);
+		free(op);
+	}
 	operationExpr->second = second;
 	return operationExpr;
 }
 
 void printOperationExpr(tOperationExpr * operationExpr) {
 	printExpr(operationExpr->first);
-	printf(" %s ", operationExpr->op);
+	if (operationExpr->op != NULL) printf(" %s ", operationExpr->op);
 	printExpr(operationExpr->second);
 }
 
 void deleteOperationExpr(tOperationExpr * operationExpr) {
 	deleteExpr(operationExpr->first);
-	free(operationExpr->op);
+	if (operationExpr->op != NULL) free(operationExpr->op);
 	deleteExpr(operationExpr->second);
 	free(operationExpr);
+}
+
+/*** Modif Expr ***/
+
+tModifExpr * newModifExpr(char * prevOp, tExpr * expr, char * postOp) {
+	tModifExpr * modifExpr = malloc(sizeof(tModifExpr));
+	modifExpr->expr = expr;
+	if (prevOp != NULL) {
+		modifExpr->prevOp = strdup(prevOp);
+		free(prevOp);
+	}
+	if (postOp != NULL) {
+		modifExpr->postOp = strdup(postOp);
+		free(postOp);
+	}
+	return modifExpr;
+}
+
+void printModifExpr(tModifExpr * modifExpr) {
+	if (modifExpr->prevOp != NULL) printf("%s", modifExpr->prevOp);
+	printExpr(modifExpr->expr);
+	if (modifExpr->postOp != NULL) printf("%s", modifExpr->postOp);
+}
+
+void deleteModifExpr(tModifExpr * modifExpr) {
+	if (modifExpr->prevOp != NULL) free(modifExpr->prevOp);
+	deleteExpr(modifExpr->expr);
+	if (modifExpr->postOp != NULL) free(modifExpr->postOp);
+	free(modifExpr);
+}
+
+/*** Object Access Expr ***/
+
+tObjAccessExpr * newObjAccessExpr(char * name, tList * params) {
+	tObjAccessExpr * objAccessExpr = malloc(sizeof(tObjAccessExpr));
+	objAccessExpr->name = strdup(name);
+	free(name);
+	objAccessExpr->params = params;
+	return objAccessExpr;
+}
+
+void printObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	printf(".%s", objAccessExpr->name);
+	if (objAccessExpr->params != NULL) {
+		printf("(");
+		printParams(objAccessExpr->params);
+		printf(")");
+	}
+}
+
+void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	free(objAccessExpr->name);
+	if (objAccessExpr->params != NULL) deleteParams(objAccessExpr->params);
+	free(objAccessExpr);
 }
 
 

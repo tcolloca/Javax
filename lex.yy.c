@@ -921,12 +921,12 @@ return RETURN;
 case 16:
 YY_RULE_SETUP
 #line 49 "tokens.l"
-return OP_PLUS_PLUS;
+SAVE_STRING; return OP_PLUS_PLUS;
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 50 "tokens.l"
-return OP_MINUS_MINUS;
+SAVE_STRING; return OP_MINUS_MINUS;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP

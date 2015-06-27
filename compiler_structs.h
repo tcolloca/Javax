@@ -22,6 +22,8 @@
 #define EXPR_EQUALITY			4
 #define EXPR_OBJ_CREATION		5
 #define EXPR_OPERATION			6
+#define EXPR_MODIF				7
+#define	EXPR_OBJ_ACCESS			8
 
 typedef struct program tProgram;
 
@@ -68,6 +70,10 @@ typedef struct identifier tIdentifier;
 typedef struct objectCreation tObjectCreation;
 
 typedef struct operationExpr tOperationExpr;
+
+typedef struct modifExpr tModifExpr;
+
+typedef struct objAccess tObjAccessExpr;
 
 /*** Program ***/
 
@@ -295,5 +301,21 @@ tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second);
 void printOperationExpr(tOperationExpr * operationExpr);
 
 void deleteOperationExpr(tOperationExpr * operationExpr);
+
+/*** Modif Expr ***/
+
+tModifExpr * newModifExpr(char * prevOp, tExpr * expr, char * postOp);
+
+void printModifExpr(tModifExpr * modifExpr);
+
+void deleteModifExpr(tModifExpr * modifExpr);
+
+/*** Object Access Expr ***/
+
+tObjAccessExpr * newObjAccessExpr(char * name, tList * params);
+
+void printObjAccessExpr(tObjAccessExpr * objAccessExpr);
+
+void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr);
 
 #endif
