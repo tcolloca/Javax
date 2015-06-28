@@ -5,13 +5,23 @@
 #include "lib/list.h"
 
 typedef struct program {
+	char * name;
+	tList * imports;
 	tList * classes;
 	tMain * main;
 } tProgram;
 
+typedef struct imports {
+	tList * imports;
+} tImports;
+
 typedef struct main {
 	tList * instrs;
 } tMain;
+
+typedef struct import {
+	tList * importElems;
+} tImport;
 
 typedef struct class {
 	char * name;
@@ -124,16 +134,28 @@ typedef struct objAccess {
 	tList * params;
 } tObjAccessExpr;
 
+typedef struct arrayExpr {
+	tExpr * expr;
+	int size;
+} tArrayExpr;
+
 /*** Program ***/
 
-tProgram * newProgram() {
+tProgram * newProgram(char * name) {
 	tProgram * program = malloc(sizeof(tProgram));
+	program->name = strdup(name);
+	free(name);
+	program->imports = NULL;
 	program->classes = NULL;
 	program->main = NULL;
 	return program;
 }
 
 void printProgram(tProgram * program) {
+	if (program->imports != NULL) {
+		printImports(program->imports);
+	}
+	printf("public class %s {\n", program->name);
 	if (program->classes != NULL) {
 		printClasses(program->classes);
 		printf("\n");
@@ -141,6 +163,11 @@ void printProgram(tProgram * program) {
 	if (program->main != NULL) {
 		printMain(program->main);
 	}
+	printf("}\n");
+}
+
+void addImports(tProgram * program, tList * imports) {
+	program->imports = imports;
 }
 
 void addClasses(tProgram * program, tList * classes) {
@@ -152,6 +179,11 @@ void addMain(tProgram * program, tMain * main) {
 }
 
 void deleteProgram(tProgram * program) {
+	free(program->name);
+	/*
+	if (program->imports != NULL) {
+		deleteImports(program->imports);
+	}
 	if (program->classes != NULL) {
 		deleteClasses(program->classes);
 	}
@@ -159,7 +191,73 @@ void deleteProgram(tProgram * program) {
 		deleteMain(program->main);
 	}
 	free(program);
+	*/
 }
+
+/*** Imports ***/
+
+tList * newImportElems(char * name) {
+	tList * import = _newList(sizeof(char *));
+	_addElement(import, strdup(name));
+	free(name);
+	return import;
+}
+
+tImport * newImport(tList * importElems) {
+	tImport * import = malloc(sizeof(tImport));
+	import->importElems = importElems;
+	return import;
+}
+
+tList * newImports() {
+	return _newList(sizeof(tImport));
+}
+
+
+void printImports(tList * imports) {
+	_reset(imports);
+	tImport * import;
+	while ((import = _next(imports)) != NULL) {
+		printImport(import->importElems);
+		printf("\n");
+	}
+	_reset(imports);
+} 
+
+
+void printImport(tList * import) {
+	_reset(import);
+	printf("import ");
+	char * elem = _next(import);
+	printf("%s", elem);
+	
+	while ((elem = _next(import)) != NULL) {
+		printf(".%s", elem);
+	}
+	printf(";\n");
+	_reset(import);
+}
+
+void deleteImports(tList * imports) {
+	_reset(imports);
+	tImport * import;
+	while ((import = _next(imports)) != NULL) {
+		deleteImport(import->importElems);
+	}
+	_reset(imports);
+	_deleteList(imports);
+}
+
+void deleteImport(tList * import) {
+	_reset(import);
+	char * elem;
+	while ((elem = _next(import)) != NULL) {
+		free(elem);
+	}
+	_reset(import);
+	_deleteList(import);
+}
+
 
 /*** Main ***/
 
@@ -170,7 +268,7 @@ tMain * newMain(tList * instrs) {
 }
 
 void printMain(tMain * main) {
-	printf("int main() { \n");
+	printf("public static void main(String[] args) {\n");
 	printInstrs(main->instrs);
 	printf("}\n");
 }
@@ -204,7 +302,7 @@ void printClasses(tList * classes) {
 
 
 void printClass(tClass * class) {
-	printf("class %s {\n\n", class->name);
+	printf("static class %s {\n\n", class->name);
 	printProperties(class->properties);
 	printConstructors(class->constructors);
 	printMethods(class->methods);
@@ -716,6 +814,9 @@ void printExpr(tExpr * expr) {
 		case EXPR_OBJ_ACCESS:
 			printObjAccessExpr(expr->expr);
 			break;
+		case EXPR_ARRAY:
+			printArrayExpr(expr->expr);
+			break;
 	}
 }
 
@@ -747,6 +848,9 @@ void deleteExpr(tExpr * expr) {
 			break;
 		case EXPR_OBJ_ACCESS:
 			deleteObjAccessExpr(expr->expr);
+			break;
+		case EXPR_ARRAY:
+			deleteArrayExpr(expr->expr);
 			break;
 	}
 	free(expr);
@@ -988,6 +1092,25 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 		deleteParams(objAccessExpr->params);
 	}
 	free(objAccessExpr);
+}
+
+/*** Array Expr ***/
+
+tArrayExpr * newArrayExpr(tExpr * expr, int size)	{
+	tArrayExpr * arrayExpr = malloc(sizeof(tArrayExpr));
+	arrayExpr->expr = expr;
+	arrayExpr->size = size;
+	return arrayExpr;
+}
+
+void printArrayExpr(tArrayExpr * arrayExpr) {
+	printExpr(arrayExpr->expr);
+	printf("[%d]", arrayExpr->size);
+}
+
+void deleteArrayExpr(tArrayExpr * arrayExpr) {
+	deleteExpr(arrayExpr->expr);
+	free(arrayExpr);
 }
 
 

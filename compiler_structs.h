@@ -24,8 +24,11 @@
 #define EXPR_OPERATION			6
 #define EXPR_MODIF				7
 #define	EXPR_OBJ_ACCESS			8
+#define	EXPR_ARRAY				9
 
 typedef struct program tProgram;
+
+typedef struct import tImport;
 
 typedef struct main tMain;
 
@@ -75,17 +78,37 @@ typedef struct modifExpr tModifExpr;
 
 typedef struct objAccess tObjAccessExpr;
 
+typedef struct arrayExpr tArrayExpr;
+
 /*** Program ***/
 
-tProgram * newProgram();
+tProgram * newProgram(char * name);
 
 void printProgram(tProgram * program);
+
+void addImports(tProgram * program, tList * imports);
 
 void addClasses(tProgram * program, tList * classes);
 
 void addMain(tProgram * program, tMain * main);
 
 void deleteProgram(tProgram * program);
+
+/*** Imports ***/
+
+tList * newImportElems(char * name);
+
+tImport * newImport(tList * importElems);
+
+tList * newImports();
+
+void printImports(tList * importElems);
+
+void printImport(tList * import);
+
+void deleteImports(tList * imports);
+
+void deleteImport(tList * import);
 
 /*** Main ***/
 
@@ -317,5 +340,13 @@ tObjAccessExpr * newObjAccessExpr(char * name, tList * params);
 void printObjAccessExpr(tObjAccessExpr * objAccessExpr);
 
 void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr);
+
+/*** Array Expr ***/
+
+tArrayExpr * newArrayExpr(tExpr * expr, int size);
+
+void printArrayExpr(tArrayExpr * arrayExpr);
+
+void deleteArrayExpr(tArrayExpr * arrayExpr);
 
 #endif

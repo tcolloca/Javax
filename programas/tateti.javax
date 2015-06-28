@@ -1,0 +1,53 @@
+program: tateti
+
+import java.util.Scanner;
+
+class Tablero {
+
+	Character[][] tablero;
+	
+	method boolean put(char player, int row, int col) {
+		List row = tablero.get(row);
+		if (row.get(col) != NULL) return false;
+		row.add(col, player);
+		return true;
+	}
+	
+	method void printTablero() {
+		int i = 0;
+		int j = 0;
+		Character c;
+		System.out.println();
+		System.out.println();
+		while ( i < 3) {
+			while (j<3) {
+				c = tablero.get(i).get(j);
+				System.out.print((c == null) ? " " : c);
+				j++;
+			}
+			j = 0;
+			i++;
+		}
+	}
+}
+
+main() {
+	Scanner s = new Scanner(System.in);
+	System.out.print("Ingrese un numero para calcular fibonacci: ");
+	int original = s.nextInt();
+	int n = original;
+	int prev = 1;
+	int curr = 1;
+	int aux;
+	if (n == 1 || n == 2) {curr = 1;}
+	else {
+		n -= 2;
+		while (n > 0) {
+			aux = curr;
+			curr += prev;
+			prev = aux;
+			n--;
+		}
+	}
+	System.out.println("Fibonacci de " + original + " es " + curr);
+}

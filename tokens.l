@@ -44,6 +44,8 @@ const return CONST;
 new return NEW;
 class return CLASS;
 method return METHOD;
+program return PROGRAM;
+import return IMPORT;
 main return MAIN;
 (return) return RETURN;
 

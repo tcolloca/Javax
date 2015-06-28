@@ -1,0 +1,14 @@
+program: prog
+
+class Tablero {
+	int[][] a;
+	
+	Tablero(){
+		a = new int[3][3];
+		System.out.print(a[2][1]);
+	}
+}
+
+main () {
+}
+

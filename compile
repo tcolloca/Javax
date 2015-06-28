@@ -1,4 +1,4 @@
 flex tokens.l;
 yacc grammar.y;
-cc lex.yy.c y.tab.c compiler_structs.c lib/list.c -o test
+cc lex.yy.c y.tab.c compiler_structs.c lib/list.c -o programas/compiler
 

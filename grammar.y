@@ -40,7 +40,7 @@ sumInts(int a, int b) {
 %token <character> CHAR
 %token <string> STRING
 %token <string> IDENTIFIER
-%token IF ELSE FOR WHILE CONST NEW CLASS METHOD RETURN MAIN
+%token IF ELSE FOR WHILE CONST NEW IMPORT CLASS METHOD PROGRAM RETURN MAIN
 %token <string> OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
 %token <string> OP_PLUS_PLUS OP_MINUS_MINUS
 %token <string> OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
@@ -55,6 +55,8 @@ sumInts(int a, int b) {
 
 %type <void_pointer> classes
 %type <void_pointer> main 
+%type <string> program_name
+%type <void_pointer> import imports import_element
 %type <void_pointer> class 
 %type <void_pointer> class_instance_properties 
 %type <void_pointer> class_instance_property 
@@ -85,14 +87,51 @@ sumInts(int a, int b) {
  /*** Program definition ***/
 
 program:
-	classes main {
-		tProgram * program = newProgram();
-		addClasses(program, $1);
-		addMain(program, $2);
+	program_name imports classes main {
+		tProgram * program = newProgram($1);
+		addImports(program, $2);
+		addClasses(program, $3);
+		addMain(program, $4);
 		printProgram(program);
 		deleteProgram(program);
 	}
 	;
+
+program_name:
+	PROGRAM COND_COLN IDENTIFIER {
+		$$ = $3;
+	}
+	;
+	
+imports:
+	imports import {
+		_addElement($1, $2);
+		$$ = $1;
+	}
+	|
+	/* empty */ {
+		tList * imports = newImports();
+		$$ = imports;
+	}
+	;
+	
+import: 
+	IMPORT import_element SEMC {
+		tImport * import = newImport($2);
+		$$ = import;
+	}
+	;
+
+import_element:
+	import_element OP_PROP IDENTIFIER {
+		_addElement($1, $3);
+		$$ = $1;
+	}
+	|
+	IDENTIFIER {
+		tList * importElems = newImportElems($1);
+		$$ = importElems;
+	}
 
 classes:
 	classes class {
@@ -149,6 +188,20 @@ class_instance_property:
 	|
 	IDENTIFIER IDENTIFIER OP_ASSIGN expr SEMC {
 		tProperty * property = newProperty($1, $2, $4);
+		$$ = property;
+	}
+	|
+	IDENTIFIER LBRA RBRA IDENTIFIER SEMC {
+		char * name = malloc(strlen($1) + 3);
+		sprintf(name, "%s[]", $1);
+		tProperty * property = newProperty(name, $4, NULL);
+		$$ = property;
+	}
+	|
+	IDENTIFIER LBRA RBRA LBRA RBRA IDENTIFIER SEMC {
+		char * name = malloc(strlen($1) + 5);
+		sprintf(name, "%s[][]", $1);
+		tProperty * property = newProperty(name, $6, NULL);
 		$$ = property;
 	}
 	;
@@ -538,6 +591,12 @@ expr_object_creation:
 		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
 		$$ = expr;
 	}
+	|
+	NEW IDENTIFIER LBRA INT RBRA {
+	}
+	|
+	NEW IDENTIFIER LBRA INT RBRA LBRA INT RBRA {
+	}
 	;
 
 	/*** Pre additives, sign and not expressions ***/
@@ -644,6 +703,12 @@ expr_basic:
 	LPAR expr RPAR {
 		tParenthesisExpr * parenthesisExpr = newParenthesisExpr($2);
 		tExpr * expr = newExpr(EXPR_PARENTHESIS, parenthesisExpr);
+		$$ = expr;
+	}
+	|
+	expr_basic LBRA INT RBRA {
+		tArrayExpr * arrayExpr = newArrayExpr($1, $3);
+		tExpr * expr = newExpr(EXPR_ARRAY, arrayExpr);
 		$$ = expr;
 	}
 	;
