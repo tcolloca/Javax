@@ -94,8 +94,13 @@ program:
 		addImports(program, $2);
 		addClasses(program, $3);
 		addMain(program, $4);
+		if (!checkPendingClasses()) {
+			printUknownTypes();
+		}
 		printProgram(program);
 		deleteProgram(program);
+		deletePendingClasses();
+		deleteClassesMap();
 	}
 	;
 
@@ -146,6 +151,7 @@ classes:
 	}
 	|
 	/* empty */ {
+		initPendingClasses();
 		tList * classes = newClasses();
 		$$ = classes;
 	}
@@ -188,11 +194,17 @@ class_instance_properties:
 
 class_instance_property:
 	type IDENTIFIER SEMC {
+		if (!isType($1)) {
+			addPendingClass($1);
+		}
 		tProperty * property = newProperty($1, $2, NULL);
 		$$ = property;
 	}
 	|
 	type IDENTIFIER OP_ASSIGN expr SEMC {
+		if (!isType($1)) {
+			addPendingClass($1);
+		}
 		tProperty * property = newProperty($1, $2, $4);
 		$$ = property;
 	}
@@ -236,6 +248,9 @@ class_instance_methods:
 
 class_instance_method:
 	METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
+		if (!isType($2)) {
+			addPendingClass($2);
+		}
 		tMethod * method = newMethod($2, $3, $5, $8);
 		$$ = method;
 	}
@@ -306,12 +321,18 @@ instr_loop:
 
 instr_declaration:
 	type IDENTIFIER {
+		if (!isType($1)) {
+			addPendingClass($1); // TODO!
+		}
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
 		$$ = instr;
 	}
 	|
 	type IDENTIFIER OP_ASSIGN expr {
+		if (!isType($1)) {
+			addPendingClass($1); // TODO!
+		}
 		free($3);
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, $4);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -579,12 +600,18 @@ expr_object_creation:
 	}
 	|
 	NEW IDENTIFIER LPAR parameters RPAR {
+		if (!isTypeName($2)) {
+			addPendingClassName($2); // TODO!
+		}
 		tObjectCreation * objCreation = newObjCreation($2, $4);
 		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
 		$$ = expr;
 	}
 	|
 	NEW IDENTIFIER array_size {
+		if (!isTypeName($2)) {
+			addPendingClassName($2); // TODO!
+		}
 		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $3);
 		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
 		$$ = expr;
@@ -767,6 +794,9 @@ parameters_def_2:
 
 parameter_def:
 	type IDENTIFIER {
+		if (!isType($1)) {
+			addPendingClass($1); // TODO!
+		}
 		tDefParam * defParam = newDefParam($1, $2);
 		$$ = defParam;
 	}
