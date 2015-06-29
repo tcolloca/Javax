@@ -597,9 +597,15 @@ expr_object_creation:
 	}
 	|
 	NEW IDENTIFIER LBRA INT RBRA {
+		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $4, 0);
+		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
+		$$ = expr;
 	}
 	|
 	NEW IDENTIFIER LBRA INT RBRA LBRA INT RBRA {
+		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $4, $7);
+		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
+		$$ = expr;
 	}
 	;
 
@@ -738,7 +744,7 @@ built_in:
 		free($1);
 		$$ = builtIn;
 	}
-	;
+	;	
 
 /*** Parameters ***/
 

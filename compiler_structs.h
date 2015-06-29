@@ -25,6 +25,7 @@
 #define EXPR_MODIF				7
 #define	EXPR_OBJ_ACCESS			8
 #define	EXPR_ARRAY				9
+#define	EXPR_ARRAY_CREATION		10
 
 typedef struct program tProgram;
 
@@ -71,6 +72,8 @@ typedef tExpr tParenthesisExpr;
 typedef struct identifier tIdentifier;
 
 typedef struct objectCreation tObjectCreation;
+
+typedef struct arrayCreation tArrayCreationExpr;
 
 typedef struct operationExpr tOperationExpr;
 
@@ -340,6 +343,14 @@ tObjAccessExpr * newObjAccessExpr(char * name, tList * params);
 void printObjAccessExpr(tObjAccessExpr * objAccessExpr);
 
 void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr);
+
+/*** Array Creation Expr ***/
+
+tArrayCreationExpr * newArrayCreationExpr(char * name, int first, int second);
+
+void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
+
+void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
 
 /*** Array Expr ***/
 

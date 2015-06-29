@@ -117,6 +117,12 @@ typedef struct objectCreation {
 	tList * params;
 } tObjectCreation;
 
+typedef struct arrayCreation {
+	char * name;
+	int first;
+	int second;
+} tArrayCreationExpr;
+
 typedef struct operationExpr {
 	tExpr * first;
 	char * op;
@@ -817,6 +823,9 @@ void printExpr(tExpr * expr) {
 		case EXPR_ARRAY:
 			printArrayExpr(expr->expr);
 			break;
+		case EXPR_ARRAY_CREATION:
+			printArrayCreationExpr(expr->expr);
+			break;
 	}
 }
 
@@ -851,6 +860,9 @@ void deleteExpr(tExpr * expr) {
 			break;
 		case EXPR_ARRAY:
 			deleteArrayExpr(expr->expr);
+			break;
+		case EXPR_ARRAY_CREATION:
+			deleteArrayCreationExpr(expr->expr);
 			break;
 	}
 	free(expr);
@@ -1093,6 +1105,28 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 	}
 	free(objAccessExpr);
 }
+
+/*** Array Creation Expr ***/
+
+tArrayCreationExpr * newArrayCreationExpr(char * name, int first, int second)	{
+	tArrayCreationExpr * arrayCreationExpr = malloc(sizeof(tArrayCreationExpr));
+	arrayCreationExpr->name = strdup(name);
+	free(name);
+	arrayCreationExpr->first = first;
+	arrayCreationExpr->second = second;
+	return arrayCreationExpr;
+}
+
+void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
+	printf("new %s[%d]", arrayCreationExpr->name, arrayCreationExpr->first);
+	if (arrayCreationExpr->second != 0) printf("[%d]", arrayCreationExpr->second);
+}
+
+void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
+	free(arrayCreationExpr->name);
+	free(arrayCreationExpr);
+}
+
 
 /*** Array Expr ***/
 
