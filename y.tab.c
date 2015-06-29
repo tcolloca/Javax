@@ -600,18 +600,18 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    92,    92,   103,   109,   114,   121,   128,   135,   143,
-     148,   155,   164,   169,   178,   183,   190,   195,   204,   209,
-     217,   226,   231,   238,   247,   252,   259,   264,   268,   272,
-     278,   282,   286,   294,   301,   308,   314,   323,   333,   340,
-     345,   350,   358,   363,   377,   385,   389,   395,   401,   407,
-     413,   419,   429,   433,   439,   445,   449,   457,   461,   469,
-     473,   483,   487,   493,   501,   505,   511,   517,   523,   533,
-     537,   543,   551,   555,   561,   567,   577,   581,   587,   595,
-     599,   608,   612,   618,   624,   630,   636,   646,   650,   656,
-     662,   668,   676,   684,   694,   700,   706,   712,   720,   725,
-     730,   735,   745,   750,   756,   762,   769,   776,   781,   787,
-     794,   801,   806,   814,   818
+       0,    92,    92,   108,   114,   119,   126,   133,   140,   148,
+     153,   161,   170,   175,   184,   189,   196,   204,   216,   221,
+     229,   238,   243,   250,   262,   267,   274,   279,   283,   287,
+     293,   297,   301,   309,   316,   323,   332,   344,   354,   361,
+     366,   371,   379,   384,   398,   406,   410,   416,   422,   428,
+     434,   440,   450,   454,   460,   466,   470,   478,   482,   490,
+     494,   504,   508,   514,   522,   526,   532,   538,   544,   554,
+     558,   564,   572,   576,   582,   588,   598,   602,   611,   622,
+     626,   635,   639,   645,   651,   657,   663,   673,   677,   683,
+     689,   695,   703,   711,   721,   727,   733,   739,   747,   752,
+     757,   762,   772,   777,   783,   789,   796,   806,   811,   817,
+     824,   831,   836,   844,   848
 };
 #endif
 
@@ -1727,15 +1727,20 @@ yyreduce:
 		addImports(program, (yyvsp[(2) - (4)].void_pointer));
 		addClasses(program, (yyvsp[(3) - (4)].void_pointer));
 		addMain(program, (yyvsp[(4) - (4)].void_pointer));
+		if (!checkPendingClasses()) {
+			printUknownTypes();
+		}
 		printProgram(program);
 		deleteProgram(program);
+		deletePendingClasses();
+		deleteClassesMap();
 	}
     break;
 
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 103 "grammar.y"
+#line 108 "grammar.y"
     {
 		(yyval.string) = (yyvsp[(3) - (3)].string);
 	}
@@ -1744,7 +1749,7 @@ yyreduce:
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 109 "grammar.y"
+#line 114 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1754,7 +1759,7 @@ yyreduce:
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 114 "grammar.y"
+#line 119 "grammar.y"
     {
 		tList * imports = newImports();
 		(yyval.void_pointer) = imports;
@@ -1764,7 +1769,7 @@ yyreduce:
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 121 "grammar.y"
+#line 126 "grammar.y"
     {
 		tImport * import = newImport((yyvsp[(2) - (3)].void_pointer));
 		(yyval.void_pointer) = import;
@@ -1774,7 +1779,7 @@ yyreduce:
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 128 "grammar.y"
+#line 133 "grammar.y"
     {
 		char ** aux = malloc(sizeof(char *));
 		aux = memcpy(aux, &(yyvsp[(3) - (3)].string), sizeof(char *));
@@ -1786,7 +1791,7 @@ yyreduce:
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 135 "grammar.y"
+#line 140 "grammar.y"
     {
 		char ** aux = malloc(sizeof(char *));
 		aux = memcpy(aux, &(yyvsp[(1) - (1)].string), sizeof(char *));
@@ -1798,7 +1803,7 @@ yyreduce:
   case 9:
 
 /* Line 1806 of yacc.c  */
-#line 143 "grammar.y"
+#line 148 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1808,8 +1813,9 @@ yyreduce:
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 148 "grammar.y"
+#line 153 "grammar.y"
     {
+		initPendingClasses();
 		tList * classes = newClasses();
 		(yyval.void_pointer) = classes;
 	}
@@ -1818,7 +1824,7 @@ yyreduce:
   case 11:
 
 /* Line 1806 of yacc.c  */
-#line 155 "grammar.y"
+#line 161 "grammar.y"
     {
 		tMain * main = newMain((yyvsp[(5) - (6)].void_pointer));
 		(yyval.void_pointer) = main;
@@ -1828,7 +1834,7 @@ yyreduce:
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 164 "grammar.y"
+#line 170 "grammar.y"
     {
 		tClass * class = newClass((yyvsp[(2) - (7)].string), (yyvsp[(4) - (7)].void_pointer), (yyvsp[(5) - (7)].void_pointer), (yyvsp[(6) - (7)].void_pointer));
 		(yyval.void_pointer) = class;
@@ -1838,7 +1844,7 @@ yyreduce:
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 169 "grammar.y"
+#line 175 "grammar.y"
     {
 		tClass * class = newClass((yyvsp[(2) - (6)].string), (yyvsp[(4) - (6)].void_pointer), newConstructors(NULL), (yyvsp[(5) - (6)].void_pointer));
 		(yyval.void_pointer) = class;
@@ -1848,7 +1854,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 178 "grammar.y"
+#line 184 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1858,7 +1864,7 @@ yyreduce:
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 183 "grammar.y"
+#line 189 "grammar.y"
     {
 		tList * properties = newProperties();
 		(yyval.void_pointer) = properties;
@@ -1868,8 +1874,11 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 190 "grammar.y"
+#line 196 "grammar.y"
     {
+		if (!isType((yyvsp[(1) - (3)].void_pointer))) {
+			addPendingClass((yyvsp[(1) - (3)].void_pointer));
+		}
 		tProperty * property = newProperty((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), NULL);
 		(yyval.void_pointer) = property;
 	}
@@ -1878,8 +1887,11 @@ yyreduce:
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 195 "grammar.y"
+#line 204 "grammar.y"
     {
+		if (!isType((yyvsp[(1) - (5)].void_pointer))) {
+			addPendingClass((yyvsp[(1) - (5)].void_pointer));
+		}
 		tProperty * property = newProperty((yyvsp[(1) - (5)].void_pointer), (yyvsp[(2) - (5)].string), (yyvsp[(4) - (5)].void_pointer));
 		(yyval.void_pointer) = property;
 	}
@@ -1888,7 +1900,7 @@ yyreduce:
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 204 "grammar.y"
+#line 216 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1898,7 +1910,7 @@ yyreduce:
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 209 "grammar.y"
+#line 221 "grammar.y"
     {
 		tList * constructors = newConstructors();
 		_addElement(constructors, (yyvsp[(1) - (1)].void_pointer));
@@ -1909,7 +1921,7 @@ yyreduce:
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 217 "grammar.y"
+#line 229 "grammar.y"
     {
 		tConstructor * constructor = newConstructor((yyvsp[(1) - (7)].string), (yyvsp[(3) - (7)].void_pointer), (yyvsp[(6) - (7)].void_pointer));
 		(yyval.void_pointer) = constructor;
@@ -1919,7 +1931,7 @@ yyreduce:
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 226 "grammar.y"
+#line 238 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1929,7 +1941,7 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 231 "grammar.y"
+#line 243 "grammar.y"
     {
 		tList * methods = newMethods();
 		(yyval.void_pointer) = methods;
@@ -1939,8 +1951,11 @@ yyreduce:
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 238 "grammar.y"
+#line 250 "grammar.y"
     {
+		if (!isType((yyvsp[(2) - (9)].void_pointer))) {
+			addPendingClass((yyvsp[(2) - (9)].void_pointer));
+		}
 		tMethod * method = newMethod((yyvsp[(2) - (9)].void_pointer), (yyvsp[(3) - (9)].string), (yyvsp[(5) - (9)].void_pointer), (yyvsp[(8) - (9)].void_pointer));
 		(yyval.void_pointer) = method;
 	}
@@ -1949,7 +1964,7 @@ yyreduce:
   case 24:
 
 /* Line 1806 of yacc.c  */
-#line 247 "grammar.y"
+#line 262 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
@@ -1959,7 +1974,7 @@ yyreduce:
   case 25:
 
 /* Line 1806 of yacc.c  */
-#line 252 "grammar.y"
+#line 267 "grammar.y"
     {
 		tList * instrs = newInstrs();
 		(yyval.void_pointer) = instrs;
@@ -1969,7 +1984,7 @@ yyreduce:
   case 26:
 
 /* Line 1806 of yacc.c  */
-#line 259 "grammar.y"
+#line 274 "grammar.y"
     {
 		tInstr * instr = newInstr(INSTR_NULL, NULL);
 		(yyval.void_pointer) = instr;
@@ -1979,7 +1994,7 @@ yyreduce:
   case 27:
 
 /* Line 1806 of yacc.c  */
-#line 264 "grammar.y"
+#line 279 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (2)].void_pointer);
 	}
@@ -1988,7 +2003,7 @@ yyreduce:
   case 28:
 
 /* Line 1806 of yacc.c  */
-#line 268 "grammar.y"
+#line 283 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -1997,7 +2012,7 @@ yyreduce:
   case 29:
 
 /* Line 1806 of yacc.c  */
-#line 272 "grammar.y"
+#line 287 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2006,7 +2021,7 @@ yyreduce:
   case 30:
 
 /* Line 1806 of yacc.c  */
-#line 278 "grammar.y"
+#line 293 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2015,7 +2030,7 @@ yyreduce:
   case 31:
 
 /* Line 1806 of yacc.c  */
-#line 282 "grammar.y"
+#line 297 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2024,7 +2039,7 @@ yyreduce:
   case 32:
 
 /* Line 1806 of yacc.c  */
-#line 286 "grammar.y"
+#line 301 "grammar.y"
     {
 		tInstrSimple * instrSimple = newInstrSimple((yyvsp[(1) - (1)].void_pointer));
 		tInstr * instr = newInstr(INSTR_SIMPLE, instrSimple);
@@ -2035,7 +2050,7 @@ yyreduce:
   case 33:
 
 /* Line 1806 of yacc.c  */
-#line 294 "grammar.y"
+#line 309 "grammar.y"
     {
 		tInstr * instr = newInstr(INSTR_IF, (yyvsp[(1) - (1)].void_pointer));
 		(yyval.void_pointer) = instr;
@@ -2045,7 +2060,7 @@ yyreduce:
   case 34:
 
 /* Line 1806 of yacc.c  */
-#line 301 "grammar.y"
+#line 316 "grammar.y"
     {
 		tInstr * instr = newInstr(INSTR_WHILE, (yyvsp[(1) - (1)].void_pointer));
 		(yyval.void_pointer) = instr;
@@ -2055,8 +2070,11 @@ yyreduce:
   case 35:
 
 /* Line 1806 of yacc.c  */
-#line 308 "grammar.y"
+#line 323 "grammar.y"
     {
+		if (!isType((yyvsp[(1) - (2)].void_pointer))) {
+			addPendingClass((yyvsp[(1) - (2)].void_pointer)); // TODO!
+		}
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].string), NULL);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
 		(yyval.void_pointer) = instr;
@@ -2066,8 +2084,11 @@ yyreduce:
   case 36:
 
 /* Line 1806 of yacc.c  */
-#line 314 "grammar.y"
+#line 332 "grammar.y"
     {
+		if (!isType((yyvsp[(1) - (4)].void_pointer))) {
+			addPendingClass((yyvsp[(1) - (4)].void_pointer)); // TODO!
+		}
 		free((yyvsp[(3) - (4)].string));
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration((yyvsp[(1) - (4)].void_pointer), (yyvsp[(2) - (4)].string), (yyvsp[(4) - (4)].void_pointer));
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -2078,7 +2099,7 @@ yyreduce:
   case 37:
 
 /* Line 1806 of yacc.c  */
-#line 323 "grammar.y"
+#line 344 "grammar.y"
     {
 		tInstrReturn * instrReturn = newInstrReturn((yyvsp[(2) - (2)].void_pointer));
 		tInstr * instr = newInstr(INSTR_RETURN, instrReturn);
@@ -2089,7 +2110,7 @@ yyreduce:
   case 38:
 
 /* Line 1806 of yacc.c  */
-#line 333 "grammar.y"
+#line 354 "grammar.y"
     {
 		tInstrIf * instrIf = newInstrIf((yyvsp[(3) - (8)].void_pointer), (yyvsp[(6) - (8)].void_pointer), (yyvsp[(8) - (8)].void_pointer));
 		(yyval.void_pointer) = instrIf;
@@ -2099,7 +2120,7 @@ yyreduce:
   case 39:
 
 /* Line 1806 of yacc.c  */
-#line 340 "grammar.y"
+#line 361 "grammar.y"
     {
 		tInstrElse * instrElse = newInstrElse(NULL, (yyvsp[(3) - (4)].void_pointer));
 		(yyval.void_pointer) = instrElse;
@@ -2109,7 +2130,7 @@ yyreduce:
   case 40:
 
 /* Line 1806 of yacc.c  */
-#line 345 "grammar.y"
+#line 366 "grammar.y"
     {
 		tInstrElse * instrElse = newInstrElse((yyvsp[(2) - (2)].void_pointer), NULL);
 		(yyval.void_pointer) = instrElse;
@@ -2119,7 +2140,7 @@ yyreduce:
   case 41:
 
 /* Line 1806 of yacc.c  */
-#line 350 "grammar.y"
+#line 371 "grammar.y"
     {
 		(yyval.void_pointer) = NULL;
 	}
@@ -2128,7 +2149,7 @@ yyreduce:
   case 42:
 
 /* Line 1806 of yacc.c  */
-#line 358 "grammar.y"
+#line 379 "grammar.y"
     {
 		tInstrWhile * instrWhile = newInstrWhile((yyvsp[(3) - (7)].void_pointer), (yyvsp[(6) - (7)].void_pointer));
 		(yyval.void_pointer) = instrWhile;
@@ -2138,7 +2159,7 @@ yyreduce:
   case 43:
 
 /* Line 1806 of yacc.c  */
-#line 363 "grammar.y"
+#line 384 "grammar.y"
     {
 		tList * instrs = newInstrs();
 		_addElement(instrs, (yyvsp[(5) - (5)].void_pointer));
@@ -2150,7 +2171,7 @@ yyreduce:
   case 44:
 
 /* Line 1806 of yacc.c  */
-#line 377 "grammar.y"
+#line 398 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2159,7 +2180,7 @@ yyreduce:
   case 45:
 
 /* Line 1806 of yacc.c  */
-#line 385 "grammar.y"
+#line 406 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2168,7 +2189,7 @@ yyreduce:
   case 46:
 
 /* Line 1806 of yacc.c  */
-#line 389 "grammar.y"
+#line 410 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2179,7 +2200,7 @@ yyreduce:
   case 47:
 
 /* Line 1806 of yacc.c  */
-#line 395 "grammar.y"
+#line 416 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2190,7 +2211,7 @@ yyreduce:
   case 48:
 
 /* Line 1806 of yacc.c  */
-#line 401 "grammar.y"
+#line 422 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2201,7 +2222,7 @@ yyreduce:
   case 49:
 
 /* Line 1806 of yacc.c  */
-#line 407 "grammar.y"
+#line 428 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2212,7 +2233,7 @@ yyreduce:
   case 50:
 
 /* Line 1806 of yacc.c  */
-#line 413 "grammar.y"
+#line 434 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2223,7 +2244,7 @@ yyreduce:
   case 51:
 
 /* Line 1806 of yacc.c  */
-#line 419 "grammar.y"
+#line 440 "grammar.y"
     { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -2234,7 +2255,7 @@ yyreduce:
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 429 "grammar.y"
+#line 450 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2243,7 +2264,7 @@ yyreduce:
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 439 "grammar.y"
+#line 460 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2252,7 +2273,7 @@ yyreduce:
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 445 "grammar.y"
+#line 466 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2261,7 +2282,7 @@ yyreduce:
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 449 "grammar.y"
+#line 470 "grammar.y"
     {
 		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
@@ -2272,7 +2293,7 @@ yyreduce:
   case 57:
 
 /* Line 1806 of yacc.c  */
-#line 457 "grammar.y"
+#line 478 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2281,7 +2302,7 @@ yyreduce:
   case 58:
 
 /* Line 1806 of yacc.c  */
-#line 461 "grammar.y"
+#line 482 "grammar.y"
     {
 		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
@@ -2292,7 +2313,7 @@ yyreduce:
   case 59:
 
 /* Line 1806 of yacc.c  */
-#line 469 "grammar.y"
+#line 490 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2301,7 +2322,7 @@ yyreduce:
   case 60:
 
 /* Line 1806 of yacc.c  */
-#line 473 "grammar.y"
+#line 494 "grammar.y"
     {
 		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
@@ -2312,7 +2333,7 @@ yyreduce:
   case 61:
 
 /* Line 1806 of yacc.c  */
-#line 483 "grammar.y"
+#line 504 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2321,7 +2342,7 @@ yyreduce:
   case 62:
 
 /* Line 1806 of yacc.c  */
-#line 487 "grammar.y"
+#line 508 "grammar.y"
     {
 		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
@@ -2332,7 +2353,7 @@ yyreduce:
   case 63:
 
 /* Line 1806 of yacc.c  */
-#line 493 "grammar.y"
+#line 514 "grammar.y"
     {
 		tEqualityExpr * equalityExpr = newEqualityExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
@@ -2343,7 +2364,7 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 501 "grammar.y"
+#line 522 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2352,7 +2373,7 @@ yyreduce:
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 505 "grammar.y"
+#line 526 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2363,7 +2384,7 @@ yyreduce:
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 511 "grammar.y"
+#line 532 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2374,7 +2395,7 @@ yyreduce:
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 517 "grammar.y"
+#line 538 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2385,7 +2406,7 @@ yyreduce:
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 523 "grammar.y"
+#line 544 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2396,7 +2417,7 @@ yyreduce:
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 533 "grammar.y"
+#line 554 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2405,7 +2426,7 @@ yyreduce:
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 537 "grammar.y"
+#line 558 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2416,7 +2437,7 @@ yyreduce:
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 543 "grammar.y"
+#line 564 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2427,7 +2448,7 @@ yyreduce:
   case 72:
 
 /* Line 1806 of yacc.c  */
-#line 551 "grammar.y"
+#line 572 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2436,7 +2457,7 @@ yyreduce:
   case 73:
 
 /* Line 1806 of yacc.c  */
-#line 555 "grammar.y"
+#line 576 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2447,7 +2468,7 @@ yyreduce:
   case 74:
 
 /* Line 1806 of yacc.c  */
-#line 561 "grammar.y"
+#line 582 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2458,7 +2479,7 @@ yyreduce:
   case 75:
 
 /* Line 1806 of yacc.c  */
-#line 567 "grammar.y"
+#line 588 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (3)].void_pointer), (yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2469,7 +2490,7 @@ yyreduce:
   case 76:
 
 /* Line 1806 of yacc.c  */
-#line 577 "grammar.y"
+#line 598 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2478,8 +2499,11 @@ yyreduce:
   case 77:
 
 /* Line 1806 of yacc.c  */
-#line 581 "grammar.y"
+#line 602 "grammar.y"
     {
+		if (!isTypeName((yyvsp[(2) - (5)].string))) {
+			addPendingClassName((yyvsp[(2) - (5)].string)); // TODO!
+		}
 		tObjectCreation * objCreation = newObjCreation((yyvsp[(2) - (5)].string), (yyvsp[(4) - (5)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
 		(yyval.void_pointer) = expr;
@@ -2489,8 +2513,11 @@ yyreduce:
   case 78:
 
 /* Line 1806 of yacc.c  */
-#line 587 "grammar.y"
+#line 611 "grammar.y"
     {
+		if (!isTypeName((yyvsp[(2) - (3)].string))) {
+			addPendingClassName((yyvsp[(2) - (3)].string)); // TODO!
+		}
 		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr((yyvsp[(2) - (3)].string), (yyvsp[(3) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
 		(yyval.void_pointer) = expr;
@@ -2500,7 +2527,7 @@ yyreduce:
   case 79:
 
 /* Line 1806 of yacc.c  */
-#line 595 "grammar.y"
+#line 622 "grammar.y"
     {
 		(yyval.void_pointer) = newSizes((yyvsp[(2) - (3)].void_pointer));
 	}
@@ -2509,7 +2536,7 @@ yyreduce:
   case 80:
 
 /* Line 1806 of yacc.c  */
-#line 599 "grammar.y"
+#line 626 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (4)].void_pointer), (yyvsp[(3) - (4)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (4)].void_pointer);
@@ -2519,7 +2546,7 @@ yyreduce:
   case 81:
 
 /* Line 1806 of yacc.c  */
-#line 608 "grammar.y"
+#line 635 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2528,7 +2555,7 @@ yyreduce:
   case 82:
 
 /* Line 1806 of yacc.c  */
-#line 612 "grammar.y"
+#line 639 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer), NULL);
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2539,7 +2566,7 @@ yyreduce:
   case 83:
 
 /* Line 1806 of yacc.c  */
-#line 618 "grammar.y"
+#line 645 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer), NULL);
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2550,7 +2577,7 @@ yyreduce:
   case 84:
 
 /* Line 1806 of yacc.c  */
-#line 624 "grammar.y"
+#line 651 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer), NULL);
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2561,7 +2588,7 @@ yyreduce:
   case 85:
 
 /* Line 1806 of yacc.c  */
-#line 630 "grammar.y"
+#line 657 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer), NULL);
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2572,7 +2599,7 @@ yyreduce:
   case 86:
 
 /* Line 1806 of yacc.c  */
-#line 636 "grammar.y"
+#line 663 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer), NULL);
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2583,7 +2610,7 @@ yyreduce:
   case 87:
 
 /* Line 1806 of yacc.c  */
-#line 646 "grammar.y"
+#line 673 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2592,7 +2619,7 @@ yyreduce:
   case 88:
 
 /* Line 1806 of yacc.c  */
-#line 650 "grammar.y"
+#line 677 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr(NULL, (yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].string));
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2603,7 +2630,7 @@ yyreduce:
   case 89:
 
 /* Line 1806 of yacc.c  */
-#line 656 "grammar.y"
+#line 683 "grammar.y"
     {
 		tModifExpr * modifExpr = newModifExpr(NULL, (yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].string));
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
@@ -2614,7 +2641,7 @@ yyreduce:
   case 90:
 
 /* Line 1806 of yacc.c  */
-#line 662 "grammar.y"
+#line 689 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (2)].void_pointer), NULL, (yyvsp[(2) - (2)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2625,7 +2652,7 @@ yyreduce:
   case 91:
 
 /* Line 1806 of yacc.c  */
-#line 668 "grammar.y"
+#line 695 "grammar.y"
     {
 		tOperationExpr * operationExpr = newOperationExpr((yyvsp[(1) - (2)].void_pointer), NULL, (yyvsp[(2) - (2)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
@@ -2636,7 +2663,7 @@ yyreduce:
   case 92:
 
 /* Line 1806 of yacc.c  */
-#line 676 "grammar.y"
+#line 703 "grammar.y"
     {
 		tObjAccessExpr * objAccessExpr = newObjAccessExpr((yyvsp[(2) - (2)].string), NULL);
 		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
@@ -2647,7 +2674,7 @@ yyreduce:
   case 93:
 
 /* Line 1806 of yacc.c  */
-#line 684 "grammar.y"
+#line 711 "grammar.y"
     {
 		tObjAccessExpr * objAccessExpr = newObjAccessExpr((yyvsp[(2) - (5)].string), (yyvsp[(4) - (5)].void_pointer));
 		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
@@ -2658,7 +2685,7 @@ yyreduce:
   case 94:
 
 /* Line 1806 of yacc.c  */
-#line 694 "grammar.y"
+#line 721 "grammar.y"
     {
 		tBuiltInExpr * builtIn = (yyvsp[(1) - (1)].void_pointer);
 		tExpr * expr = newExpr(EXPR_BUILT_IN, (yyvsp[(1) - (1)].void_pointer));
@@ -2669,7 +2696,7 @@ yyreduce:
   case 95:
 
 /* Line 1806 of yacc.c  */
-#line 700 "grammar.y"
+#line 727 "grammar.y"
     {
 		tIdentifier * identifier = newIdentifier((yyvsp[(1) - (1)].string));
 		tExpr * expr = newExpr(EXPR_IDENTIFIER, identifier);
@@ -2680,7 +2707,7 @@ yyreduce:
   case 96:
 
 /* Line 1806 of yacc.c  */
-#line 706 "grammar.y"
+#line 733 "grammar.y"
     {
 		tParenthesisExpr * parenthesisExpr = newParenthesisExpr((yyvsp[(2) - (3)].void_pointer));
 		tExpr * expr = newExpr(EXPR_PARENTHESIS, parenthesisExpr);
@@ -2691,7 +2718,7 @@ yyreduce:
   case 97:
 
 /* Line 1806 of yacc.c  */
-#line 712 "grammar.y"
+#line 739 "grammar.y"
     {
 		tArrayExpr * arrayExpr = newArrayExpr((yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].void_pointer));
 		tExpr * expr = newExpr(EXPR_ARRAY, arrayExpr);
@@ -2702,7 +2729,7 @@ yyreduce:
   case 98:
 
 /* Line 1806 of yacc.c  */
-#line 720 "grammar.y"
+#line 747 "grammar.y"
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_INT, &(yyvsp[(1) - (1)].integer), sizeof(int));
 		(yyval.void_pointer) = builtIn;
@@ -2712,7 +2739,7 @@ yyreduce:
   case 99:
 
 /* Line 1806 of yacc.c  */
-#line 725 "grammar.y"
+#line 752 "grammar.y"
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_BOOLEAN, &(yyvsp[(1) - (1)].boolean), sizeof(int));
 		(yyval.void_pointer) = builtIn;
@@ -2722,7 +2749,7 @@ yyreduce:
   case 100:
 
 /* Line 1806 of yacc.c  */
-#line 730 "grammar.y"
+#line 757 "grammar.y"
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_CHAR, &(yyvsp[(1) - (1)].character), sizeof(char));
 		(yyval.void_pointer) = builtIn;
@@ -2732,7 +2759,7 @@ yyreduce:
   case 101:
 
 /* Line 1806 of yacc.c  */
-#line 735 "grammar.y"
+#line 762 "grammar.y"
     {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_STRING, (yyvsp[(1) - (1)].string), strlen((yyvsp[(1) - (1)].string)) + 1);
 		free((yyvsp[(1) - (1)].string));
@@ -2743,7 +2770,7 @@ yyreduce:
   case 102:
 
 /* Line 1806 of yacc.c  */
-#line 745 "grammar.y"
+#line 772 "grammar.y"
     {
 		tList * defParams = newDefParams();
 		(yyval.void_pointer) = defParams;
@@ -2753,7 +2780,7 @@ yyreduce:
   case 103:
 
 /* Line 1806 of yacc.c  */
-#line 750 "grammar.y"
+#line 777 "grammar.y"
     {
 		(yyval.void_pointer) = (yyvsp[(1) - (1)].void_pointer);
 	}
@@ -2762,7 +2789,7 @@ yyreduce:
   case 104:
 
 /* Line 1806 of yacc.c  */
-#line 756 "grammar.y"
+#line 783 "grammar.y"
     {
 		tList * defParams = newDefParams();
 		_addElement(defParams, (yyvsp[(1) - (1)].void_pointer));
@@ -2773,7 +2800,7 @@ yyreduce:
   case 105:
 
 /* Line 1806 of yacc.c  */
-#line 762 "grammar.y"
+#line 789 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (3)].void_pointer), (yyvsp[(3) - (3)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (3)].void_pointer);
@@ -2783,8 +2810,11 @@ yyreduce:
   case 106:
 
 /* Line 1806 of yacc.c  */
-#line 769 "grammar.y"
+#line 796 "grammar.y"
     {
+		if (!isType((yyvsp[(1) - (2)].void_pointer))) {
+			addPendingClass((yyvsp[(1) - (2)].void_pointer)); // TODO!
+		}
 		tDefParam * defParam = newDefParam((yyvsp[(1) - (2)].void_pointer), (yyvsp[(2) - (2)].string));
 		(yyval.void_pointer) = defParam;
 	}
@@ -2793,7 +2823,7 @@ yyreduce:
   case 107:
 
 /* Line 1806 of yacc.c  */
-#line 776 "grammar.y"
+#line 806 "grammar.y"
     {
 		tList * params = newParams();
 		(yyval.void_pointer) = params;
@@ -2803,7 +2833,7 @@ yyreduce:
   case 108:
 
 /* Line 1806 of yacc.c  */
-#line 781 "grammar.y"
+#line 811 "grammar.y"
     {
 		tList * params = newParams();
 		_addElement(params, (yyvsp[(1) - (1)].void_pointer));
@@ -2814,7 +2844,7 @@ yyreduce:
   case 109:
 
 /* Line 1806 of yacc.c  */
-#line 787 "grammar.y"
+#line 817 "grammar.y"
     {
 		_addElement((yyvsp[(1) - (3)].void_pointer), (yyvsp[(3) - (3)].void_pointer));
 		(yyval.void_pointer) = (yyvsp[(1) - (3)].void_pointer);
@@ -2824,7 +2854,7 @@ yyreduce:
   case 110:
 
 /* Line 1806 of yacc.c  */
-#line 794 "grammar.y"
+#line 824 "grammar.y"
     {
 		tParam * param = newParam((yyvsp[(1) - (1)].void_pointer));
 		(yyval.void_pointer) = param;
@@ -2834,7 +2864,7 @@ yyreduce:
   case 111:
 
 /* Line 1806 of yacc.c  */
-#line 801 "grammar.y"
+#line 831 "grammar.y"
     {
 		(yyval.void_pointer) = newType((yyvsp[(1) - (1)].string));
 	}
@@ -2843,7 +2873,7 @@ yyreduce:
   case 112:
 
 /* Line 1806 of yacc.c  */
-#line 806 "grammar.y"
+#line 836 "grammar.y"
     {
 		tType * type = newType((yyvsp[(1) - (2)].string));
 		addBrackets(type, (yyvsp[(2) - (2)].integer));
@@ -2854,7 +2884,7 @@ yyreduce:
   case 113:
 
 /* Line 1806 of yacc.c  */
-#line 814 "grammar.y"
+#line 844 "grammar.y"
     {
 		(yyval.integer) = 1;
 	}
@@ -2863,7 +2893,7 @@ yyreduce:
   case 114:
 
 /* Line 1806 of yacc.c  */
-#line 818 "grammar.y"
+#line 848 "grammar.y"
     {
 		(yyval.integer) = (yyvsp[(1) - (3)].integer) + 1;
 	}
@@ -2872,7 +2902,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2876 "y.tab.c"
+#line 2906 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -3103,6 +3133,6 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 823 "grammar.y"
+#line 853 "grammar.y"
 	
 

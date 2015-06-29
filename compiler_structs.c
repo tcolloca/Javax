@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "compiler_structs.h"
 #include "lib/list.h"
+#include "lib/uthash.h"
 
 typedef struct program {
 	char * name;
@@ -28,6 +29,7 @@ typedef struct class {
 	tList * properties;
 	tList * constructors;
 	tList * methods;
+	UT_hash_handle hh; /* hashable*/
 } tClass;
 
 typedef struct property {
@@ -149,6 +151,94 @@ typedef struct type {
 	int brackets;
 } tType;
 
+typedef struct unknownType {
+	char * name;
+	UT_hash_handle hh; /* hashable*/
+} tUnknownType;
+
+tClass * classes = NULL;
+tList * pendingClasses = NULL;
+tUnknownType * unknownTypes = NULL;
+
+/*** PendingClasses ***/
+
+void initPendingClasses() {
+	pendingClasses = _newList(sizeof(char *));
+}
+
+void addPendingClass(tType * type) {
+	addPendingClassName(type->type);
+}
+
+void addPendingClassName(char * type) {
+	char ** aux = malloc(sizeof(char *));
+	char * aux2 = strdup(type);
+	aux = memcpy(aux, &aux2, sizeof(char *));
+	_addElement(pendingClasses, aux);
+}
+
+int checkPendingClasses() {
+	_reset(pendingClasses);
+	char ** name;
+	int flag = 1;
+	while ((name = _next(pendingClasses)) != NULL) {
+		if (!classExists(*name)) {
+			addUknownType(*name);
+			flag = 0;
+		}
+	}
+	_reset(pendingClasses);
+	return flag;
+}
+
+void addUknownType(char * name) {
+	if (hasUnknownType(name)) {
+		return;
+	}
+	tUnknownType * unknownType = malloc(sizeof(tUnknownType));
+	unknownType->name = name;
+	HASH_ADD_KEYPTR(hh, unknownTypes, unknownType->name, strlen(unknownType->name), unknownType);
+}
+
+int hasUnknownType(char * name) {
+	tUnknownType * unknownType;
+	HASH_FIND_STR(unknownTypes, name, unknownType);
+	return unknownType != NULL;
+}
+
+void printUknownTypes() {
+	printf("Unknown types:\n");
+	char ** name;
+	tUnknownType * unknownType;
+
+	for(unknownType = unknownTypes; unknownType != NULL; unknownType = unknownType->hh.next) {
+        printf("%s\n", unknownType->name);
+    }
+	/*while ((name = _next(unknownTypes)) != NULL) {
+		printf("%s\n", *name);
+	}*/
+}
+
+void deletePendingClasses() {
+	_reset(pendingClasses);
+	char ** name;
+	while ((name = _next(pendingClasses)) != NULL) {
+		free(*name);
+		free(name);
+	}
+	_reset(pendingClasses);
+	deleteUnknownTypes();
+	_deleteList(pendingClasses);
+}
+
+void deleteUnknownTypes() {
+	tUnknownType * unknownType, * tmp;
+	HASH_ITER(hh, unknownTypes, unknownType, tmp) {
+    	HASH_DEL(unknownTypes, unknownType);
+    	free(unknownType);
+  	}
+}
+
 /*** Program ***/
 
 tProgram * newProgram(char * name) {
@@ -165,7 +255,6 @@ void printProgram(tProgram * program) {
 	if (program->imports != NULL) {
 		printImports(program->imports);
 	}
-	printf("public class %s {\n", program->name);
 	if (program->classes != NULL) {
 		printClasses(program->classes);
 		printf("\n");
@@ -295,6 +384,7 @@ tClass * newClass(char * name, tList * properties, tList * constructors, tList *
 	class->properties = properties;
 	class->constructors = constructors;
 	class->methods = methods;
+	addClassToClassMap(class);
 	return class;
 }
 
@@ -337,6 +427,27 @@ void deleteClass(tClass * class) {
 
 tList * newClasses() {
 	return _newList(sizeof(tClass));
+}
+
+void addClassToClassMap(tClass * class) {
+	tClass * newClass = malloc(sizeof(tClass));
+	newClass = memcpy(newClass, class, sizeof(tClass)); 
+	HASH_ADD_KEYPTR(hh, classes, newClass->name, strlen(newClass->name), newClass);
+}
+
+int classExists(char * name) {
+	tClass * class;
+	HASH_FIND_STR(classes, name, class);
+	return class != NULL;
+}
+
+void deleteClassesMap() {
+	tClass * class, * tmp;
+
+  	HASH_ITER(hh, classes, class, tmp) {
+    	HASH_DEL(classes, class);
+    	free(class);
+  	}
 }
 
 /*** Property ***/
@@ -1129,7 +1240,7 @@ void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
 
 void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
 	free(arrayCreationExpr->name);
-	_deleteList(arrayCreationExpr->sizes);
+	deleteSizes(arrayCreationExpr->sizes);
 	free(arrayCreationExpr);
 }
 
@@ -1151,7 +1262,7 @@ void printArrayExpr(tArrayExpr * arrayExpr) {
 
 void deleteArrayExpr(tArrayExpr * arrayExpr) {
 	free(arrayExpr->variable);
-	_deleteList(arrayExpr->sizes);
+	deleteSizes(arrayExpr->sizes);
 	free(arrayExpr);
 }
 
@@ -1175,6 +1286,29 @@ void printType(tType * type) {
 	for (i = 0; i < type->brackets; i++) {
 		printf("[]");
 	}
+}
+
+int isType(tType * type) {
+	return isTypeName(type->type);
+}
+
+int isTypeName(char * typeName) {
+	if (!strcmp(typeName, "int")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "char")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "String")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "boolean")) {
+		return 1;
+	}
+	if (classExists(typeName)) {
+		return 1;
+	}
+	return 0;
 }
 
 void deleteType(tType * type) {
