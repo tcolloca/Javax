@@ -180,7 +180,6 @@ void addMain(tProgram * program, tMain * main) {
 
 void deleteProgram(tProgram * program) {
 	free(program->name);
-	/*
 	if (program->imports != NULL) {
 		deleteImports(program->imports);
 	}
@@ -191,15 +190,13 @@ void deleteProgram(tProgram * program) {
 		deleteMain(program->main);
 	}
 	free(program);
-	*/
 }
 
 /*** Imports ***/
 
-tList * newImportElems(char * name) {
+tList * newImportElems(char ** name) {
 	tList * import = _newList(sizeof(char *));
-	_addElement(import, strdup(name));
-	free(name);
+	_addElement(import, name);
 	return import;
 }
 
@@ -228,11 +225,10 @@ void printImports(tList * imports) {
 void printImport(tList * import) {
 	_reset(import);
 	printf("import ");
-	char * elem = _next(import);
-	printf("%s", elem);
-	
+	char ** elem = _next(import);
+	printf("%s", *elem);	
 	while ((elem = _next(import)) != NULL) {
-		printf(".%s", elem);
+		printf(".%s", *elem);
 	}
 	printf(";\n");
 	_reset(import);
@@ -243,6 +239,7 @@ void deleteImports(tList * imports) {
 	tImport * import;
 	while ((import = _next(imports)) != NULL) {
 		deleteImport(import->importElems);
+		free(import);
 	}
 	_reset(imports);
 	_deleteList(imports);
@@ -250,8 +247,9 @@ void deleteImports(tList * imports) {
 
 void deleteImport(tList * import) {
 	_reset(import);
-	char * elem;
+	char ** elem;
 	while ((elem = _next(import)) != NULL) {
+		free(*elem);
 		free(elem);
 	}
 	_reset(import);
@@ -374,7 +372,9 @@ void deleteProperties(tList * properties) {
 void deleteProperty(tProperty * property) {
 	free(property->type);
 	free(property->name);
-	deleteExpr(property->expr);
+	if(property->expr != NULL) {
+		deleteExpr(property->expr);
+	}
 	free(property);
 }
 

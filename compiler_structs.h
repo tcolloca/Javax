@@ -96,7 +96,7 @@ void deleteProgram(tProgram * program);
 
 /*** Imports ***/
 
-tList * newImportElems(char * name);
+tList * newImportElems(char ** name);
 
 tImport * newImport(tList * importElems);
 

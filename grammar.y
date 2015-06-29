@@ -124,12 +124,16 @@ import:
 
 import_element:
 	import_element OP_PROP IDENTIFIER {
-		_addElement($1, $3);
+		char ** aux = malloc(sizeof(char *));
+		aux = memcpy(aux, &$3, sizeof(char *));
+		_addElement($1, aux);
 		$$ = $1;
 	}
 	|
 	IDENTIFIER {
-		tList * importElems = newImportElems($1);
+		char ** aux = malloc(sizeof(char *));
+		aux = memcpy(aux, &$1, sizeof(char *));
+		tList * importElems = newImportElems(aux);
 		$$ = importElems;
 	}
 
