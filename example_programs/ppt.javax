@@ -33,10 +33,12 @@ main() {
 	Game game = new Game();
 	String play;
 	boolean gameOver = false;
+	System.out.print("\033[2J\033[1;1H");
 	while (!gameOver) {
 		game.printResults();
 		System.out.println("Piedra, Papel o Tijera? (Q para terminar)");
 		play = s.next().toLowerCase();
+		System.out.print("\033[2J\033[1;1H");
 		if (play.equals("q") || play.equals("quit")){
 			gameOver = true;
 		} else if (play.equals("piedra") || play.equals("papel") || play.equals("tijera")) {
