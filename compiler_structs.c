@@ -31,7 +31,7 @@ typedef struct class {
 } tClass;
 
 typedef struct property {
-	char * type;
+	tType * type;
 	char * name;
 	tExpr * expr;
 } tProperty;
@@ -43,14 +43,14 @@ typedef struct constructor {
 } tConstructor;
 
 typedef struct method {
-	char * returnType;
+	tType * returnType;
 	char * name;
 	tList * defParams;
 	tList * instrs;
 } tMethod;
 
 typedef struct defParam {
-	char * type;
+	tType * type;
 	char * name;
 } tDefParam;
 
@@ -95,7 +95,7 @@ typedef struct builtInExpr {
 
 typedef struct assignmentExpr { //TODO: Tom, cambie esto, esta bien?
 	//int type;
-	char * variable;
+	tExpr * variable;
 	char * op;
 	tExpr * expr;
 } tAssignmentExpr;
@@ -119,8 +119,7 @@ typedef struct objectCreation {
 
 typedef struct arrayCreation {
 	char * name;
-	int first;
-	int second;
+	tList * sizes;
 } tArrayCreationExpr;
 
 typedef struct operationExpr {
@@ -141,9 +140,14 @@ typedef struct objAccess {
 } tObjAccessExpr;
 
 typedef struct arrayExpr {
-	tExpr * expr;
-	int size;
+	char * variable;
+	tList * sizes;
 } tArrayExpr;
+
+typedef struct type {
+	char * type;
+	int brackets;
+} tType;
 
 /*** Program ***/
 
@@ -337,10 +341,9 @@ tList * newClasses() {
 
 /*** Property ***/
 
-tProperty * newProperty(char * type, char * name, tExpr * expr) {
+tProperty * newProperty(tType * type, char * name, tExpr * expr) {
 	tProperty * property = malloc(sizeof(tProperty));
-	property->type = strdup(type);
-	free(type);
+	property->type = type;
 	property->name = strdup(name);
 	free(name);
 	property->expr = expr;
@@ -357,7 +360,9 @@ void printProperties(tList * properties) {
 }
 
 void printProperty(tProperty * property) {
-	printf("\t%s %s", property->type, property->name);
+	printf("\t");
+	printType(property->type);
+	printf(" %s", property->name);
 	if (property->expr != NULL) {
 		printf(" = ");
 		printExpr(property->expr);
@@ -376,7 +381,7 @@ void deleteProperties(tList * properties) {
 }
 
 void deleteProperty(tProperty * property) {
-	free(property->type);
+	deleteType(property->type);
 	free(property->name);
 	if(property->expr != NULL) {
 		deleteExpr(property->expr);
@@ -441,10 +446,9 @@ tList * newConstructors() {
 
 /*** Method ***/
 
-tMethod * newMethod(char * returnType, char * name, tList * defParams, tList * instrs) {
+tMethod * newMethod(tType * returnType, char * name, tList * defParams, tList * instrs) {
 	tMethod * method = malloc(sizeof(tMethod));
-	method->returnType = strdup(returnType);
-	free(returnType);
+	method->returnType = returnType;
 	method->name = strdup(name);
 	free(name);
 	method->defParams = defParams;
@@ -463,7 +467,9 @@ void printMethods(tList * methods) {
 }
 
 void printMethod(tMethod * method) {
-	printf("\t%s %s(", method->returnType, method->name);
+	printf("\t");
+	printType(method->returnType);
+	printf(" %s(", method->name);
 	printDefParams(method->defParams);
 	printf(") {\n");
 	printInstrs(method->instrs);
@@ -481,7 +487,7 @@ void deleteMethods(tList * methods) {
 }
 
 void deleteMethod(tMethod * method) {
-	free(method->returnType);
+	deleteType(method->returnType);
 	free(method->name);
 	deleteDefParams(method->defParams);
 	deleteInstrs(method->instrs);
@@ -494,10 +500,9 @@ tList * newMethods() {
 
 /*** DefParam ***/
 
-tDefParam * newDefParam(char * type, char * name) {
+tDefParam * newDefParam(tType * type, char * name) {
 	tDefParam * defParam = malloc(sizeof(tDefParam));
-	defParam->type = strdup(type);
-	free(type);
+	defParam->type = type;
 	defParam->name = strdup(name);
 	free(name);
 	return defParam;
@@ -518,7 +523,8 @@ void printDefParams(tList * defParams) {
 }
 
 void printDefParam(tDefParam * defParam) {
-	printf("%s %s", defParam->type, defParam->name);
+	printType(defParam->type);
+	printf(" %s", defParam->name);
 }
 
 void deleteDefParams(tList * defParams) {
@@ -532,7 +538,7 @@ void deleteDefParams(tList * defParams) {
 }
 
 void deleteDefParam(tDefParam * defParam) {
-	free(defParam->type);
+	deleteType(defParam->type);
 	free(defParam->name);
 	free(defParam);
 }
@@ -654,7 +660,7 @@ tList * newInstrs() {
 
 /*** InstrDeclaration ***/
 
-tInstrDeclaration * newInstrDeclaration(char * type, char * name, tExpr * expr) {
+tInstrDeclaration * newInstrDeclaration(tType * type, char * name, tExpr * expr) {
 	return newProperty(type, name, expr);
 }
 
@@ -903,10 +909,9 @@ void deleteBuiltIn(tBuiltInExpr * builtIn) {
 
 /*** AssignmentExpr ***/
 
-tAssignmentExpr * newAssignmentExpr(char * variable, char * op, tExpr * expr) {
+tAssignmentExpr * newAssignmentExpr(tExpr * variable, char * op, tExpr * expr) {
 	tAssignmentExpr * assignmentExpr = malloc(sizeof(tAssignmentExpr));
-	assignmentExpr->variable = strdup(variable);
-	free(variable);
+	assignmentExpr->variable = variable;
 	assignmentExpr->op = strdup(op);
 	free(op);
 	assignmentExpr->expr = expr;
@@ -914,12 +919,13 @@ tAssignmentExpr * newAssignmentExpr(char * variable, char * op, tExpr * expr) {
 }
 
 void printAssignmentExpr(tAssignmentExpr * assignmentExpr) {
-	printf("%s %s ", assignmentExpr->variable, assignmentExpr->op);
+	printExpr(assignmentExpr->variable);
+	printf(" %s ", assignmentExpr->op);
 	printExpr(assignmentExpr->expr);
 }
 
 void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr) {
-	free(assignmentExpr->variable);
+	deleteExpr(assignmentExpr->variable);
 	free(assignmentExpr->op);
 	deleteExpr(assignmentExpr->expr);
 	free(assignmentExpr);
@@ -1108,44 +1114,100 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 
 /*** Array Creation Expr ***/
 
-tArrayCreationExpr * newArrayCreationExpr(char * name, int first, int second)	{
+tArrayCreationExpr * newArrayCreationExpr(char * name, tList * sizes)	{
 	tArrayCreationExpr * arrayCreationExpr = malloc(sizeof(tArrayCreationExpr));
 	arrayCreationExpr->name = strdup(name);
 	free(name);
-	arrayCreationExpr->first = first;
-	arrayCreationExpr->second = second;
+	arrayCreationExpr->sizes = sizes;
 	return arrayCreationExpr;
 }
 
 void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
-	printf("new %s[%d]", arrayCreationExpr->name, arrayCreationExpr->first);
-	if (arrayCreationExpr->second != 0) printf("[%d]", arrayCreationExpr->second);
+	printf("new %s", arrayCreationExpr->name);
+	printSizes(arrayCreationExpr->sizes);
 }
 
 void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
 	free(arrayCreationExpr->name);
+	_deleteList(arrayCreationExpr->sizes);
 	free(arrayCreationExpr);
 }
 
 
 /*** Array Expr ***/
 
-tArrayExpr * newArrayExpr(tExpr * expr, int size)	{
+tArrayExpr * newArrayExpr(char * variable, tList * sizes)	{
 	tArrayExpr * arrayExpr = malloc(sizeof(tArrayExpr));
-	arrayExpr->expr = expr;
-	arrayExpr->size = size;
+	arrayExpr->variable = strdup(variable);
+	free(variable);
+	arrayExpr->sizes = sizes;
 	return arrayExpr;
 }
 
 void printArrayExpr(tArrayExpr * arrayExpr) {
-	printExpr(arrayExpr->expr);
-	printf("[%d]", arrayExpr->size);
+	printf("%s", arrayExpr->variable);
+	printSizes(arrayExpr->sizes);
 }
 
 void deleteArrayExpr(tArrayExpr * arrayExpr) {
-	deleteExpr(arrayExpr->expr);
+	free(arrayExpr->variable);
+	_deleteList(arrayExpr->sizes);
 	free(arrayExpr);
 }
 
+/*** Type ***/
 
+tType * newType(char * name) {
+	tType * type = malloc(sizeof(tType));
+	type->type = strdup(name);
+	free(name);
+	type->brackets = 0;
+	return type;
+}
+
+void addBrackets(tType * type, int brackets) {
+	type->brackets += brackets;
+}
+
+void printType(tType * type) {
+	printf("%s", type->type);
+	int i;
+	for (i = 0; i < type->brackets; i++) {
+		printf("[]");
+	}
+}
+
+void deleteType(tType * type) {
+	free(type->type);
+	free(type);
+}
+
+/*** Sizes ***/
+
+tList * newSizes(tExpr * expr) {
+	tList * sizes = _newList(sizeof(tExpr));
+	_addElement(sizes, expr);
+	return sizes;
+}
+
+void printSizes(tList * sizes) {
+	_reset(sizes);
+	tExpr * size;
+	while ((size = _next(sizes)) != NULL) {
+		printf("[");
+		printExpr(size);
+		printf("]");
+	}
+	_reset(sizes);
+}
+
+void deleteSizes(tList * sizes) {
+	_reset(sizes);
+	tExpr * size;
+	while ((size = _next(sizes)) != NULL) {
+		deleteExpr(size);
+	}
+	_reset(sizes);
+	_deleteList(sizes);
+}
 

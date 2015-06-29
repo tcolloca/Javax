@@ -83,6 +83,8 @@ typedef struct objAccess tObjAccessExpr;
 
 typedef struct arrayExpr tArrayExpr;
 
+typedef struct type tType;
+
 /*** Program ***/
 
 tProgram * newProgram(char * name);
@@ -137,7 +139,7 @@ tList * newClasses();
 
 /*** Property ***/
 
-tProperty * newProperty(char * type, char * name, tExpr * expr);
+tProperty * newProperty(tType * type, char * name, tExpr * expr);
 
 void printProperties(tList * properties);
 
@@ -165,7 +167,7 @@ tList * newConstructors();
 
 /*** Method ***/
 
-tMethod * newMethod(char * returnType, char * name, tList * defParams, tList * instrs);
+tMethod * newMethod(tType * returnType, char * name, tList * defParams, tList * instrs);
 
 void printMethods(tList * methods);
 
@@ -180,7 +182,7 @@ tList * newMethods();
 
 /*** DefParam ***/
 
-tDefParam * newDefParam(char * type, char * name);
+tDefParam * newDefParam(tType * type, char * name);
 
 void printDefParams(tList * defparams);
 
@@ -218,7 +220,7 @@ tList * newInstrs();
 
 /*** InstrDeclaration ***/
 
-tInstrDeclaration * newInstrDeclaration(char * type, char * name, tExpr * expr);
+tInstrDeclaration * newInstrDeclaration(tType * type, char * name, tExpr * expr);
 
 void printInstrDeclaration(tInstrDeclaration * instrDeclaration);
 
@@ -282,7 +284,7 @@ void deleteBuiltIn(tBuiltInExpr * builtIn) ;
 
 /*** AssignmentExpr ***/
 
-tAssignmentExpr * newAssignmentExpr(char * variable, char * op, tExpr * expr);
+tAssignmentExpr * newAssignmentExpr(tExpr * variable, char * op, tExpr * expr);
 
 void printAssignmentExpr(tAssignmentExpr * assignmentExpr);
 
@@ -346,7 +348,7 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr);
 
 /*** Array Creation Expr ***/
 
-tArrayCreationExpr * newArrayCreationExpr(char * name, int first, int second);
+tArrayCreationExpr * newArrayCreationExpr(char * name, tList * sizes);
 
 void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
 
@@ -354,10 +356,28 @@ void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
 
 /*** Array Expr ***/
 
-tArrayExpr * newArrayExpr(tExpr * expr, int size);
+tArrayExpr * newArrayExpr(char * variable, tList * sizes);
 
 void printArrayExpr(tArrayExpr * arrayExpr);
 
 void deleteArrayExpr(tArrayExpr * arrayExpr);
+
+/*** Type ***/
+
+tType * newType(char * name);
+
+void addBrackets(tType * type, int brackets);
+
+void printType(tType * type);
+
+void deleteType(tType * type);
+
+/*** Sizes ***/
+
+tList * newSizes(tExpr * expr);
+
+void printSizes(tList * sizes);
+
+void deleteSizes(tList * sizes);
 
 #endif

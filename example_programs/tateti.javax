@@ -11,7 +11,9 @@ class Tablero {
 	}
 	
 	method boolean put(char player, int row, int col) {
-		if (tablero[row][col] != NULL) return false;
+		if (tablero[row][col] != null) {
+			 return false;
+		}
 		tablero[row][col] = player;
 		return true;
 	}

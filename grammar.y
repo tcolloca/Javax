@@ -81,6 +81,8 @@ sumInts(int a, int b) {
 %type <void_pointer> expr_object_creation expr_multiplicative expr_additive expr_order expr_and expr_or
 %type <void_pointer> expr expr_implies expr_boolean expr_conditional expr_assignment parameters parameter
 %type <void_pointer> method_call property_access
+%type <void_pointer> type array_size
+%type <integer> brackets
 
 %%
 
@@ -185,27 +187,13 @@ class_instance_properties:
 	; 
 
 class_instance_property:
-	IDENTIFIER IDENTIFIER SEMC {
+	type IDENTIFIER SEMC {
 		tProperty * property = newProperty($1, $2, NULL);
 		$$ = property;
 	}
 	|
-	IDENTIFIER IDENTIFIER OP_ASSIGN expr SEMC {
+	type IDENTIFIER OP_ASSIGN expr SEMC {
 		tProperty * property = newProperty($1, $2, $4);
-		$$ = property;
-	}
-	|
-	IDENTIFIER LBRA RBRA IDENTIFIER SEMC {
-		char * name = malloc(strlen($1) + 3);
-		sprintf(name, "%s[]", $1);
-		tProperty * property = newProperty(name, $4, NULL);
-		$$ = property;
-	}
-	|
-	IDENTIFIER LBRA RBRA LBRA RBRA IDENTIFIER SEMC {
-		char * name = malloc(strlen($1) + 5);
-		sprintf(name, "%s[][]", $1);
-		tProperty * property = newProperty(name, $6, NULL);
 		$$ = property;
 	}
 	;
@@ -247,7 +235,7 @@ class_instance_methods:
 	; 
 
 class_instance_method:
-	METHOD IDENTIFIER IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
+	METHOD type IDENTIFIER LPAR parameters_def RPAR LCUR instr_set RCUR {
 		tMethod * method = newMethod($2, $3, $5, $8);
 		$$ = method;
 	}
@@ -317,13 +305,13 @@ instr_loop:
 	;
 
 instr_declaration:
-	IDENTIFIER IDENTIFIER {
+	type IDENTIFIER {
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
 		$$ = instr;
 	}
 	|
-	IDENTIFIER IDENTIFIER OP_ASSIGN expr {
+	type IDENTIFIER OP_ASSIGN expr {
 		free($3);
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, $4);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -398,37 +386,37 @@ expr_assignment:
 		$$ = $1;
 	}
 	|//TODO: puse IDENTIFIER a la izq Tom, esta bien?
-	IDENTIFIER OP_ASSIGN expr_assignment { 
+	expr_conditional OP_ASSIGN expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_PLUS_SH expr_assignment { 
+	expr_conditional OP_PLUS_SH expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_MINUS_SH expr_assignment { 
+	expr_conditional OP_MINUS_SH expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_MULT_SH expr_assignment { 
+	expr_conditional OP_MULT_SH expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_DIV_SH expr_assignment { 
+	expr_conditional OP_DIV_SH expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
 	}
 	|
-	IDENTIFIER OP_MOD_SH expr_assignment { 
+	expr_conditional OP_MOD_SH expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
 		$$ = expr;
@@ -596,16 +584,21 @@ expr_object_creation:
 		$$ = expr;
 	}
 	|
-	NEW IDENTIFIER LBRA INT RBRA {
-		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $4, 0);
+	NEW IDENTIFIER array_size {
+		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $3);
 		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
 		$$ = expr;
 	}
+	;
+
+array_size:
+	LBRA expr RBRA {
+		$$ = newSizes($2);
+	}
 	|
-	NEW IDENTIFIER LBRA INT RBRA LBRA INT RBRA {
-		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $4, $7);
-		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
-		$$ = expr;
+	array_size LBRA expr RBRA {
+		_addElement($1, $3);
+		$$ = $1;
 	}
 	;
 
@@ -716,8 +709,8 @@ expr_basic:
 		$$ = expr;
 	}
 	|
-	expr_basic LBRA INT RBRA {
-		tArrayExpr * arrayExpr = newArrayExpr($1, $3);
+	IDENTIFIER array_size {
+		tArrayExpr * arrayExpr = newArrayExpr($1, $2);
 		tExpr * expr = newExpr(EXPR_ARRAY, arrayExpr);
 		$$ = expr;
 	}
@@ -773,7 +766,7 @@ parameters_def_2:
 	;
 
 parameter_def:
-	IDENTIFIER IDENTIFIER {
+	type IDENTIFIER {
 		tDefParam * defParam = newDefParam($1, $2);
 		$$ = defParam;
 	}
@@ -804,5 +797,27 @@ parameter:
 	}
 	;
 
+type:
+	IDENTIFIER {
+		$$ = newType($1);
+	}
+	|
+
+	IDENTIFIER brackets {
+		tType * type = newType($1);
+		addBrackets(type, $2);
+		$$ = type;
+	}
+	;
+
+brackets:
+	LBRA RBRA {
+		$$ = 1;
+	}
+	|
+	brackets LBRA RBRA {
+		$$ = $1 + 1;
+	}
+	;
 
 %%	
