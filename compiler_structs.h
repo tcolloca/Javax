@@ -85,6 +85,26 @@ typedef struct arrayExpr tArrayExpr;
 
 typedef struct type tType;
 
+typedef struct unknownType tUnknownType;
+
+/*** PendingCLasses ***/
+
+void initPendingClasses();
+
+void addPendingClass(tType * type);
+
+void addPendingClassName(char * type);
+
+int checkPendingClasses();
+
+void addUknownType(char * name);
+
+void printUknownTypes();
+
+void deletePendingClasses();
+
+void deleteUnknownTypes();
+
 /*** Program ***/
 
 tProgram * newProgram(char * name);
@@ -136,6 +156,12 @@ void deleteClasses(tList * classes);
 void deleteClass(tClass * class);
 
 tList * newClasses();
+
+void addClassToClassMap(tClass * class);
+
+int classExists(char * name);
+
+void deleteClassesMap();
 
 /*** Property ***/
 
@@ -369,6 +395,10 @@ tType * newType(char * name);
 void addBrackets(tType * type, int brackets);
 
 void printType(tType * type);
+
+int isType(tType * type);
+
+int isTypeName(char * typeName);
 
 void deleteType(tType * type);
 
