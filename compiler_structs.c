@@ -26,11 +26,16 @@ typedef struct import {
 
 typedef struct class {
 	char * name;
+	tExtends * extends;
 	tList * properties;
 	tList * constructors;
 	tList * methods;
 	UT_hash_handle hh; /* hashable*/
 } tClass;
+
+typedef struct extends {
+	char * name;
+} tExtends;
 
 typedef struct property {
 	tType * type;
@@ -255,6 +260,7 @@ void printProgram(tProgram * program) {
 	if (program->imports != NULL) {
 		printImports(program->imports);
 	}
+	printf("public class %s {\n", program->name);
 	if (program->classes != NULL) {
 		printClasses(program->classes);
 		printf("\n");
@@ -377,10 +383,11 @@ void deleteMain(tMain * main) {
 
 /*** Class ***/
 
-tClass * newClass(char * name, tList * properties, tList * constructors, tList * methods) {
+tClass * newClass(char * name, tExtends * extends, tList * properties, tList * constructors, tList * methods) {
 	tClass * class = malloc(sizeof(tClass));
 	class->name = strdup(name);
 	free(name);
+	class->extends = extends;
 	class->properties = properties;
 	class->constructors = constructors;
 	class->methods = methods;
@@ -400,7 +407,9 @@ void printClasses(tList * classes) {
 
 
 void printClass(tClass * class) {
-	printf("static class %s {\n\n", class->name);
+	printf("static class %s ", class->name);
+	printExtends(class->extends);
+	printf("{\n\n");
 	printProperties(class->properties);
 	printConstructors(class->constructors);
 	printMethods(class->methods);
@@ -419,6 +428,7 @@ void deleteClasses(tList * classes) {
 
 void deleteClass(tClass * class) {
 	free(class->name);
+	deleteExtends(class->extends);
 	deleteProperties(class->properties);
 	deleteConstructors(class->constructors);
 	deleteMethods(class->methods);
@@ -448,7 +458,29 @@ void deleteClassesMap() {
     	HASH_DEL(classes, class);
     	free(class);
   	}
+ }
+ 
+/*** Extends ***/
+
+tExtends * newExtends(char * name) {
+	tExtends * extends = malloc(sizeof(tExtends));
+	if (name != NULL) {
+		extends->name = strdup(name);
+		free(name);
+	} else extends->name = NULL;
+	return extends;
 }
+
+void printExtends(tExtends * extends) {
+	if (extends->name != NULL) printf("extends %s ", extends->name);
+	
+}
+
+void deleteExtends(tExtends * extends) {
+	if (extends->name != NULL) free(extends->name);
+	free(extends);
+}
+
 
 /*** Property ***/
 
@@ -1303,6 +1335,24 @@ int isTypeName(char * typeName) {
 		return 1;
 	}
 	if (!strcmp(typeName, "boolean")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "Scanner")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "Character")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "Integer")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "void")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "float")) {
+		return 1;
+	}
+	if (!strcmp(typeName, "double")) {
 		return 1;
 	}
 	if (classExists(typeName)) {
