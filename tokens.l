@@ -46,6 +46,7 @@ class return CLASS;
 method return METHOD;
 program return PROGRAM;
 import return IMPORT;
+extends return EXTENDS;
 main return MAIN;
 (return) return RETURN;
 
