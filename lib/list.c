@@ -68,3 +68,13 @@ void _deleteNode(tNode * node) {
 	}
 	free(node);
 }
+
+int _size(tList * list) {
+	int size = 0;
+	_reset(list);
+	while (_next(list) != NULL) {
+		size++;
+	}
+	_reset(list);
+	return size;
+}

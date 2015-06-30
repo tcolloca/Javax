@@ -51,6 +51,7 @@ import return IMPORT;
 extends return EXTENDS;
 main return MAIN;
 (return) return RETURN;
+null return TOKEN_NULL;
 
 \+\+ SAVE_STRING; return OP_PLUS_PLUS;
 \-\- SAVE_STRING; return OP_MINUS_MINUS;

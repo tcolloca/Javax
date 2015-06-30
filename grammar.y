@@ -42,7 +42,7 @@ sumInts(int a, int b) {
 %token <string> STRING
 %token <doubleNum> DOUBLE
 %token <string> IDENTIFIER
-%token IF ELSE FOR WHILE CONST NEW IMPORT EXTENDS CLASS METHOD PROGRAM RETURN MAIN
+%token IF ELSE FOR WHILE CONST NEW IMPORT EXTENDS CLASS METHOD PROGRAM RETURN MAIN TOKEN_NULL
 %token <string> OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
 %token <string> OP_PLUS_PLUS OP_MINUS_MINUS
 %token <string> OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
@@ -58,7 +58,7 @@ sumInts(int a, int b) {
 %type <void_pointer> classes
 %type <void_pointer> main 
 %type <string> program_name
-%type <void_pointer> import imports import_element extends
+%type <void_pointer> import imports import_element extends import_element2
 %type <void_pointer> class 
 %type <void_pointer> class_instance_properties 
 %type <void_pointer> class_instance_property 
@@ -82,7 +82,6 @@ sumInts(int a, int b) {
 %type <void_pointer> built_in expr_basic expr_post_additive_or_access expr_pre_additive_sign_and_not expr_equality
 %type <void_pointer> expr_object_creation expr_multiplicative expr_additive expr_order expr_and expr_or
 %type <void_pointer> expr expr_implies expr_boolean expr_conditional expr_assignment parameters parameter
-%type <void_pointer> method_call property_access
 %type <void_pointer> type array_size
 %type <integer> brackets
 
@@ -92,6 +91,7 @@ sumInts(int a, int b) {
 
 program:
 	program_name imports classes main {
+		initSystem();
 		tProgram * program = newProgram($1);
 		addImports(program, $2);
 		addClasses(program, $3);
@@ -99,10 +99,13 @@ program:
 		if (!checkPendingClasses()) {
 			printUknownTypes();
 		}
+		analyseProgram(program);
 		printProgram(program);
 		deleteProgram(program);
 		deletePendingClasses();
 		deleteClassesMap();
+		deleteSymbols();
+		deleteSystem();
 	}
 	;
 
@@ -123,7 +126,7 @@ imports:
 		$$ = imports;
 	}
 	;
-	
+		
 import: 
 	IMPORT import_element SEMC {
 		tImport * import = newImport($2);
@@ -132,7 +135,25 @@ import:
 	;
 
 import_element:
-	import_element OP_PROP IDENTIFIER {
+	import_element2 OP_PROP IDENTIFIER {
+		newImportedClass($3);
+		char ** aux = malloc(sizeof(char *));
+		aux = memcpy(aux, &$3, sizeof(char *));
+		_addElement($1, aux);
+		$$ = $1;
+	}
+	|
+	IDENTIFIER {
+		newImportedClass($1);
+		char ** aux = malloc(sizeof(char *));
+		aux = memcpy(aux, &$1, sizeof(char *));
+		tList * importElems = newImportElems(aux);
+		$$ = importElems;
+	}
+	;
+
+import_element2:
+	import_element2 OP_PROP IDENTIFIER {
 		char ** aux = malloc(sizeof(char *));
 		aux = memcpy(aux, &$3, sizeof(char *));
 		_addElement($1, aux);
@@ -145,6 +166,7 @@ import_element:
 		tList * importElems = newImportElems(aux);
 		$$ = importElems;
 	}
+	;
 
 classes:
 	classes class {
@@ -537,26 +559,26 @@ expr_order:
 	}
 	|
 	expr_order OP_GE expr_additive {
-		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
 		$$ = expr;
 	}
 	|
 	expr_order OP_LE expr_additive {
-		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
 		$$ = expr;
 	}
 	|
 	expr_order OP_GT expr_additive {
-		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
 		$$ = expr;
 	}
 	|
 	expr_order OP_LT expr_additive {
-		tOperationExpr * operationExpr = newOperationExpr($1, $2, $3);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
+		tEqualityExpr * equalityExpr = newEqualityExpr($1, $2, $3);
+		tExpr * expr = newExpr(EXPR_EQUALITY, equalityExpr);
 		$$ = expr;
 	}
 	;
@@ -698,31 +720,15 @@ expr_post_additive_or_access:
 		tExpr * expr = newExpr(EXPR_MODIF, modifExpr);
 		$$ = expr;
 	}
-	| //TODO: Esto permite hacer coas que no se pueden hacer, habria uqe moverlo me parece
-	expr_post_additive_or_access method_call {
-		tOperationExpr * operationExpr = newOperationExpr($1, NULL, $2);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
-		$$ = expr;
-	}
 	|
-	expr_post_additive_or_access property_access {
-		tOperationExpr * operationExpr = newOperationExpr($1, NULL, $2);
-		tExpr * expr = newExpr(EXPR_OPERATION, operationExpr);
-		$$ = expr;
-	}
-	;
-
-property_access:
-	OP_PROP IDENTIFIER {
-		tObjAccessExpr * objAccessExpr = newObjAccessExpr($2, NULL);
+	expr_post_additive_or_access OP_PROP IDENTIFIER LPAR parameters RPAR {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr($1, $3, $5);
 		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
 		$$ = expr;
 	}
-	;
-
-method_call:
-	OP_PROP IDENTIFIER LPAR parameters RPAR {
-		tObjAccessExpr * objAccessExpr = newObjAccessExpr($2, $4);
+	|
+	expr_post_additive_or_access OP_PROP IDENTIFIER  {
+		tObjAccessExpr * objAccessExpr = newObjAccessExpr($1, $3, NULL);
 		tExpr * expr = newExpr(EXPR_OBJ_ACCESS, objAccessExpr); 
 		$$ = expr;
 	}
@@ -780,6 +786,11 @@ built_in:
 	|
 	DOUBLE {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_DOUBLE, &$1, sizeof(double));
+		$$ = builtIn;
+	}
+	|
+	TOKEN_NULL {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_NULL, NULL, 0);
 		$$ = builtIn;
 	}
 	;	

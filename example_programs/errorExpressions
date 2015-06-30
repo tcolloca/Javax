@@ -1,0 +1,5 @@
+program: errorExpressions
+
+main() {
+	int var = 2+ true;
+}

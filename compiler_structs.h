@@ -15,6 +15,7 @@
 #define INPUT_CHAR 			2
 #define INPUT_STRING 		3
 #define INPUT_DOUBLE 		4
+#define INPUT_NULL			5
 
 #define EXPR_BUILT_IN			0
 #define EXPR_ASSIGNMENT			1
@@ -70,7 +71,7 @@ typedef struct assignmentExpr tAssignmentExpr;
 
 typedef struct equalityExpr tEqualityExpr;
 
-typedef tExpr tParenthesisExpr;
+typedef struct parenthesisExpr tParenthesisExpr;
 
 typedef struct identifier tIdentifier;
 
@@ -82,13 +83,23 @@ typedef struct operationExpr tOperationExpr;
 
 typedef struct modifExpr tModifExpr;
 
-typedef struct objAccess tObjAccessExpr;
+typedef struct objAccessExpr tObjAccessExpr;
 
 typedef struct arrayExpr tArrayExpr;
 
 typedef struct type tType;
 
 typedef struct unknownType tUnknownType;
+
+typedef struct symbol tSymbol;
+
+/*** System ***/
+
+void initSystem();
+
+void addOutStream();
+
+void deleteSystem();
 
 /*** PendingCLasses ***/
 
@@ -122,6 +133,8 @@ void addMain(tProgram * program, tMain * main);
 
 void deleteProgram(tProgram * program);
 
+void analyseProgram(tProgram * program);
+
 /*** Imports ***/
 
 tList * newImportElems(char ** name);
@@ -146,9 +159,13 @@ void printMain(tMain * main);
 
 void deleteMain(tMain * main);
 
+void analyseMain(tMain * main);
+
 /*** Class ***/
 
 tClass * newClass(char * name, tExtends * extends, tList * properties, tList * constructors, tList * methods);
+
+void newImportedClass(char * name);
 
 void printClasses(tList * classes);
 
@@ -156,7 +173,11 @@ void printClass(tClass * class);
 
 void deleteClasses(tList * classes);
 
+void analyseClasses(tList * classes);
+
 void deleteClass(tClass * class);
+
+void analyseClass(tClass * class);
 
 tList * newClasses();
 
@@ -164,7 +185,21 @@ void addClassToClassMap(tClass * class);
 
 int classExists(char * name);
 
+tClass * getClass(char * name);
+
 void deleteClassesMap();
+
+void deleteImportedClasses();
+
+int hasProperty(tClass * class, char * name);
+
+tProperty * getProperty(tClass * class, char * name);
+
+int hasMethod(tClass * class, char * name);
+
+tMethod * getMethod(tClass * class, char * name);
+
+int hasConstructor(tClass * class);
 
 /*** Extends ***/
 
@@ -184,7 +219,11 @@ void printProperty(tProperty * property);
 
 void deleteProperties(tList * properties);
 
+void analyseProperties(tList * properties);
+
 void deleteProperty(tProperty * property);
+
+void analyseProperty(tProperty * property);
 
 tList * newProperties();
 
@@ -198,7 +237,11 @@ void printConstructor(tConstructor * constructor);
 
 void deleteConstructors(tList * constructors);
 
+void analyseConstructors(tList * constructors);
+
 void deleteConstructor(tConstructor * constructor);
+
+void analyseConstructor(tConstructor * constructor);
 
 tList * newConstructors();
 
@@ -212,7 +255,11 @@ void printMethod(tMethod * method);
 
 void deleteMethods(tList * methods);
 
+void analyseMethods(tList * methods);
+
 void deleteMethod(tMethod * method);
+
+void analyseMethod(tMethod * method);
 
 tList * newMethods();
 
@@ -221,13 +268,17 @@ tList * newMethods();
 
 tDefParam * newDefParam(tType * type, char * name);
 
-void printDefParams(tList * defparams);
+void printDefParams(tList * defParams);
 
-void printDefParam(tDefParam * defparam);
+void printDefParam(tDefParam * defParam);
 
-void deleteDefParams(tList * defparams);
+void deleteDefParams(tList * defParams);
 
-void deleteDefParam(tDefParam * defparam);
+void analyseDefParams(tList * defParams);
+
+void deleteDefParam(tDefParam * defParam);
+
+void analyseDefParam(tDefParam * defParam);
 
 tList * newDefParams();
 
@@ -239,7 +290,13 @@ void printParams(tList * params);
 
 void deleteParams(tList * params);
 
+void analyseParams(tList * params);
+
+void analyseParam(tParam * param);
+
 tList * newParams();
+
+int paramsHaveErrors(tList * params);
 
 /*** Instr ***/
 
@@ -251,7 +308,11 @@ void printInstr(tInstr * instr);
 
 void deleteInstrs(tList * instrs);
 
+void analyseInstrs(tList * instrs);
+
 void deleteInstr(tInstr * instr);
+
+void analyseInstr(tInstr * instr);
 
 tList * newInstrs();
 
@@ -263,6 +324,8 @@ void printInstrDeclaration(tInstrDeclaration * instrDeclaration);
 
 void deleteInstrDeclaration(tInstrDeclaration * instrDeclaration);
 
+void analyseInstrDeclaration(tInstrDeclaration * instrDeclaration);
+
 /*** InstrReturn ***/
 
 tInstrReturn * newInstrReturn(tExpr * expr);
@@ -270,6 +333,8 @@ tInstrReturn * newInstrReturn(tExpr * expr);
 void printInstrReturn(tInstrReturn * instrReturn);
 
 void deleteInstrReturn(tInstrReturn * instrReturn);
+
+void analyseInstrReturn(tInstrReturn * instrReturn);
 
 /*** InstrSimple ***/
 
@@ -279,6 +344,8 @@ void printInstrSimple(tInstrSimple * instrSimple);
 
 void deleteInstrSimple(tInstrSimple * instrSimple);
 
+void analyseInstrSimple(tInstrSimple * instrSimple);
+
 /*** InstrIf ***/
 
 tInstrIf * newInstrIf(tExpr * expr, tList * instrs, tInstrElse * instrElse);
@@ -286,6 +353,8 @@ tInstrIf * newInstrIf(tExpr * expr, tList * instrs, tInstrElse * instrElse);
 void printInstrIf(tInstrIf * instrIf);
 
 void deleteInstrIf(tInstrIf * instrIf);
+
+void analyseInstrIf(tInstrIf * instrIf);
 
 /*** InstrElse ***/
 
@@ -295,6 +364,8 @@ void printInstrElse(tInstrElse * instrElse);
 
 void deleteInstrElse(tInstrElse * instrElse);
 
+void analyseInstrElse(tInstrElse * instrElse);
+
 /*** InstrWhile ***/
 
 tInstrWhile * newInstrWhile(tExpr * expr, tList * instrs);
@@ -302,6 +373,8 @@ tInstrWhile * newInstrWhile(tExpr * expr, tList * instrs);
 void printInstrWhile(tInstrWhile * instrWhile);
 
 void deleteInstrWhile(tInstrWhile * instrWhile);
+
+void analyseInstrWhile(tInstrWhile * instrWhile);
 
 /*** Expr ***/
 
@@ -311,13 +384,25 @@ void printExpr(tExpr * expr);
 
 void deleteExpr(tExpr * expr);
 
+void analyseExpr(tExpr * expr);
+
+tType * getType(int type, void * expr);
+
+void deleteExprType(int type, void * expr);
+
+int isLeftValue(tExpr * expr);
+
 /*** BuiltInExpr ***/
 
 tBuiltInExpr * newBuiltIn(int type, void * variable, int bytes);
 
 void printBuiltIn(tBuiltInExpr * builtIn);
 
-void deleteBuiltIn(tBuiltInExpr * builtIn) ;
+void deleteBuiltIn(tBuiltInExpr * builtIn);
+
+void analyseBuiltIn(tBuiltInExpr * builtIn);
+
+tType * getBuiltInType(int type);
 
 /*** AssignmentExpr ***/
 
@@ -327,13 +412,17 @@ void printAssignmentExpr(tAssignmentExpr * assignmentExpr);
 
 void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr);
 
+void analyseAssignmentExpr(tAssignmentExpr * assignmentExpr);
+
 /*** EqualityExpr ***/
 
 tEqualityExpr * newEqualityExpr(tExpr * first, char * op, tExpr * second);
 
 void printEqualityExpr(tEqualityExpr * equalityExpr);
 
-void deleteEqualityExpr(tEqualityExpr * equalityExpr) ;
+void deleteEqualityExpr(tEqualityExpr * equalityExpr);
+
+void analyseEqualityExpr(tEqualityExpr * equalityExpr);
 
 /*** Identifier ***/
 
@@ -343,6 +432,10 @@ void printIdentifier(tIdentifier * identifier);
 
 void deleteIdentifier(tIdentifier * identifier);
 
+void analyseIdentifier(tIdentifier * identifier);
+
+tType * getIdentifierType(char * name);
+
 /*** ParenthesisExpr ***/
 
 tParenthesisExpr * newParenthesisExpr(tExpr * expr);
@@ -350,6 +443,8 @@ tParenthesisExpr * newParenthesisExpr(tExpr * expr);
 void printParenthesisExpr(tParenthesisExpr * parenthesisExpr);
 
 void deleteParenthesisExpr(tParenthesisExpr * parenthesisExpr);
+
+void analyseParenthesisExpr(tParenthesisExpr * parenthesisExpr);
 
 /*** Object Creation ***/
 
@@ -359,6 +454,8 @@ void printObjCreation(tObjectCreation * objCreation);
 
 void deleteObjCreation(tObjectCreation * objCreation);
 
+void analyseObjCreation(tObjectCreation * objCreation);
+
 /*** Operation Expr ***/
 
 tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second);
@@ -366,6 +463,10 @@ tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second);
 void printOperationExpr(tOperationExpr * operationExpr);
 
 void deleteOperationExpr(tOperationExpr * operationExpr);
+
+void analyseOperationExpr(tOperationExpr * operationExpr);
+
+tType * getOperationType(tExpr * first, tExpr * second, char * op);
 
 /*** Modif Expr ***/
 
@@ -375,13 +476,21 @@ void printModifExpr(tModifExpr * modifExpr);
 
 void deleteModifExpr(tModifExpr * modifExpr);
 
+void analyseModifExpr(tModifExpr * modifExpr);
+
+tType * getModifType(tExpr * expr, char * op);
+
 /*** Object Access Expr ***/
 
-tObjAccessExpr * newObjAccessExpr(char * name, tList * params);
+tObjAccessExpr * newObjAccessExpr(tExpr * expr, char * name, tList * params);
 
 void printObjAccessExpr(tObjAccessExpr * objAccessExpr);
 
 void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr);
+
+void analyseObjAccessExpr(tObjAccessExpr * objAccessExpr);
+
+int isObjAccessLeftValue(tObjAccessExpr * objAccessExpr);
 
 /*** Array Creation Expr ***/
 
@@ -391,6 +500,8 @@ void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
 
 void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
 
+void analyseArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr);
+
 /*** Array Expr ***/
 
 tArrayExpr * newArrayExpr(char * variable, tList * sizes);
@@ -398,6 +509,8 @@ tArrayExpr * newArrayExpr(char * variable, tList * sizes);
 void printArrayExpr(tArrayExpr * arrayExpr);
 
 void deleteArrayExpr(tArrayExpr * arrayExpr);
+
+void analyseArrayExpr(tArrayExpr * arrayExpr);
 
 /*** Type ***/
 
@@ -420,5 +533,95 @@ tList * newSizes(tExpr * expr);
 void printSizes(tList * sizes);
 
 void deleteSizes(tList * sizes);
+
+void analyseSizes(tList * sizes);
+
+int sizesHaveErrors(tList * sizes);
+
+/*** Scope ***/
+
+void newBlock();
+
+void endBlock();
+
+/*** Symbols ***/
+
+void addSymbol(char * name, tType * type);
+
+int hasSymbol(char * name);
+
+tSymbol * getSymbol(char * name);
+
+void deleteSymbols();
+
+void deleteSymbol(tSymbol * symbol);
+
+void deleteSymbolsInScope();
+
+int isInScope(tSymbol * symbol);
+
+/*** Type Validation ***/
+
+tType * intType();
+
+tType * charType();
+
+tType * stringType();
+
+tType * booleanType();
+
+tType * nullType();
+
+tType * objectType(char * name);
+
+tType * unknownType();
+
+tType * arrayType(char * name, int brackets);
+
+tType * getBasicType(tType * type);
+
+tType * errorType();
+
+tType * nestedErrorType();
+
+int hasError(tExpr * expr);
+
+tType * getBiggestType(tExpr * first, tExpr * second);
+
+int typesMatch(tExpr * expr1, tExpr * expr2);
+
+int isObject(tExpr * expr);
+
+int isIntType(tType * type);
+
+int isCharType(tType * type);
+
+int isStringType(tType * type);
+
+int isBooleanType(tType * type);
+
+int isNullType(tType * type);
+
+int isObjectType(tType * type);
+
+int isUnknownType(tType * type);
+
+int isArrayType(tType * type);
+
+int isErrorType(tType * type);
+
+int isNestedErrorType(tType * type);
+
+int isAlphabeticType(tType * type);
+
+int isNumericType(tType * type);
+
+int isValidBinaryOperation(tType * type1, tType * type2, char * op);
+
+int isValidUnaryOperation(tType * type, char * op);
+
+int sameSize(tType * type, int size);
+
+tType * copyType(tType * type);
 
 #endif

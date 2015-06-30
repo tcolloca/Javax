@@ -92,61 +92,76 @@ typedef struct instrWhile {
 
 typedef struct expr {
 	int type;
+	tType * exprType;
 	void * expr;
 } tExpr;
 
 typedef struct builtInExpr {
 	int type;
 	void * variable;
+	tType * exprType;
 } tBuiltInExpr;
 
-typedef struct assignmentExpr { //TODO: Tom, cambie esto, esta bien?
+typedef struct assignmentExpr { 
 	//int type;
+	tType * exprType;
 	tExpr * variable;
 	char * op;
 	tExpr * expr;
 } tAssignmentExpr;
 
 typedef struct equalityExpr {
+	tType * exprType;
 	tExpr * first;
 	char * op;
 	tExpr * second;
 } tEqualityExpr;
 
-typedef tExpr tParenthesisExpr;
+typedef struct parenthesisExpr {
+	tExpr * expr;
+	tType * exprType;
+} tParenthesisExpr;
 
 typedef struct identifier {
+	tType * exprType;
 	char * name;
 } tIdentifier;
 
 typedef struct objectCreation {
+	tType * exprType;
 	char * name;
 	tList * params;
 } tObjectCreation;
 
 typedef struct arrayCreation {
+	tType * exprType;
 	char * name;
 	tList * sizes;
 } tArrayCreationExpr;
 
 typedef struct operationExpr {
+	tType * exprType;
 	tExpr * first;
 	char * op;
 	tExpr * second;
 } tOperationExpr;
 
 typedef struct modifExpr {
+	tType * exprType;
 	char * prevOp;
 	tExpr * expr;
 	char * postOp;
 } tModifExpr;
 
-typedef struct objAccess {
+typedef struct objAccessExpr {
+	tType * exprType;
 	char * name;
 	tList * params;
+	tExpr * expr;
 } tObjAccessExpr;
 
 typedef struct arrayExpr {
+	tType * exprType;
 	char * variable;
 	tList * sizes;
 } tArrayExpr;
@@ -161,9 +176,59 @@ typedef struct unknownType {
 	UT_hash_handle hh; /* hashable*/
 } tUnknownType;
 
+typedef struct symbol {
+	char * name;
+	tType * type;
+	int scope;
+	UT_hash_handle hh; /* hashable*/
+} tSymbol;
+
+tClass * outStreamClass = NULL;
+tClass * systemClass = NULL;
+tType * systemType = NULL;
+
 tClass * classes = NULL;
 tList * pendingClasses = NULL;
+tList * importedClasses = NULL;
 tUnknownType * unknownTypes = NULL;
+
+tSymbol * symbols = NULL;
+int scope = 0;
+
+/*** System ***/
+
+void initSystem() {
+	addOutStream();
+
+	tList * properties = newProperties();
+	tProperty * property = newProperty(objectType(strdup("OutStream")), strdup("out"), NULL);
+	_addElement(properties, property);
+	tList * constructors = newConstructors();
+	tList * methods = newMethods();
+	systemClass = newClass(strdup("System"), properties, constructors, methods);
+	addClassToClassMap(systemClass);
+
+	addSymbol(systemClass->name, systemType = objectType(strdup("System")));
+}
+
+void addOutStream() {
+	tList * properties = newProperties();
+	tList * constructors = newConstructors();
+	tList * methods = newMethods();
+	tList * defParams = newDefParams();
+	tDefParam * defParam = newDefParam(stringType(), strdup("string"));
+	_addElement(defParams, defParam);
+	tMethod * method = newMethod(intType(), strdup("println"), defParams, newInstrs());
+	_addElement(methods, method);
+	outStreamClass = newClass(strdup("OutStream"), properties, constructors, methods);
+	addClassToClassMap(outStreamClass);
+}
+
+void deleteSystem() {
+	deleteClass(systemClass);
+	deleteClass(outStreamClass);
+	deleteType(systemType);
+}
 
 /*** PendingClasses ***/
 
@@ -297,6 +362,15 @@ void deleteProgram(tProgram * program) {
 	free(program);
 }
 
+void analyseProgram(tProgram * program) {
+	if (program->classes != NULL) {
+		analyseClasses(program->classes);
+	}
+	if (program->main != NULL) {
+		analyseMain(program->main);
+	}
+}
+
 /*** Imports ***/
 
 tList * newImportElems(char ** name) {
@@ -312,6 +386,7 @@ tImport * newImport(tList * importElems) {
 }
 
 tList * newImports() {
+	importedClasses = _newList(sizeof(tClass));
 	return _newList(sizeof(tImport));
 }
 
@@ -347,6 +422,7 @@ void deleteImports(tList * imports) {
 		free(import);
 	}
 	_reset(imports);
+	deleteImportedClasses();
 	_deleteList(imports);
 }
 
@@ -381,6 +457,12 @@ void deleteMain(tMain * main) {
 	free(main);
 }
 
+void analyseMain(tMain * main) {
+	if (main->instrs != NULL) {
+		analyseInstrs(main->instrs);
+	}
+}
+
 /*** Class ***/
 
 tClass * newClass(char * name, tExtends * extends, tList * properties, tList * constructors, tList * methods) {
@@ -393,6 +475,13 @@ tClass * newClass(char * name, tExtends * extends, tList * properties, tList * c
 	class->methods = methods;
 	addClassToClassMap(class);
 	return class;
+}
+
+void newImportedClass(char * name) {
+	tClass * class = malloc(sizeof(tClass));
+	class->name = name;
+	addClassToClassMap(class);
+	_addElement(importedClasses, class);
 }
 
 void printClasses(tList * classes) {
@@ -426,6 +515,15 @@ void deleteClasses(tList * classes) {
 	_deleteList(classes);
 }
 
+void analyseClasses(tList * classes) {
+	_reset(classes);
+	tClass * class;
+	while ((class = _next(classes)) != NULL) {
+		analyseClass(class);
+	}
+	_reset(classes);
+}
+
 void deleteClass(tClass * class) {
 	free(class->name);
 	deleteExtends(class->extends);
@@ -433,6 +531,14 @@ void deleteClass(tClass * class) {
 	deleteConstructors(class->constructors);
 	deleteMethods(class->methods);
 	free(class);
+}
+
+void analyseClass(tClass * class) {
+	newBlock();
+	analyseProperties(class->properties);
+	analyseConstructors(class->constructors);
+	analyseMethods(class->methods);
+	endBlock();
 }
 
 tList * newClasses() {
@@ -446,9 +552,13 @@ void addClassToClassMap(tClass * class) {
 }
 
 int classExists(char * name) {
+	return getClass(name) != NULL;
+}
+
+tClass * getClass(char * name) {
 	tClass * class;
 	HASH_FIND_STR(classes, name, class);
-	return class != NULL;
+	return class;
 }
 
 void deleteClassesMap() {
@@ -459,6 +569,54 @@ void deleteClassesMap() {
     	free(class);
   	}
  }
+
+ void deleteImportedClasses() {
+	_reset(importedClasses);
+	tClass * class;
+	while ((class = _next(importedClasses)) != NULL) {
+		free(class);
+	}
+	_reset(importedClasses);
+	_deleteList(importedClasses);
+}
+
+int hasProperty(tClass * class, char * name) {
+	return getProperty(class, name) != NULL;
+}
+
+tProperty * getProperty(tClass * class, char * name) {
+	_reset(class->properties);
+	tProperty * property;
+	while ((property = _next(class->properties)) != NULL) {
+		if (!strcmp(property->name, name)) {
+			_reset(class->properties);
+			return property;
+		}
+	}
+	_reset(class->properties);
+	return NULL;
+}
+
+int hasMethod(tClass * class, char * name) {
+	return getMethod(class, name) != NULL;
+}
+
+tMethod * getMethod(tClass * class, char * name) {
+	_reset(class->methods);
+	tMethod * method;
+	while ((method = _next(class->methods)) != NULL) {
+		if (!strcmp(method->name, name)) {
+			_reset(class->methods);
+			return method;
+		}
+	}
+	_reset(class->methods);
+	return NULL;
+}
+
+int hasConstructor(tClass * class) {
+	return !_isEmpty(class->constructors);
+}
  
 /*** Extends ***/
 
@@ -480,7 +638,6 @@ void deleteExtends(tExtends * extends) {
 	if (extends->name != NULL) free(extends->name);
 	free(extends);
 }
-
 
 /*** Property ***/
 
@@ -523,6 +680,15 @@ void deleteProperties(tList * properties) {
 	_deleteList(properties);
 }
 
+void analyseProperties(tList * properties) {
+	_reset(properties);
+	tProperty * property;
+	while ((property = _next(properties)) != NULL) {
+		analyseProperty(property);
+	}
+	_reset(properties);
+}
+
 void deleteProperty(tProperty * property) {
 	deleteType(property->type);
 	free(property->name);
@@ -530,6 +696,18 @@ void deleteProperty(tProperty * property) {
 		deleteExpr(property->expr);
 	}
 	free(property);
+}
+
+void analyseProperty(tProperty * property) {
+	if (hasSymbol(property->name)) {
+		printf("Property %s has already been declared.\n", property->name);
+		// TODO: Existing symbol.
+	} else {
+		addSymbol(property->name, property->type);
+	}
+	if (property->expr != NULL) {
+		analyseExpr(property->expr);
+	}	
 }
 
 tList * newProperties() {
@@ -575,12 +753,27 @@ void deleteConstructors(tList * constructors) {
 	_deleteList(constructors);
 }
 
+void analyseConstructors(tList * constructors) {
+	_reset(constructors);
+	tConstructor * constructor;
+	while ((constructor = _next(constructors)) != NULL) {
+		analyseConstructor(constructor);
+	}
+	_reset(constructors);
+}
 
 void deleteConstructor(tConstructor * constructor) {
 	free(constructor->name);
 	deleteDefParams(constructor->defParams);
 	deleteInstrs(constructor->instrs);
 	free(constructor);
+}
+
+void analyseConstructor(tConstructor * constructor) {
+	newBlock();
+	analyseDefParams(constructor->defParams);
+	analyseInstrs(constructor->instrs);
+	endBlock();
 }
 
 tList * newConstructors() {
@@ -629,12 +822,28 @@ void deleteMethods(tList * methods) {
 	_deleteList(methods);
 }
 
+void analyseMethods(tList * methods) {
+	_reset(methods);
+	tMethod * method;
+	while ((method = _next(methods)) != NULL) {
+		analyseMethod(method);
+	}
+	_reset(methods);
+}
+
 void deleteMethod(tMethod * method) {
 	deleteType(method->returnType);
 	free(method->name);
 	deleteDefParams(method->defParams);
 	deleteInstrs(method->instrs);
 	free(method);
+}
+
+void analyseMethod(tMethod * method) {
+	newBlock();
+	analyseDefParams(method->defParams);
+	analyseInstrs(method->instrs);
+	endBlock();
 }
 
 tList * newMethods() {
@@ -680,10 +889,28 @@ void deleteDefParams(tList * defParams) {
 	_deleteList(defParams);
 }
 
+void analyseDefParams(tList * defParams) {
+	_reset(defParams);
+	tDefParam * defParam;
+	while ((defParam = _next(defParams)) != NULL) {
+		analyseDefParam(defParam);
+	}
+	_reset(defParams);
+}
+
 void deleteDefParam(tDefParam * defParam) {
 	deleteType(defParam->type);
 	free(defParam->name);
 	free(defParam);
+}
+
+void analyseDefParam(tDefParam * defParam) {
+	if (hasSymbol(defParam->name)) {
+		printf("Parameter %s has already been declared.\n", defParam->name);
+		// TODO: Existing symbol.
+	} else {
+		addSymbol(defParam->name, defParam->type);
+	}
 }
 
 tList * newDefParams() {
@@ -720,8 +947,34 @@ void deleteParams(tList * params) {
 	_deleteList(params);
 }
 
+void analyseParams(tList * params) {
+	_reset(params);
+	tParam * param;
+	while ((param = _next(params)) != NULL) {
+		analyseParam(param);
+	}
+	_reset(params);
+}
+
+void analyseParam(tParam * param) {
+	analyseExpr(param);
+}
+
 tList * newParams() {
 	return _newList(sizeof(tParam));
+}
+
+int paramsHaveErrors(tList * params) {
+	_reset(params);
+	tParam * param;
+	while ((param = _next(params)) != NULL) {
+		if (hasError(param)) {
+			_reset(params);
+			return 1;
+		}
+	}
+	_reset(params);
+	return 0;
 }
 
 /*** Instr ***/
@@ -774,6 +1027,17 @@ void deleteInstrs(tList * instrs) {
 	_deleteList(instrs);
 }
 
+void analyseInstrs(tList * instrs) {
+	newBlock();
+	_reset(instrs);
+	tInstr * instr;
+	while ((instr = _next(instrs)) != NULL) {
+		analyseInstr(instr);
+	}
+	_reset(instrs);
+	endBlock();
+}
+
 void deleteInstr(tInstr * instr) {
 	switch (instr->type) {
 		case INSTR_NULL:
@@ -797,6 +1061,28 @@ void deleteInstr(tInstr * instr) {
 	free(instr);
 }
 
+void analyseInstr(tInstr * instr) {
+	switch (instr->type) {
+		case INSTR_NULL:
+			return;
+		case INSTR_DECLARATION:
+			analyseInstrDeclaration(instr->instr);
+			break;
+		case INSTR_RETURN:
+			analyseInstrReturn(instr->instr);
+			break;
+		case INSTR_SIMPLE:
+			analyseInstrSimple(instr->instr);
+			break;
+		case INSTR_IF:
+			analyseInstrIf(instr->instr);
+			break;
+		case INSTR_WHILE:
+			analyseInstrWhile(instr->instr);
+			break;
+	}
+}
+
 tList * newInstrs() {
 	return _newList(sizeof(tInstr));
 }
@@ -815,6 +1101,18 @@ void deleteInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 	deleteProperty(instrDeclaration);
 }
 
+void analyseInstrDeclaration(tInstrDeclaration * instrDeclaration) {
+	if (hasSymbol(instrDeclaration->name)) {
+		printf("Variable %s has already been declared.\n", instrDeclaration->name);
+		// TODO: Existing symbol.
+	} else {
+		addSymbol(instrDeclaration->name, instrDeclaration->type);
+	}
+	if (instrDeclaration->expr != NULL) {
+		analyseExpr(instrDeclaration->expr);
+	}	
+}
+
 /*** InstrReturn ***/
 
 tInstrReturn * newInstrReturn(tExpr * expr) {
@@ -831,6 +1129,10 @@ void deleteInstrReturn(tInstrReturn * instrReturn) {
 	deleteExpr(instrReturn);
 }
 
+void analyseInstrReturn(tInstrReturn * instrReturn) {
+	analyseExpr(instrReturn);
+}
+
 /*** InstrSimple ***/
 
 tInstrSimple * newInstrSimple(tExpr * expr) {
@@ -845,6 +1147,10 @@ void printInstrSimple(tInstrSimple * instrSimple) {
 
 void deleteInstrSimple(tInstrSimple * instrSimple) {
 	deleteExpr(instrSimple);
+}
+
+void analyseInstrSimple(tInstrSimple * instrSimple) {
+	analyseExpr(instrSimple);
 }
 
 /*** InstrIf ***/
@@ -879,6 +1185,14 @@ void deleteInstrIf(tInstrIf * instrIf) {
 	free(instrIf);
 }
 
+void analyseInstrIf(tInstrIf * instrIf) {
+	analyseExpr(instrIf->expr);
+	analyseInstrs(instrIf->instrs);
+	if (instrIf->instrElse != NULL) {
+		analyseInstrElse(instrIf->instrElse);
+	}
+}
+
 /*** InstrElse ***/
 
 tInstrElse * newInstrElse(tInstrIf * instrIf, tList * instrs) {
@@ -908,6 +1222,14 @@ void deleteInstrElse(tInstrElse * instrElse) {
 	free(instrElse);
 }
 
+void analyseInstrElse(tInstrElse * instrElse) {
+	if (instrElse->instrIf != NULL) {
+		analyseInstrIf(instrElse->instrIf);
+	} else {
+		analyseInstrs(instrElse->instrs);
+	}
+}
+
 /*** InstrWhile ***/
 
 tInstrWhile * newInstrWhile(tExpr * expr, tList * instrs) {
@@ -931,12 +1253,18 @@ void deleteInstrWhile(tInstrWhile * instrWhile) {
 	free(instrWhile);
 }
 
+void analyseInstrWhile(tInstrWhile * instrWhile) {
+	analyseExpr(instrWhile->expr);
+	analyseInstrs(instrWhile->instrs);
+}
+
 /*** Expr ***/
 
 tExpr * newExpr(int type, void * expr) {
 	tExpr * newExpr = malloc(sizeof(tExpr));
 	newExpr->type = type;
 	newExpr->expr = expr;
+	newExpr->exprType = copyType(getType(type, expr));
 	return newExpr;
 }
 
@@ -979,6 +1307,8 @@ void printExpr(tExpr * expr) {
 }
 
 void deleteExpr(tExpr * expr) {
+	deleteType(expr->exprType);
+	//deleteExprType(expr->type, expr->expr);
 	switch (expr->type) {
 		case EXPR_BUILT_IN:
 			deleteBuiltIn(expr->expr);
@@ -1017,14 +1347,157 @@ void deleteExpr(tExpr * expr) {
 	free(expr);
 }
 
+void analyseExpr(tExpr * expr) {
+	if (hasError(expr)) {
+		printf("There's an error in expr: ");
+		printExpr(expr);
+		printf(" \n");
+
+		tEqualityExpr * eqExpr;
+		tOperationExpr * opExpr;
+		switch (expr->type) {
+			case EXPR_EQUALITY:
+				eqExpr = (tEqualityExpr *) expr->expr;
+				printf("%s %s %s\n", eqExpr->first->exprType->type, eqExpr->op, eqExpr->second->exprType->type);
+				//printf("types match? %d", isValidBinaryOperation(eqExpr->first->exprType, eqExpr->second->exprType, eqExpr->op));
+			break;
+			case EXPR_OPERATION:
+				opExpr = (tOperationExpr *) expr->expr;
+				printf("%s %s %s\n", opExpr->first->exprType->type, opExpr->op, opExpr->second->exprType->type);
+				//isValidBinaryOperation(opExpr->first->exprType, opExpr->second->exprType, opExpr->op);
+			break;
+		}
+	}
+	switch (expr->type) {
+		case EXPR_BUILT_IN:
+			analyseBuiltIn(expr->expr);
+			break;	
+		case EXPR_ASSIGNMENT:
+			analyseAssignmentExpr(expr->expr);
+			break;
+		case EXPR_PARENTHESIS:
+			analyseParenthesisExpr(expr->expr);
+			break;
+		case EXPR_IDENTIFIER:
+			analyseIdentifier(expr->expr);
+			break;
+		case EXPR_EQUALITY:
+			analyseEqualityExpr(expr->expr);
+			break;
+		case EXPR_OBJ_CREATION:
+			analyseObjCreation(expr->expr);
+			break;
+		case EXPR_OPERATION:
+			analyseOperationExpr(expr->expr);
+			break;
+		case EXPR_MODIF:
+			analyseModifExpr(expr->expr);
+			break;
+		case EXPR_OBJ_ACCESS:
+			analyseObjAccessExpr(expr->expr);
+			break;
+		case EXPR_ARRAY:
+			analyseArrayExpr(expr->expr);
+			break;
+		case EXPR_ARRAY_CREATION:
+			analyseArrayCreationExpr(expr->expr);
+			break;
+	}
+}
+
+tType * getType(int type, void * expr) {
+	switch (type) {
+		case EXPR_BUILT_IN:
+			return ((tBuiltInExpr *) expr)->exprType;
+		case EXPR_ASSIGNMENT:
+			return ((tAssignmentExpr *) expr)->exprType;
+		case EXPR_PARENTHESIS:
+			return ((tParenthesisExpr *) expr)->exprType;
+		case EXPR_IDENTIFIER:
+			return ((tIdentifier *) expr)->exprType;
+		case EXPR_EQUALITY:
+			return ((tEqualityExpr *) expr)->exprType;
+		case EXPR_OBJ_CREATION:
+			return ((tObjectCreation *) expr)->exprType;
+		case EXPR_OPERATION:
+			return ((tObjectCreation *) expr)->exprType;
+		case EXPR_MODIF:
+			return ((tModifExpr *) expr)->exprType;
+		case EXPR_OBJ_ACCESS:
+			return ((tObjAccessExpr *) expr)->exprType;
+		case EXPR_ARRAY:
+			return ((tArrayExpr *) expr)->exprType;
+		case EXPR_ARRAY_CREATION:
+			return ((tArrayCreationExpr *) expr)->exprType;
+	}
+}
+
+void deleteExprType(int type, void * expr) {
+	switch (type) {
+		case EXPR_BUILT_IN:
+			deleteType(((tBuiltInExpr *) expr)->exprType);
+		case EXPR_ASSIGNMENT:
+			deleteType(((tAssignmentExpr *) expr)->exprType);
+		case EXPR_PARENTHESIS:
+			deleteType(((tParenthesisExpr *) expr)->exprType);
+		case EXPR_IDENTIFIER:
+			deleteType(((tIdentifier *) expr)->exprType);
+		case EXPR_EQUALITY:
+			deleteType(((tEqualityExpr *) expr)->exprType);
+		case EXPR_OBJ_CREATION:
+			deleteType(((tObjectCreation *) expr)->exprType);
+		case EXPR_OPERATION:
+			deleteType(((tObjectCreation *) expr)->exprType);
+		case EXPR_MODIF:
+			deleteType(((tModifExpr *) expr)->exprType);
+		case EXPR_OBJ_ACCESS:
+			deleteType(((tObjAccessExpr *) expr)->exprType);
+		case EXPR_ARRAY:
+			deleteType(((tArrayExpr *) expr)->exprType);
+		case EXPR_ARRAY_CREATION:
+			deleteType(((tArrayCreationExpr *) expr)->exprType);
+	}
+}
+
+int isLeftValue(tExpr * expr) {
+	switch (expr->type) {
+		case EXPR_BUILT_IN:
+			return 0;
+		case EXPR_ASSIGNMENT:
+			return 0;
+		case EXPR_PARENTHESIS:
+			return isLeftValue(expr->expr);
+		case EXPR_IDENTIFIER:
+			return 1;
+		case EXPR_EQUALITY:
+			return 0;
+		case EXPR_OBJ_CREATION:
+			return 0;
+		case EXPR_OPERATION:
+			return 0;
+		case EXPR_MODIF:
+			return 0;
+		case EXPR_OBJ_ACCESS:
+			return isObjAccessLeftValue((tObjAccessExpr *) expr->expr);
+		case EXPR_ARRAY:
+			return 1;
+		case EXPR_ARRAY_CREATION:
+			return 0;
+	}
+}
 
 /*** BuiltInExpr ***/
 
 tBuiltInExpr * newBuiltIn(int type, void * variable, int bytes) {
 	tBuiltInExpr * builtIn = malloc(sizeof(tBuiltInExpr));
+	builtIn->exprType = getBuiltInType(type);
 	builtIn->type = type;
-	builtIn->variable = malloc(bytes);
-	builtIn->variable = memcpy(builtIn->variable, variable, bytes);
+	if (variable != NULL) {
+		builtIn->variable = malloc(bytes);
+		builtIn->variable = memcpy(builtIn->variable, variable, bytes);
+	} else {
+		builtIn->variable = NULL;
+	}
 	return builtIn;
 }
 
@@ -1042,12 +1515,38 @@ void printBuiltIn(tBuiltInExpr * builtIn) {
 		case INPUT_STRING:
 			printf("\"%s\"",(char *) builtIn->variable);
 			break;
+		case INPUT_NULL:
+			printf("null");
+			break;
 	}
 }
 
 void deleteBuiltIn(tBuiltInExpr * builtIn) {
-	free(builtIn->variable);
+	if (builtIn->variable != NULL) {
+		free(builtIn->variable);
+	}
+	deleteType(builtIn->exprType);
 	free(builtIn);
+}
+
+void analyseBuiltIn(tBuiltInExpr * builtIn) {
+}
+
+tType * getBuiltInType(int type) {
+	switch (type) {
+		case INPUT_INT:
+			return intType();	
+		case INPUT_BOOLEAN:
+			return booleanType();	
+		case INPUT_CHAR:
+			return charType();	
+		case INPUT_STRING:
+			return stringType();	
+		case INPUT_NULL:
+			return nullType();
+		default:
+			return errorType(); // TODO: Do sth?
+	}
 }
 
 /*** AssignmentExpr ***/
@@ -1058,6 +1557,14 @@ tAssignmentExpr * newAssignmentExpr(tExpr * variable, char * op, tExpr * expr) {
 	assignmentExpr->op = strdup(op);
 	free(op);
 	assignmentExpr->expr = expr;
+	
+	if (hasError(variable) || hasError(expr)) {
+		assignmentExpr->exprType = nestedErrorType();
+	} else if (typesMatch(variable, expr) && isLeftValue(variable)) {
+		assignmentExpr->exprType = copyType(variable->exprType);
+	} else {
+		assignmentExpr->exprType = errorType();
+	}
 	return assignmentExpr;
 }
 
@@ -1071,7 +1578,13 @@ void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr) {
 	deleteExpr(assignmentExpr->variable);
 	free(assignmentExpr->op);
 	deleteExpr(assignmentExpr->expr);
+	deleteType(assignmentExpr->exprType);
 	free(assignmentExpr);
+}
+
+void analyseAssignmentExpr(tAssignmentExpr * assignmentExpr) {
+	analyseExpr(assignmentExpr->variable);
+	analyseExpr(assignmentExpr->expr);
 }
 
 /*** Equality ***/
@@ -1082,6 +1595,13 @@ tEqualityExpr * newEqualityExpr(tExpr * first, char * op, tExpr * second) {
 	equalityExpr->op = strdup(op);
 	free(op);
 	equalityExpr->second = second;
+	if (hasError(first) || hasError(second)) {
+		equalityExpr->exprType = nestedErrorType();
+	} else if (typesMatch(first, second) && isValidBinaryOperation(first->exprType, second->exprType, equalityExpr->op)) {
+		equalityExpr->exprType = booleanType();
+	} else {
+		equalityExpr->exprType = errorType();
+	}
 	return equalityExpr;
 }
 
@@ -1095,7 +1615,13 @@ void deleteEqualityExpr(tEqualityExpr * equalityExpr) {
 	deleteExpr(equalityExpr->first);
 	free(equalityExpr->op);
 	deleteExpr(equalityExpr->second);
+	deleteType(equalityExpr->exprType);
 	free(equalityExpr);
+}
+
+void analyseEqualityExpr(tEqualityExpr * equalityExpr) {
+	analyseExpr(equalityExpr->first);
+	analyseExpr(equalityExpr->second);
 }
 
 /*** Identifier ***/
@@ -1104,6 +1630,7 @@ tIdentifier * newIdentifier(char * name) {
 	tIdentifier * identifier = malloc(sizeof(tIdentifier));
 	identifier->name = strdup(name);
 	free(name);
+	identifier->exprType = getIdentifierType(identifier->name);
 	return identifier;
 }
 
@@ -1113,7 +1640,19 @@ void printIdentifier(tIdentifier * identifier) {
 
 void deleteIdentifier(tIdentifier * identifier) {
 	free(identifier->name);
+	deleteType(identifier->exprType);
 	free(identifier);
+}
+
+void analyseIdentifier(tIdentifier * identifier) {
+	if (!hasSymbol(identifier->name)) {
+		printf("Unknown symbol %s\n", identifier->name);
+		// TODO: Unknown symbol.
+	}
+}
+
+tType * getIdentifierType(char * name) {
+	return unknownType();
 }
 
 /*** ParenthesisExpr ***/
@@ -1121,6 +1660,11 @@ void deleteIdentifier(tIdentifier * identifier) {
 tParenthesisExpr * newParenthesisExpr(tExpr * expr) {
 	tParenthesisExpr * parenthesisExpr = malloc(sizeof(tParenthesisExpr));
 	parenthesisExpr->expr = expr;
+	if (hasError(expr)) {
+		parenthesisExpr->exprType = nestedErrorType();
+	} else {
+		parenthesisExpr->exprType = copyType(expr->exprType);
+	}
 	return parenthesisExpr;
 }
 
@@ -1132,7 +1676,12 @@ void printParenthesisExpr(tParenthesisExpr * parenthesisExpr) {
 
 void deleteParenthesisExpr(tParenthesisExpr * parenthesisExpr) {
 	deleteExpr(parenthesisExpr->expr);
+	deleteType(parenthesisExpr->exprType);
 	free(parenthesisExpr);
+}
+
+void analyseParenthesisExpr(tParenthesisExpr * parenthesisExpr) {
+	analyseExpr(parenthesisExpr->expr);
 }
 
 /*** Object Creation ***/
@@ -1142,6 +1691,11 @@ tObjectCreation * newObjCreation(char * name, tList * params) {
 	objCreation->name = strdup(name);
 	free(name);
 	objCreation->params = params;
+	if (paramsHaveErrors(params)) {
+		objCreation->exprType = nestedErrorType();
+	} else {
+		objCreation->exprType = objectType(strdup(objCreation->name));
+	}
 	return objCreation;
 }
 
@@ -1154,39 +1708,58 @@ void printObjCreation(tObjectCreation * objCreation) {
 void deleteObjCreation(tObjectCreation * objCreation) {
 	deleteParams(objCreation->params);
 	free(objCreation->name);
+	deleteType(objCreation->exprType);
 	free(objCreation);
+}
+
+void analyseObjCreation(tObjectCreation * objCreation) {
+	analyseParams(objCreation->params);
 }
 
 /*** Operation Expr ***/
 
-// TODO: por qué op podría ser NULL?
 tOperationExpr * newOperationExpr(tExpr * first, char * op, tExpr * second) {
 	tOperationExpr * operationExpr = malloc(sizeof(tOperationExpr));
 	operationExpr->first = first;
 	operationExpr->op = NULL;
-	if (op != NULL) {
-		operationExpr->op = strdup(op);
-		free(op);
-	}
+	operationExpr->op = strdup(op);
+	free(op);
 	operationExpr->second = second;
+	if (hasError(first) || hasError(second)) {
+		operationExpr->exprType = nestedErrorType();
+	} else if (typesMatch(first, second) && isValidBinaryOperation(first->exprType, second->exprType, operationExpr->op)) {
+		operationExpr->exprType = getOperationType(first, second, operationExpr->op);
+	} else {
+		operationExpr->exprType = errorType();
+	}
 	return operationExpr;
 }
 
 void printOperationExpr(tOperationExpr * operationExpr) {
 	printExpr(operationExpr->first);
-	if (operationExpr->op != NULL) {
-		printf(" %s ", operationExpr->op);
-	}
+	printf(" %s ", operationExpr->op);
 	printExpr(operationExpr->second);
 }
 
 void deleteOperationExpr(tOperationExpr * operationExpr) {
 	deleteExpr(operationExpr->first);
-	if (operationExpr->op != NULL) {
-		free(operationExpr->op);
-	}
+	free(operationExpr->op);
 	deleteExpr(operationExpr->second);
+	deleteType(operationExpr->exprType);
 	free(operationExpr);
+}
+
+void analyseOperationExpr(tOperationExpr * operationExpr) {
+	analyseExpr(operationExpr->first);
+	analyseExpr(operationExpr->second);
+}
+
+tType * getOperationType(tExpr * first, tExpr * second, char * op) {
+	if (!strcmp(op, "%")) {
+		return intType();
+	} else {
+		return getBiggestType(first, second);
+	}
 }
 
 /*** Modif Expr ***/
@@ -1203,6 +1776,14 @@ tModifExpr * newModifExpr(char * prevOp, tExpr * expr, char * postOp) {
 	if (postOp != NULL) {
 		modifExpr->postOp = strdup(postOp);
 		free(postOp);
+	}
+	char * op = modifExpr->prevOp != NULL ? modifExpr->prevOp:modifExpr->postOp;
+	if (hasError(expr)) {
+		modifExpr->exprType = nestedErrorType();
+	} else if (isValidUnaryOperation(expr->exprType, op)) {
+		modifExpr->exprType = getModifType(expr, op);
+	} else {
+		modifExpr->exprType = errorType();
 	}
 	return modifExpr;
 }
@@ -1225,20 +1806,63 @@ void deleteModifExpr(tModifExpr * modifExpr) {
 	if (modifExpr->postOp != NULL) {
 		free(modifExpr->postOp);
 	}
+	deleteType(modifExpr->exprType);
 	free(modifExpr);
+}
+
+void analyseModifExpr(tModifExpr * modifExpr) {
+	analyseExpr(modifExpr->expr);
+}
+
+tType * getModifType(tExpr * expr, char * op) {
+	if (!strcmp(op, "!")) {
+		return booleanType();
+	} else {
+		return copyType(expr->exprType);
+	}
 }
 
 /*** Object Access Expr ***/
 
-tObjAccessExpr * newObjAccessExpr(char * name, tList * params) {
+tObjAccessExpr * newObjAccessExpr(tExpr * expr, char * name, tList * params) {
 	tObjAccessExpr * objAccessExpr = malloc(sizeof(tObjAccessExpr));
+	objAccessExpr->expr = expr;
 	objAccessExpr->name = strdup(name);
 	free(name);
 	objAccessExpr->params = params;
+	
+	if (hasError(expr)) {
+		objAccessExpr->exprType = nestedErrorType();
+	} else if (isLeftValue(expr) && isObject(expr)) {
+		tClass * class = getClass(expr->exprType->type);
+		if (class == NULL) {
+			objAccessExpr->exprType = unknownType();
+		} else {
+			if (params == NULL) {
+				tProperty * property = getProperty(class, objAccessExpr->name);
+				if (property == NULL) {
+					objAccessExpr->exprType = errorType();
+				} else {
+					objAccessExpr->exprType = copyType(property->type);
+				}		
+			} else {
+				tMethod * method = getMethod(class, objAccessExpr->name);
+				if (method == NULL) {
+					objAccessExpr->exprType = errorType();
+				} else {
+					objAccessExpr->exprType = copyType(method->returnType);
+				}
+			}
+		}
+	} else {
+		objAccessExpr->exprType = errorType();
+	}
+
 	return objAccessExpr;
 }
 
 void printObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	printExpr(objAccessExpr->expr);
 	printf(".%s", objAccessExpr->name);
 	if (objAccessExpr->params != NULL) {
 		printf("(");
@@ -1248,11 +1872,31 @@ void printObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 }
 
 void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	deleteExpr(objAccessExpr->expr);
 	free(objAccessExpr->name);
 	if (objAccessExpr->params != NULL) {
 		deleteParams(objAccessExpr->params);
 	}
+	deleteType(objAccessExpr->exprType);
 	free(objAccessExpr);
+}
+
+void analyseObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	analyseExpr(objAccessExpr->expr);
+	if (objAccessExpr->params != NULL) {
+		analyseParams(objAccessExpr->params);
+	}
+}
+
+isObjAccessLeftValue(tObjAccessExpr * objAccessExpr) {
+	tExpr * expr = objAccessExpr->expr;
+	tList * params = objAccessExpr->params;
+	char * name = objAccessExpr->name;
+	if (isLeftValue(expr) && isObject(expr)) {
+		tClass * class = getClass(expr->exprType->type);
+		return class == NULL || (params == NULL && getProperty(class, name) != NULL);	
+	}
+	return 0;
 }
 
 /*** Array Creation Expr ***/
@@ -1262,6 +1906,11 @@ tArrayCreationExpr * newArrayCreationExpr(char * name, tList * sizes)	{
 	arrayCreationExpr->name = strdup(name);
 	free(name);
 	arrayCreationExpr->sizes = sizes;
+	if (sizesHaveErrors(sizes)) {
+		arrayCreationExpr->exprType = nestedErrorType();
+	} else {
+		arrayCreationExpr->exprType = arrayType(strdup(arrayCreationExpr->name), _size(sizes));
+	}
 	return arrayCreationExpr;
 }
 
@@ -1273,9 +1922,13 @@ void printArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
 void deleteArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
 	free(arrayCreationExpr->name);
 	deleteSizes(arrayCreationExpr->sizes);
+	deleteType(arrayCreationExpr->exprType);
 	free(arrayCreationExpr);
 }
 
+void analyseArrayCreationExpr(tArrayCreationExpr * arrayCreationExpr) {
+	analyseSizes(arrayCreationExpr->sizes);
+}
 
 /*** Array Expr ***/
 
@@ -1284,6 +1937,13 @@ tArrayExpr * newArrayExpr(char * variable, tList * sizes)	{
 	arrayExpr->variable = strdup(variable);
 	free(variable);
 	arrayExpr->sizes = sizes;
+	tType * arrayType = getIdentifierType(variable);
+	if (!isUnknownType(arrayType) && (isErrorType(arrayType) || !sameSize(arrayType, _size(sizes)))) {
+		arrayExpr->exprType = errorType();
+	} else {
+		arrayExpr->exprType = getBasicType(arrayType);
+	}
+	free(arrayType);
 	return arrayExpr;
 }
 
@@ -1295,7 +1955,12 @@ void printArrayExpr(tArrayExpr * arrayExpr) {
 void deleteArrayExpr(tArrayExpr * arrayExpr) {
 	free(arrayExpr->variable);
 	deleteSizes(arrayExpr->sizes);
+	deleteType(arrayExpr->exprType);
 	free(arrayExpr);
+}
+
+void analyseArrayExpr(tArrayExpr * arrayExpr) {
+	analyseSizes(arrayExpr->sizes);
 }
 
 /*** Type ***/
@@ -1395,3 +2060,286 @@ void deleteSizes(tList * sizes) {
 	_deleteList(sizes);
 }
 
+void analyseSizes(tList * sizes) {
+	_reset(sizes);
+	tExpr * size;
+	while ((size = _next(sizes)) != NULL) {
+		analyseExpr(size);
+	}
+	_reset(sizes);
+}
+
+int sizesHaveErrors(tList * sizes) {
+	_reset(sizes);
+	tExpr * size;
+	while ((size = _next(sizes)) != NULL) {
+		if (hasError(size)) {
+			_reset(sizes);
+			return 1;
+		}
+	}
+	_reset(sizes);
+	return 0;
+}
+
+/*** Scope ***/
+
+void newBlock() {
+	scope++;
+}
+
+void endBlock() {
+	deleteSymbolsInScope();
+	scope--;
+}
+
+/*** Symbols ***/
+
+void addSymbol(char * name, tType * type) {
+	tSymbol * symbol = malloc(sizeof(tSymbol));
+
+	symbol->name = name;
+	symbol->type = type;
+	symbol->scope = scope;
+
+	HASH_ADD_KEYPTR(hh, symbols, symbol->name, strlen(symbol->name), symbol);
+}
+
+int hasSymbol(char * name) {
+	return getSymbol(name) != NULL;
+}
+
+tSymbol * getSymbol(char * name) {
+	tSymbol * symbol;
+	HASH_FIND_STR(symbols, name, symbol);
+	return symbol;
+}
+
+void deleteSymbols() {
+	tSymbol * symbol, * tmp;
+
+	HASH_ITER(hh, symbols, symbol, tmp) {
+		HASH_DEL(symbols, symbol);
+		deleteSymbol(symbol);
+	}
+}
+
+void deleteSymbol(tSymbol * symbol) {
+	free(symbol);
+}
+
+void deleteSymbolsInScope() {
+	tSymbol * symbol, * tmp;
+
+	HASH_ITER(hh, symbols, symbol, tmp) {
+		if (isInScope(symbol)) {
+			HASH_DEL(symbols, symbol);
+			deleteSymbol(symbol);
+		}
+	}
+}
+
+int isInScope(tSymbol * symbol) {
+	return symbol->scope == scope;
+}
+
+/*** Type Validation ***/
+
+tType * intType() {
+	return newType(strdup("int"));
+}
+
+tType * charType() {
+	return newType(strdup("char"));
+}
+
+tType * stringType() {
+	return newType(strdup("String"));
+}
+
+tType * booleanType() {
+	return newType(strdup("boolean"));
+}
+
+tType * nullType() {
+	return newType(strdup("null"));
+}
+
+tType * objectType(char * name) {
+	tType * type = newType(strdup(name));
+	free(name);
+	return type;
+}
+
+tType * unknownType() {
+	return newType(strdup("_unknown"));
+}
+
+tType * arrayType(char * name, int brackets) {
+	tType * type = newType(strdup(name));
+	free(name);
+	addBrackets(type, brackets);
+	return type;
+}
+
+tType * getBasicType(tType * type) {
+	return newType(type->type);
+}
+
+tType * errorType() {
+	return newType(strdup("_error"));
+}
+
+tType * nestedErrorType() {
+	return newType(strdup("_nestedError"));
+}
+
+int hasError(tExpr * expr) {
+	return isErrorType(expr->exprType) || isNestedErrorType(expr->exprType);
+}
+
+tType * getBiggestType(tExpr * first, tExpr * second) {
+	if (isArrayType(first->exprType) || isArrayType(second->exprType)) {
+		return isArrayType(first->exprType) ? copyType(first->exprType) : copyType(second->exprType);
+	}
+	if (isStringType(first->exprType) || isStringType(second->exprType)) {
+		return stringType();
+	}
+	return !isUnknownType(first->exprType) ? copyType(first->exprType) : copyType(second->exprType);
+}
+
+int typesMatch(tExpr * expr1, tExpr * expr2) {
+	tType * type1 = expr1->exprType;
+	tType * type2 = expr2->exprType;
+
+	if (isArrayType(type1)) {
+		if (!sameSize(type1, type2->brackets)) {
+			return 0;
+		}
+	}
+
+	if (isObjectType(type1) || isNullType(type1)) {
+		if (isObjectType(type2) || isNullType(type2) || isUnknownType(type2)) {
+			return 1;
+		} 
+		return 0;
+	}
+	if (isNumericType(type1)) {
+		if (isNumericType(type2) || isUnknownType(type2)) {
+			return 1;
+		} 
+		return 0;
+	}
+	if (isAlphabeticType(type1)) {
+		if (isAlphabeticType(type2) || isUnknownType(type2)) {
+			return 1;
+		} 
+		return 0;
+	}
+	if (isBooleanType(type1)) {
+		if (isBooleanType(type2) || isUnknownType(type2)) {
+			return 1;
+		} 
+		return 0;
+	}
+	if (isUnknownType(type1)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int isObject(tExpr * expr) {
+	return isObjectType(expr->exprType) || isUnknownType(expr->exprType);
+}
+
+int isIntType(tType * type) {
+	return !strcmp(type->type, "int");
+}
+
+int isCharType(tType * type) {
+	return !strcmp(type->type, "char");
+}
+
+int isStringType(tType * type) {
+	return !strcmp(type->type, "String");
+}
+
+int isBooleanType(tType * type) {
+	return !strcmp(type->type, "boolean");
+}
+
+int isNullType(tType * type) {
+	return !strcmp(type->type, "null");
+}
+
+int isObjectType(tType * type) {
+	tClass * class = getClass(type->type);
+	return class != NULL;
+}
+
+int isUnknownType(tType * type) {
+	return !strcmp(type->type, "_unknown");
+}
+
+int isArrayType(tType * type) {
+	return type->brackets > 0;
+}
+
+int isErrorType(tType * type) {
+	return !strcmp(type->type, "_error");
+}
+
+int isNestedErrorType(tType * type) {
+	return !strcmp(type->type, "_nestedError");
+}
+
+int isAlphabeticType(tType * type) {
+	return isCharType(type) || isStringType(type);
+}
+
+int isNumericType(tType * type) {
+	return isIntType(type);
+}
+
+int isValidBinaryOperation(tType * type1, tType * type2, char * op) {
+	if (!strcmp(op, "%")) {
+		return (isIntType(type1) || isUnknownType(type1)) &&
+		(isIntType(type2) || isUnknownType(type2));
+	}
+	if (!strcmp(op, "+")) {
+		return (isNumericType(type1) || isAlphabeticType(type1) || isUnknownType(type1)) &&
+		(isNumericType(type2) || isAlphabeticType(type2) || isUnknownType(type2));
+	}
+	if (!strcmp(op, "-") || !strcmp(op, "*") || !strcmp(op, "/") || 
+		!strcmp(op, "<=") || !strcmp(op, "=<") || !strcmp(op, ">=") ||
+		!strcmp(op, "=>") || !strcmp(op, "<") || !strcmp(op, ">")) {
+		return (isNumericType(type1) || isUnknownType(type1)) &&
+		(isNumericType(type2) || isUnknownType(type2));
+	}
+	if (!strcmp(op, "==") || !strcmp(op, "!=")) {
+		return 1;
+	}
+	/** boolean ops **/
+	return (isBooleanType(type1) || isUnknownType(type1)) &&
+		(isBooleanType(type2) || isUnknownType(type2));
+}
+
+int isValidUnaryOperation(tType * type, char * op) {
+	if (!strcmp(op, "!")) {
+		return isBooleanType(type) || isUnknownType(type);
+	}
+	/** ++, --, + and - ops **/
+	return isNumericType(type) || isUnknownType(type);
+}
+
+int sameSize(tType * type, int size) {
+	return type->brackets == size;
+}
+
+tType * copyType(tType * type) {
+	tType * newType = malloc(sizeof(tType));
+	newType = memcpy(newType, type, sizeof(tType));
+	newType->type = strdup(type->type);
+	return newType;
+}
