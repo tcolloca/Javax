@@ -1,4 +1,4 @@
-program: tateti
+program: fourinline
 
 import java.util.Scanner;
 
@@ -8,36 +8,67 @@ class Tablero {
 	char winner;
 	
 	Tablero() {
-		tablero = new Character[3][3];
+		tablero = new Character[7][6];
 	}
 	
-	method boolean put(char player, int row, int col) {
-		if (row < 0 || row > 2 || col < 0 || col > 2 || tablero[row][col] != null) {
+	method boolean put(char player, int col) {
+		if (col < 0 || col > 6) {
 			 return false;
 		}
-		tablero[row][col] = player;
-		return true;
+		int i = 0;
+		while (i < 6) {
+			if (tablero[col][i] == null) {
+				tablero[col][i] = player;
+				return true;
+			}
+			i++;
+		}
+		return false;
 	}
 	
 	method boolean isGameOver() {
-		if (tablero[0][0] != null && tablero[0][0] == tablero[1][1] && tablero[0][0] == tablero[2][2]) {
-			winner = tablero[0][0];
-			return true;
-		}
-		if (tablero[2][0] != null && tablero[2][0] == tablero[1][1] && tablero[2][0] == tablero[0][2]) {
-			winner = tablero[2][0];
-			return true;
-		}
 		int i = 0;
-		while (i < 3) {
-			if (tablero[i][0] != null && tablero[i][0] == tablero[i][1] && tablero[i][0] == tablero[i][2]) {
-				winner = tablero[i][0];
-				return true;
+		int j = 0;
+		int k;
+		boolean over;
+		while (i < 7) {
+			while (j < 3) {
+				if (tablero[i][j] != null) {
+					over = true;
+					k = j + 1;
+					while (over && k < j + 4) {
+						over = over && tablero[i][k] == tablero[i][j];
+						k++;
+					}
+					if (over) {
+						winner = tablero[i][j];
+						return true;
+					}
+				}
+				j++;
 			}
-			if (tablero[0][i] != null && tablero[0][i] == tablero[1][i] && tablero[0][i] == tablero[2][i]) {
-				winner = tablero[0][i];
-				return true;
+			j = 0;
+			i++;
+		}
+		i = 0;
+		j = 0;
+		while (i < 6) {
+			while (j < 4) {
+				if (tablero[j][i] != null) {
+					over = true;
+					k = j + 1;
+					while (over && k < j + 4) {
+						over = over && tablero[k][i] == tablero[j][i];
+						k++;
+					}
+					if (over) {
+						winner = tablero[j][i];
+						return true;
+					}
+				}
+				j++;
 			}
+			j = 0;
 			i++;
 		}
 		return false;
@@ -48,30 +79,24 @@ class Tablero {
 	}
 	
 	method void print() {
-		int i = 0;
+		int i = 5;
 		int j = 0;
 		Character c;
 		System.out.print("\033[2J\033[1;1H");
 		System.out.println();
-		while ( i < 3) {
-			while (j<3) {
-				c = tablero[i][j];
+		while ( i >= 0) {
+			while (j < 7) {
+				c = tablero[j][i];
 				if (c == null) {
-					System.out.print(" ");
+					System.out.print(" *");
 				} else {
-					System.out.print(c);
-				}
-				if (j < 2) {
-					System.out.print(" | ");
+					System.out.print(" " + c);
 				}
 				j++;
 			}
 			System.out.println();
-			if (i < 2) {
-				System.out.println("_   _   _ " );
-			}
 			j = 0;
-			i++;
+			i--;
 		}
 	}
 }
@@ -82,7 +107,6 @@ main() {
 	boolean gameOver = false;
 	boolean turnOver;
 	char player = 'X';
-	int row;
 	int col;
 	while (!gameOver) {
 		turnOver = false;
@@ -90,14 +114,12 @@ main() {
 		System.out.println();
 		System.out.println("Turno del jugador " + player);
 		while (!turnOver) {
-		System.out.println();
-			System.out.print("Ingrese la fila: ");
-			row = s.nextInt();
+			System.out.println();
 			System.out.println();
 			System.out.print("Ingrese la columna: ");
 			col = s.nextInt();
 			System.out.println();
-			turnOver = tablero.put(player, row - 1, col - 1);
+			turnOver = tablero.put(player, col - 1);
 			if (!turnOver) {
 				System.out.println("Parametros invalidos, intente nuevamente.");
 			}

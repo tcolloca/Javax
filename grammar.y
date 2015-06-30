@@ -40,7 +40,7 @@ sumInts(int a, int b) {
 %token <character> CHAR
 %token <string> STRING
 %token <string> IDENTIFIER
-%token IF ELSE FOR WHILE CONST NEW IMPORT CLASS METHOD PROGRAM RETURN MAIN
+%token IF ELSE FOR WHILE CONST NEW IMPORT EXTENDS CLASS METHOD PROGRAM RETURN MAIN
 %token <string> OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
 %token <string> OP_PLUS_PLUS OP_MINUS_MINUS
 %token <string> OP_EQ OP_NE OP_GE OP_LE OP_GT OP_LT
@@ -56,7 +56,7 @@ sumInts(int a, int b) {
 %type <void_pointer> classes
 %type <void_pointer> main 
 %type <string> program_name
-%type <void_pointer> import imports import_element
+%type <void_pointer> import imports import_element extends
 %type <void_pointer> class 
 %type <void_pointer> class_instance_properties 
 %type <void_pointer> class_instance_property 
@@ -167,16 +167,27 @@ main:
  /*** Class definition ***/
 
 class:
-	CLASS IDENTIFIER LCUR class_instance_properties class_constructors class_instance_methods RCUR {
-		tClass * class = newClass($2, $4, $5, $6);
+	CLASS IDENTIFIER extends LCUR class_instance_properties class_constructors class_instance_methods RCUR {
+		tClass * class = newClass($2, $3, $5, $6, $7);
 		$$ = class;
 	}
 	|
-	CLASS IDENTIFIER LCUR class_instance_properties class_instance_methods RCUR {
-		tClass * class = newClass($2, $4, newConstructors(NULL), $5);
+	CLASS IDENTIFIER extends LCUR class_instance_properties class_instance_methods RCUR {
+		tClass * class = newClass($2, $3, $5, newConstructors(NULL), $6);
 		$$ = class;
 	}
 	;
+	
+extends:
+	EXTENDS IDENTIFIER {
+		tExtends * extends = newExtends($2);
+		$$ = extends;
+	}
+	|
+	/* empty */ {
+		tExtends * extends = newExtends(NULL);
+		$$ = extends;
+	}
 
 	/*** properties ***/
 

@@ -35,6 +35,8 @@ typedef struct main tMain;
 
 typedef struct class tClass;
 
+typedef struct extends tExtends;
+
 typedef struct property tProperty;
 
 typedef struct constructor tConstructor;
@@ -145,7 +147,7 @@ void deleteMain(tMain * main);
 
 /*** Class ***/
 
-tClass * newClass(char * name, tList * properties, tList * constructors, tList * methods);
+tClass * newClass(char * name, tExtends * extends, tList * properties, tList * constructors, tList * methods);
 
 void printClasses(tList * classes);
 
@@ -162,6 +164,14 @@ void addClassToClassMap(tClass * class);
 int classExists(char * name);
 
 void deleteClassesMap();
+
+/*** Extends ***/
+
+tExtends * newExtends(char * name);
+
+void printExtends(tExtends * extends);
+
+void deleteExtends(tExtends * extends);
 
 /*** Property ***/
 
