@@ -33,12 +33,14 @@ sumInts(int a, int b) {
         char * string;
         char character;
         void * void_pointer;
+        double doubleNum;
 }
 
 %token <integer> INT
 %token <boolean> BOOLEAN
 %token <character> CHAR
 %token <string> STRING
+%token <doubleNum> DOUBLE
 %token <string> IDENTIFIER
 %token IF ELSE FOR WHILE CONST NEW IMPORT EXTENDS CLASS METHOD PROGRAM RETURN MAIN
 %token <string> OP_PLUS OP_MINUS OP_MULTIPLICATION OP_DIVITION OP_EXP OP_MODULO
@@ -773,6 +775,11 @@ built_in:
 	STRING {
 		tBuiltInExpr * builtIn = newBuiltIn(INPUT_STRING, $1, strlen($1) + 1);
 		free($1);
+		$$ = builtIn;
+	}
+	|
+	DOUBLE {
+		tBuiltInExpr * builtIn = newBuiltIn(INPUT_DOUBLE, &$1, sizeof(double));
 		$$ = builtIn;
 	}
 	;	

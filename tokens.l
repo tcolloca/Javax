@@ -14,6 +14,7 @@ extern YYSTYPE yylval;
 #define SAVE_CHAR yylval.character = getChar(yytext)
 #define SAVE_STRING_VAL yylval.string = getString(yytext)
 #define SAVE_STRING_2 yylval.string = strdup(yytext)
+#define SAVE_DOUBLE yylval.doubleNum = strtod(yytext, NULL)
 
 char getChar(char * string) {
 	return string[1];
@@ -31,6 +32,7 @@ char * getString(char * string) {
 
 %%
 (0|[1-9][0-9]*|0[0-7]*|0(x|X)[0-9a-fA-F]+) SAVE_INT; return INT;
+(0|[1-9][0-9]*)\.(0-9)+ SAVE_DOUBLE; return DOUBLE;
 true SAVE_BOOLEAN(TRUE); return BOOLEAN;
 false SAVE_BOOLEAN(FALSE); return BOOLEAN;
 '[[:print:]]{-}[\']' SAVE_CHAR; return CHAR; 

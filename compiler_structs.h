@@ -14,6 +14,7 @@
 #define INPUT_BOOLEAN 		1
 #define INPUT_CHAR 			2
 #define INPUT_STRING 		3
+#define INPUT_DOUBLE 		4
 
 #define EXPR_BUILT_IN			0
 #define EXPR_ASSIGNMENT			1

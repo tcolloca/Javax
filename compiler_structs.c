@@ -1337,22 +1337,22 @@ int isTypeName(char * typeName) {
 	if (!strcmp(typeName, "boolean")) {
 		return 1;
 	}
-	if (!strcmp(typeName, "Scanner")) {
-		return 1;
-	}
 	if (!strcmp(typeName, "Character")) {
 		return 1;
 	}
 	if (!strcmp(typeName, "Integer")) {
 		return 1;
 	}
+	if (!strcmp(typeName, "Boolean")) {
+		return 1;
+	}
 	if (!strcmp(typeName, "void")) {
 		return 1;
 	}
-	if (!strcmp(typeName, "float")) {
+	if (!strcmp(typeName, "double")) {
 		return 1;
 	}
-	if (!strcmp(typeName, "double")) {
+	if (!strcmp(typeName, "Double")) {
 		return 1;
 	}
 	if (classExists(typeName)) {
