@@ -1,5 +1,4 @@
-# Javax
-
+#Javax
 Para realizar el make hay que correr la siguiente línea:
 
 make -f makefile
