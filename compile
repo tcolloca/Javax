@@ -1,4 +1,0 @@
-flex tokens.l;
-yacc -d grammar.y;
-cc lex.yy.c y.tab.c compiler_structs.c lib/list.c -o example_programs/compiler
-

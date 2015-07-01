@@ -1,7 +1,7 @@
 #ifndef def_compiler_structs
 #define def_compiler_structs
 
-#include "lib/list.h"
+#include "list.h"
 
 #define INSTR_NULL				0
 #define INSTR_DECLARATION		1
@@ -609,6 +609,8 @@ tType * getBiggestType(tExpr * first, tExpr * second);
 int typesMatch(tExpr * expr1, tExpr * expr2);
 
 int typesTypesMatch(tType * type1, tType * type2);
+
+int isBoolean(tExpr * expr);
 
 int isObject(tExpr * expr);
 

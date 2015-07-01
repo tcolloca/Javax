@@ -1,0 +1,5 @@
+mkdir -p $2
+./compiler < $1 > $2/$2.java
+mv compilation.log $2/compilation.log
+cat $2/compilation.log
+javac $2/$2.java
