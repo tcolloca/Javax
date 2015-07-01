@@ -1,0 +1,2 @@
+./compileProgram src/example_programs/$1.javax $1
+./runProgram $1

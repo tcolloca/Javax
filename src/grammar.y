@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include <string.h>
-#include "compiler_structs.h"
+#include "lib/compiler_structs.h"
 #include "lib/uthash.h"
 #include "lib/list.h"
 

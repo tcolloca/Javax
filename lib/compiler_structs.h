@@ -1,7 +1,7 @@
 #ifndef def_compiler_structs
 #define def_compiler_structs
 
-#include "lib/list.h"
+#include "list.h"
 
 #define INSTR_NULL				0
 #define INSTR_DECLARATION		1

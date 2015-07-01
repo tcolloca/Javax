@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "compiler_structs.h"
-#include "lib/list.h"
-#include "lib/uthash.h"
+#include "../lib/compiler_structs.h"
+#include "../lib/list.h"
+#include "../lib/uthash.h"
 
 typedef struct program {
 	char * name;
@@ -341,12 +341,12 @@ int hasUnknownType(char * name) {
 }
 
 void printUknownTypes() {
-	fprintf(logFile, "Unknown types:\n"); // TODO!
+	fprintf(logFile, "Warning: Unknown types:\n"); // TODO!
 	char ** name;
 	tUnknownType * unknownType;
 
 	for(unknownType = unknownTypes; unknownType != NULL; unknownType = unknownType->hh.next) {
-        fprintf(logFile, "%s\n", unknownType->name);
+        fprintf(logFile, "\t - %s\n", unknownType->name);
     }
 }
 
@@ -764,13 +764,13 @@ void deleteProperty(tProperty * property) {
 
 void analyseProperty(tProperty * property) {
 	if (hasSymbol(property->name)) {
-		fprintf(logFile, "Property %s has already been declared.\n", property->name);
+		fprintf(logFile, "Warning: Property %s has already been declared.\n", property->name);
 	} else {
 		addSymbol(property->name, property->type);
 	}
 	if (property->expr != NULL) {
 		if (!typesTypesMatch(property->type, property->expr->exprType)) {
-			fprintf(logFile, "Expected expression of type %s in property %s declaration.\n",
+			fprintf(logFile, "Warning: Expected expression of type %s in property %s declaration.\n",
 			property->type->type, property->name);
 		}
 		analyseExpr(property->expr);
@@ -973,7 +973,7 @@ void deleteDefParam(tDefParam * defParam) {
 
 void analyseDefParam(tDefParam * defParam) {
 	if (hasSymbol(defParam->name)) {
-		fprintf(logFile, "Parameter %s has already been declared.\n", defParam->name);
+		fprintf(logFile, "Warning: Parameter %s has already been declared.\n", defParam->name);
 	} else {
 		addSymbol(defParam->name, defParam->type);
 	}
@@ -1169,13 +1169,13 @@ void deleteInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 
 void analyseInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 	if (hasSymbol(instrDeclaration->name)) {
-		fprintf(logFile, "Variable %s has already been declared.\n", instrDeclaration->name);
+		fprintf(logFile, "Warning: Variable %s has already been declared.\n", instrDeclaration->name);
 	} else {
 		addSymbol(instrDeclaration->name, instrDeclaration->type);
 	}
 	if (instrDeclaration->expr != NULL) {
 		if (!typesTypesMatch(instrDeclaration->type, instrDeclaration->expr->exprType)) {
-			fprintf(logFile, "Expected expression of type %s in variable %s declaration.\n",
+			fprintf(logFile, "Warning: Expected expression of type %s in variable %s declaration.\n",
 			instrDeclaration->type->type, instrDeclaration->name);
 		}
 		analyseExpr(instrDeclaration->expr);
@@ -1256,7 +1256,7 @@ void deleteInstrIf(tInstrIf * instrIf) {
 
 void analyseInstrIf(tInstrIf * instrIf) {
 	if (!isBoolean(instrIf->expr)) {
-		fprintf(logFile, "Expected boolean expression as if condition.\n");
+		fprintf(logFile, "Warning: Expected boolean expression as if condition.\n");
 	}
 	analyseExpr(instrIf->expr);
 	analyseInstrs(instrIf->instrs);
@@ -1327,7 +1327,7 @@ void deleteInstrWhile(tInstrWhile * instrWhile) {
 
 void analyseInstrWhile(tInstrWhile * instrWhile) {
 	if (!isBoolean(instrWhile->expr)) {
-		fprintf(logFile, "Expected boolean expression as while condition.\n");
+		fprintf(logFile, "Warning: Expected boolean expression as while condition.\n");
 	}
 	analyseExpr(instrWhile->expr);
 	analyseInstrs(instrWhile->instrs);
@@ -1589,7 +1589,7 @@ void deleteBuiltIn(tBuiltInExpr * builtIn) {
 
 void analyseBuiltIn(tBuiltInExpr * builtIn) {
 	if (isErrorType(builtIn->exprType)) {
-		fprintf(logFile, "Uknown built-in.\n");
+		fprintf(logFile, "Warning: Uknown built-in.\n");
 	}
 }
 
@@ -1647,7 +1647,7 @@ void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr) {
 
 void analyseAssignmentExpr(tAssignmentExpr * assignmentExpr) {
 	if (isErrorType(assignmentExpr->exprType)) {
-		fprintf(logFile, "Not a l-value as left operand in assignment or non-matching operands' types.\n");
+		fprintf(logFile, "Warning: Not a l-value as left operand in assignment or non-matching operands' types.\n");
 	}
 	analyseExpr(assignmentExpr->variable);
 	analyseExpr(assignmentExpr->expr);
@@ -1687,7 +1687,7 @@ void deleteEqualityExpr(tEqualityExpr * equalityExpr) {
 
 void analyseEqualityExpr(tEqualityExpr * equalityExpr) {
 	if (isErrorType(equalityExpr->exprType)) {
-		fprintf(logFile, "Operation %s is not valid with operands of type %s and %s.\n",
+		fprintf(logFile, "Warning: Operation %s is not valid with operands of type %s and %s.\n",
 			equalityExpr->op, equalityExpr->first->exprType->type, equalityExpr->second->exprType->type);
 	}
 	analyseExpr(equalityExpr->first);
@@ -1716,7 +1716,7 @@ void deleteIdentifier(tIdentifier * identifier) {
 
 void analyseIdentifier(tIdentifier * identifier) {
 	if (!hasSymbol(identifier->name)) {
-		fprintf(logFile, "Unknown symbol %s.\n", identifier->name);
+		fprintf(logFile, "Warning: Unknown symbol %s\n", identifier->name);
 	}
 }
 
@@ -1820,7 +1820,7 @@ void deleteOperationExpr(tOperationExpr * operationExpr) {
 
 void analyseOperationExpr(tOperationExpr * operationExpr) {
 	if (isErrorType(operationExpr->exprType)) {
-		fprintf(logFile, "Operation %s is not valid with operands of type %s and %s.\n",
+		fprintf(logFile, "Warning: Operation %s is not valid with operands of type %s and %s.\n",
 		operationExpr->op, operationExpr->first->exprType->type, operationExpr->second->exprType->type);
 	}
 	analyseExpr(operationExpr->first);
@@ -1885,7 +1885,7 @@ void deleteModifExpr(tModifExpr * modifExpr) {
 
 void analyseModifExpr(tModifExpr * modifExpr) {
 	if (isErrorType(modifExpr->exprType)) {
-		fprintf(logFile, "Operation %s is not valid with operand of type %s.\n",
+		fprintf(logFile, "Warning: Operation %s is not valid with operand of type %s.\n",
 		modifExpr->prevOp != NULL ? modifExpr->prevOp:modifExpr->postOp, modifExpr->expr->exprType->type);
 	}
 	analyseExpr(modifExpr->expr);
@@ -1960,7 +1960,7 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 
 void analyseObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 	if (isErrorType(objAccessExpr->exprType)) {
-		fprintf(logFile, "%s does not contain a property or method %s.\n",
+		fprintf(logFile, "Warning: %s does not contain a property or method %s.\n",
 		objAccessExpr->expr->exprType->type, objAccessExpr->name);
 	}
 	analyseExpr(objAccessExpr->expr);
@@ -2042,7 +2042,7 @@ void deleteArrayExpr(tArrayExpr * arrayExpr) {
 
 void analyseArrayExpr(tArrayExpr * arrayExpr) {
 	if (isErrorType(arrayExpr->exprType)) {
-		fprintf(logFile, "Array type is not recognized or doesn't match previous declaration.\n");
+		fprintf(logFile, "Warning: Array type is not recognized or doesn't match previous declaration.\n");
 	}
 	analyseSizes(arrayExpr->sizes);
 }
