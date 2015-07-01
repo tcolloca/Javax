@@ -93,13 +93,25 @@ typedef struct unknownType tUnknownType;
 
 typedef struct symbol tSymbol;
 
+/*** logging ***/
+
+void initLog();
+
+void endLog();
+
 /*** System ***/
 
-void initSystem();
+void initJavaClasses();
 
 void addOutStream();
 
-void deleteSystem();
+void addInStream();
+
+void addSystem();
+
+void addMath();
+
+void deleteJavaClasses();
 
 /*** PendingCLasses ***/
 
@@ -552,6 +564,8 @@ int hasSymbol(char * name);
 
 tSymbol * getSymbol(char * name);
 
+tType * getSymbolType(char * name);
+
 void deleteSymbols();
 
 void deleteSymbol(tSymbol * symbol);
@@ -570,7 +584,11 @@ tType * stringType();
 
 tType * booleanType();
 
+tType * doubleType();
+
 tType * nullType();
+
+tType * voidType();
 
 tType * objectType(char * name);
 
@@ -590,6 +608,8 @@ tType * getBiggestType(tExpr * first, tExpr * second);
 
 int typesMatch(tExpr * expr1, tExpr * expr2);
 
+int typesTypesMatch(tType * type1, tType * type2);
+
 int isObject(tExpr * expr);
 
 int isIntType(tType * type);
@@ -600,7 +620,11 @@ int isStringType(tType * type);
 
 int isBooleanType(tType * type);
 
+int isDoubleType(tType * type);
+
 int isNullType(tType * type);
+
+int isVoidType(tType * type);
 
 int isObjectType(tType * type);
 

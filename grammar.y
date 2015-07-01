@@ -91,7 +91,8 @@ sumInts(int a, int b) {
 
 program:
 	program_name imports classes main {
-		initSystem();
+		initLog();
+		initJavaClasses();
 		tProgram * program = newProgram($1);
 		addImports(program, $2);
 		addClasses(program, $3);
@@ -105,7 +106,8 @@ program:
 		deletePendingClasses();
 		deleteClassesMap();
 		deleteSymbols();
-		deleteSystem();
+		deleteJavaClasses();
+		endLog();
 	}
 	;
 
@@ -357,7 +359,7 @@ instr_loop:
 instr_declaration:
 	type IDENTIFIER {
 		if (!isType($1)) {
-			addPendingClass($1); // TODO!
+			addPendingClass($1);
 		}
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, NULL);
 		tInstr * instr = newInstr(INSTR_DECLARATION, instrDeclaration);
@@ -366,7 +368,7 @@ instr_declaration:
 	|
 	type IDENTIFIER OP_ASSIGN expr {
 		if (!isType($1)) {
-			addPendingClass($1); // TODO!
+			addPendingClass($1);
 		}
 		free($3);
 		tInstrDeclaration * instrDeclaration = newInstrDeclaration($1, $2, $4);
@@ -385,14 +387,14 @@ instr_return:
 
 /*** Conditional instructions definition ***/
 
-block_if: //TODO: One-line if
+block_if: 
 	IF LPAR expr_boolean RPAR LCUR instr_set RCUR block_else {
 		tInstrIf * instrIf = newInstrIf($3, $6, $8);
 		$$ = instrIf;
 	}
 	;
 
-block_else: //TODO: One-line else
+block_else: 
 	ELSE LCUR instr_set RCUR {
 		tInstrElse * instrElse = newInstrElse(NULL, $3);
 		$$ = instrElse;
@@ -429,7 +431,6 @@ block_while:
 	/*** General expression ***/
 
 expr: 
-	//TODO BASE: Identifier, raw IDENTIFIER
 	expr_assignment {
 		$$ = $1;
 	}
@@ -441,7 +442,7 @@ expr_assignment:
 	expr_conditional {
 		$$ = $1;
 	}
-	|//TODO: puse IDENTIFIER a la izq Tom, esta bien?
+	|
 	expr_conditional OP_ASSIGN expr_assignment { 
 		tAssignmentExpr * assignmentExpr = newAssignmentExpr($1, $2, $3);
 		tExpr * expr = newExpr(EXPR_ASSIGNMENT, assignmentExpr);
@@ -636,7 +637,7 @@ expr_object_creation:
 	|
 	NEW IDENTIFIER LPAR parameters RPAR {
 		if (!isTypeName($2)) {
-			addPendingClassName($2); // TODO!
+			addPendingClassName($2);
 		}
 		tObjectCreation * objCreation = newObjCreation($2, $4);
 		tExpr * expr = newExpr(EXPR_OBJ_CREATION, objCreation);
@@ -645,7 +646,7 @@ expr_object_creation:
 	|
 	NEW IDENTIFIER array_size {
 		if (!isTypeName($2)) {
-			addPendingClassName($2); // TODO!
+			addPendingClassName($2);
 		}
 		tArrayCreationExpr * arrayCreationExpr = newArrayCreationExpr($2, $3);
 		tExpr * expr = newExpr(EXPR_ARRAY_CREATION, arrayCreationExpr);
@@ -824,7 +825,7 @@ parameters_def_2:
 parameter_def:
 	type IDENTIFIER {
 		if (!isType($1)) {
-			addPendingClass($1); // TODO!
+			addPendingClass($1);
 		}
 		tDefParam * defParam = newDefParam($1, $2);
 		$$ = defParam;

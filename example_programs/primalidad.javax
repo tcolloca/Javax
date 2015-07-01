@@ -14,5 +14,5 @@ main() {
 		}
 		n++;
 	}
-	System.out.println(String.valueOf(prime));
+	System.out.println(prime);
 }

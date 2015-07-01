@@ -184,50 +184,114 @@ typedef struct symbol {
 } tSymbol;
 
 tClass * outStreamClass = NULL;
+tClass * inStreamClass = NULL;
 tClass * systemClass = NULL;
+tClass * mathClass = NULL;
 tType * systemType = NULL;
+tType * mathType = NULL;
 
 tClass * classes = NULL;
 tList * pendingClasses = NULL;
 tList * importedClasses = NULL;
 tUnknownType * unknownTypes = NULL;
 
+FILE * logFile = NULL;
+
 tSymbol * symbols = NULL;
 int scope = 0;
 
+/*** logging ***/
+
+void initLog() {
+    char * mode = "w";
+    char logFilename[] = "compilation.log";
+    logFile = fopen(logFilename, mode);
+}
+
+void endLog() {
+	fclose(logFile);
+}
+
 /*** System ***/
 
-void initSystem() {
+void initJavaClasses() {
 	addOutStream();
-
-	tList * properties = newProperties();
-	tProperty * property = newProperty(objectType(strdup("OutStream")), strdup("out"), NULL);
-	_addElement(properties, property);
-	tList * constructors = newConstructors();
-	tList * methods = newMethods();
-	systemClass = newClass(strdup("System"), properties, constructors, methods);
-	addClassToClassMap(systemClass);
-
-	addSymbol(systemClass->name, systemType = objectType(strdup("System")));
+	addInStream();
+	addSystem();
+	addMath();
 }
 
 void addOutStream() {
 	tList * properties = newProperties();
 	tList * constructors = newConstructors();
 	tList * methods = newMethods();
-	tList * defParams = newDefParams();
-	tDefParam * defParam = newDefParam(stringType(), strdup("string"));
-	_addElement(defParams, defParam);
-	tMethod * method = newMethod(intType(), strdup("println"), defParams, newInstrs());
-	_addElement(methods, method);
-	outStreamClass = newClass(strdup("OutStream"), properties, constructors, methods);
+	
+	tList * defParamsPrintln = newDefParams();
+	tDefParam * defParamPrintln = newDefParam(stringType(), strdup("string"));
+	_addElement(defParamsPrintln, defParamPrintln);
+	tMethod * println = newMethod(voidType(), strdup("println"), defParamsPrintln, newInstrs());
+	_addElement(methods, println);
+
+	tList * defParamsPrint = newDefParams();
+	tDefParam * defParamPrint = newDefParam(stringType(), strdup("string"));
+	_addElement(defParamsPrint, defParamPrint);
+	tMethod * print = newMethod(voidType(), strdup("print"), defParamsPrint, newInstrs());
+	_addElement(methods, print);
+	
+	outStreamClass = newClass(strdup("OutStream"), newExtends(NULL), properties, constructors, methods);
 	addClassToClassMap(outStreamClass);
 }
 
-void deleteSystem() {
+void addInStream() {
+	tList * properties = newProperties();
+	tList * constructors = newConstructors();
+	tList * methods = newMethods();
+	inStreamClass = newClass(strdup("OutStream"), newExtends(NULL), properties, constructors, methods);
+	addClassToClassMap(inStreamClass);
+}
+
+void addSystem() {
+	tList * properties = newProperties();
+	tProperty * out = newProperty(objectType(strdup("OutStream")), strdup("out"), NULL);
+	_addElement(properties, out);
+	tProperty * in = newProperty(objectType(strdup("InStream")), strdup("in"), NULL);
+	_addElement(properties, in);
+	tList * constructors = newConstructors();
+	tList * methods = newMethods();
+	systemClass = newClass(strdup("System"), newExtends(NULL), properties, constructors, methods);
+	addClassToClassMap(systemClass);
+
+	addSymbol(systemClass->name, systemType = objectType(strdup("System")));
+}
+
+void addMath() {
+	tList * properties = newProperties();
+	tList * constructors = newConstructors();
+	tList * methods = newMethods();
+	
+	tList * defParamsRandom = newDefParams();
+	tMethod * random = newMethod(doubleType(), strdup("random"), defParamsRandom, newInstrs());
+	_addElement(methods, random);
+
+	tList * defParamsFloor = newDefParams();
+	tDefParam * defParamFloor = newDefParam(stringType(), strdup("double"));
+	_addElement(defParamsFloor, defParamFloor);
+	tMethod * floorMethod = newMethod(intType(), strdup("floor"), defParamsFloor, newInstrs());
+	_addElement(methods, floorMethod);
+	
+	mathClass = newClass(strdup("Math"), newExtends(NULL), properties, constructors, methods);
+	addClassToClassMap(mathClass);
+
+	addSymbol(mathClass->name, mathType = objectType(strdup("Math")));
+}
+
+void deleteJavaClasses() {
 	deleteClass(systemClass);
 	deleteClass(outStreamClass);
+	deleteClass(inStreamClass);
+	deleteClass(mathClass);
 	deleteType(systemType);
+	deleteType(mathType);
 }
 
 /*** PendingClasses ***/
@@ -277,16 +341,13 @@ int hasUnknownType(char * name) {
 }
 
 void printUknownTypes() {
-	printf("Unknown types:\n");
+	fprintf(logFile, "Unknown types:\n"); // TODO!
 	char ** name;
 	tUnknownType * unknownType;
 
 	for(unknownType = unknownTypes; unknownType != NULL; unknownType = unknownType->hh.next) {
-        printf("%s\n", unknownType->name);
+        fprintf(logFile, "%s\n", unknownType->name);
     }
-	/*while ((name = _next(unknownTypes)) != NULL) {
-		printf("%s\n", *name);
-	}*/
 }
 
 void deletePendingClasses() {
@@ -535,10 +596,13 @@ void deleteClass(tClass * class) {
 
 void analyseClass(tClass * class) {
 	newBlock();
+	tType * thisType = objectType(strdup(class->name));
+	addSymbol("this", thisType);
 	analyseProperties(class->properties);
 	analyseConstructors(class->constructors);
 	analyseMethods(class->methods);
 	endBlock();
+	deleteType(thisType);
 }
 
 tList * newClasses() {
@@ -700,12 +764,15 @@ void deleteProperty(tProperty * property) {
 
 void analyseProperty(tProperty * property) {
 	if (hasSymbol(property->name)) {
-		printf("Property %s has already been declared.\n", property->name);
-		// TODO: Existing symbol.
+		fprintf(logFile, "Property %s has already been declared.\n", property->name);
 	} else {
 		addSymbol(property->name, property->type);
 	}
 	if (property->expr != NULL) {
+		if (!typesTypesMatch(property->type, property->expr->exprType)) {
+			fprintf(logFile, "Expected expression of type %s in property %s declaration.\n",
+			property->type->type, property->name);
+		}
 		analyseExpr(property->expr);
 	}	
 }
@@ -906,7 +973,7 @@ void deleteDefParam(tDefParam * defParam) {
 
 void analyseDefParam(tDefParam * defParam) {
 	if (hasSymbol(defParam->name)) {
-		printf("Parameter %s has already been declared.\n", defParam->name);
+		fprintf(logFile, "Parameter %s has already been declared.\n", defParam->name);
 		// TODO: Existing symbol.
 	} else {
 		addSymbol(defParam->name, defParam->type);
@@ -1103,7 +1170,7 @@ void deleteInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 
 void analyseInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 	if (hasSymbol(instrDeclaration->name)) {
-		printf("Variable %s has already been declared.\n", instrDeclaration->name);
+		fprintf(logFile, "Variable %s has already been declared.\n", instrDeclaration->name);
 		// TODO: Existing symbol.
 	} else {
 		addSymbol(instrDeclaration->name, instrDeclaration->type);
@@ -1348,7 +1415,7 @@ void deleteExpr(tExpr * expr) {
 }
 
 void analyseExpr(tExpr * expr) {
-	if (hasError(expr)) {
+	if (hasError(expr)) { // TODO
 		printf("There's an error in expr: ");
 		printExpr(expr);
 		printf(" \n");
@@ -1515,6 +1582,9 @@ void printBuiltIn(tBuiltInExpr * builtIn) {
 		case INPUT_STRING:
 			printf("\"%s\"",(char *) builtIn->variable);
 			break;
+		case INPUT_DOUBLE:
+			printf("%f", *(double *) builtIn->variable);
+			break;
 		case INPUT_NULL:
 			printf("null");
 			break;
@@ -1541,11 +1611,13 @@ tType * getBuiltInType(int type) {
 		case INPUT_CHAR:
 			return charType();	
 		case INPUT_STRING:
-			return stringType();	
+			return stringType();
+		case INPUT_DOUBLE:
+			return doubleType();	
 		case INPUT_NULL:
 			return nullType();
 		default:
-			return errorType(); // TODO: Do sth?
+			return errorType();
 	}
 }
 
@@ -1646,7 +1718,7 @@ void deleteIdentifier(tIdentifier * identifier) {
 
 void analyseIdentifier(tIdentifier * identifier) {
 	if (!hasSymbol(identifier->name)) {
-		printf("Unknown symbol %s\n", identifier->name);
+		fprintf(logFile, "Unknown symbol %s\n.", identifier->name);
 		// TODO: Unknown symbol.
 	}
 }
@@ -2115,6 +2187,10 @@ tSymbol * getSymbol(char * name) {
 	return symbol;
 }
 
+tType * getSymbolType(char * name) {
+	return getSymbol(name)->type;
+}
+
 void deleteSymbols() {
 	tSymbol * symbol, * tmp;
 
@@ -2161,8 +2237,16 @@ tType * booleanType() {
 	return newType(strdup("boolean"));
 }
 
+tType * doubleType() {
+	return newType(strdup("double"));
+}
+
 tType * nullType() {
 	return newType(strdup("null"));
+}
+
+tType * voidType() {
+	return newType(strdup("void"));
 }
 
 tType * objectType(char * name) {
@@ -2202,6 +2286,9 @@ tType * getBiggestType(tExpr * first, tExpr * second) {
 	if (isArrayType(first->exprType) || isArrayType(second->exprType)) {
 		return isArrayType(first->exprType) ? copyType(first->exprType) : copyType(second->exprType);
 	}
+	if (isDoubleType(first->exprType) || isDoubleType(second->exprType)) {
+		return doubleType();
+	}
 	if (isStringType(first->exprType) || isStringType(second->exprType)) {
 		return stringType();
 	}
@@ -2212,6 +2299,10 @@ int typesMatch(tExpr * expr1, tExpr * expr2) {
 	tType * type1 = expr1->exprType;
 	tType * type2 = expr2->exprType;
 
+	return typesTypesMatch(type1, type2);
+}
+
+int typesTypesMatch(tType * type1, tType * type2) {
 	if (isArrayType(type1)) {
 		if (!sameSize(type1, type2->brackets)) {
 			return 0;
@@ -2269,8 +2360,16 @@ int isBooleanType(tType * type) {
 	return !strcmp(type->type, "boolean");
 }
 
+int isDoubleType(tType * type) {
+	return !strcmp(type->type, "double");
+}
+
 int isNullType(tType * type) {
 	return !strcmp(type->type, "null");
+}
+
+int isVoidType(tType * type) {
+	return !strcmp(type->type, "void");
 }
 
 int isObjectType(tType * type) {
@@ -2299,7 +2398,7 @@ int isAlphabeticType(tType * type) {
 }
 
 int isNumericType(tType * type) {
-	return isIntType(type);
+	return isIntType(type) || isDoubleType(type);
 }
 
 int isValidBinaryOperation(tType * type1, tType * type2, char * op) {

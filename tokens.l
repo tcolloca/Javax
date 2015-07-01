@@ -31,8 +31,8 @@ char * getString(char * string) {
 %}
 
 %%
+((0|[1-9][0-9]*)\.[0-9]+) SAVE_DOUBLE; return DOUBLE;
 (0|[1-9][0-9]*|0[0-7]*|0(x|X)[0-9a-fA-F]+) SAVE_INT; return INT;
-(0|[1-9][0-9]*)\.(0-9)+ SAVE_DOUBLE; return DOUBLE;
 true SAVE_BOOLEAN(TRUE); return BOOLEAN;
 false SAVE_BOOLEAN(FALSE); return BOOLEAN;
 '[[:print:]]{-}[\']' SAVE_CHAR; return CHAR; 
