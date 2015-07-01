@@ -1,3 +1,5 @@
 ./compiler < $1.javax > $1.java
+cat compilation.log
 javac $1.java
 java $1
+
