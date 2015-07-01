@@ -610,6 +610,8 @@ int typesMatch(tExpr * expr1, tExpr * expr2);
 
 int typesTypesMatch(tType * type1, tType * type2);
 
+int isBoolean(tExpr * expr);
+
 int isObject(tExpr * expr);
 
 int isIntType(tType * type);

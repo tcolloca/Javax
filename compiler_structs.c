@@ -974,7 +974,6 @@ void deleteDefParam(tDefParam * defParam) {
 void analyseDefParam(tDefParam * defParam) {
 	if (hasSymbol(defParam->name)) {
 		fprintf(logFile, "Parameter %s has already been declared.\n", defParam->name);
-		// TODO: Existing symbol.
 	} else {
 		addSymbol(defParam->name, defParam->type);
 	}
@@ -1171,11 +1170,14 @@ void deleteInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 void analyseInstrDeclaration(tInstrDeclaration * instrDeclaration) {
 	if (hasSymbol(instrDeclaration->name)) {
 		fprintf(logFile, "Variable %s has already been declared.\n", instrDeclaration->name);
-		// TODO: Existing symbol.
 	} else {
 		addSymbol(instrDeclaration->name, instrDeclaration->type);
 	}
 	if (instrDeclaration->expr != NULL) {
+		if (!typesTypesMatch(instrDeclaration->type, instrDeclaration->expr->exprType)) {
+			fprintf(logFile, "Expected expression of type %s in variable %s declaration.\n",
+			instrDeclaration->type->type, instrDeclaration->name);
+		}
 		analyseExpr(instrDeclaration->expr);
 	}	
 }
@@ -1253,6 +1255,9 @@ void deleteInstrIf(tInstrIf * instrIf) {
 }
 
 void analyseInstrIf(tInstrIf * instrIf) {
+	if (!isBoolean(instrIf->expr)) {
+		fprintf(logFile, "Expected boolean expression as if condition.\n");
+	}
 	analyseExpr(instrIf->expr);
 	analyseInstrs(instrIf->instrs);
 	if (instrIf->instrElse != NULL) {
@@ -1321,6 +1326,9 @@ void deleteInstrWhile(tInstrWhile * instrWhile) {
 }
 
 void analyseInstrWhile(tInstrWhile * instrWhile) {
+	if (!isBoolean(instrWhile->expr)) {
+		fprintf(logFile, "Expected boolean expression as while condition.\n");
+	}
 	analyseExpr(instrWhile->expr);
 	analyseInstrs(instrWhile->instrs);
 }
@@ -1415,26 +1423,6 @@ void deleteExpr(tExpr * expr) {
 }
 
 void analyseExpr(tExpr * expr) {
-	if (hasError(expr)) { // TODO
-		printf("There's an error in expr: ");
-		printExpr(expr);
-		printf(" \n");
-
-		tEqualityExpr * eqExpr;
-		tOperationExpr * opExpr;
-		switch (expr->type) {
-			case EXPR_EQUALITY:
-				eqExpr = (tEqualityExpr *) expr->expr;
-				printf("%s %s %s\n", eqExpr->first->exprType->type, eqExpr->op, eqExpr->second->exprType->type);
-				//printf("types match? %d", isValidBinaryOperation(eqExpr->first->exprType, eqExpr->second->exprType, eqExpr->op));
-			break;
-			case EXPR_OPERATION:
-				opExpr = (tOperationExpr *) expr->expr;
-				printf("%s %s %s\n", opExpr->first->exprType->type, opExpr->op, opExpr->second->exprType->type);
-				//isValidBinaryOperation(opExpr->first->exprType, opExpr->second->exprType, opExpr->op);
-			break;
-		}
-	}
 	switch (expr->type) {
 		case EXPR_BUILT_IN:
 			analyseBuiltIn(expr->expr);
@@ -1600,6 +1588,9 @@ void deleteBuiltIn(tBuiltInExpr * builtIn) {
 }
 
 void analyseBuiltIn(tBuiltInExpr * builtIn) {
+	if (isErrorType(builtIn->exprType)) {
+		fprintf(logFile, "Uknown built-in.\n");
+	}
 }
 
 tType * getBuiltInType(int type) {
@@ -1655,6 +1646,9 @@ void deleteAssignmentExpr(tAssignmentExpr * assignmentExpr) {
 }
 
 void analyseAssignmentExpr(tAssignmentExpr * assignmentExpr) {
+	if (isErrorType(assignmentExpr->exprType)) {
+		fprintf(logFile, "Not a l-value as left operand in assignment or non-matching operands' types.\n");
+	}
 	analyseExpr(assignmentExpr->variable);
 	analyseExpr(assignmentExpr->expr);
 }
@@ -1692,6 +1686,10 @@ void deleteEqualityExpr(tEqualityExpr * equalityExpr) {
 }
 
 void analyseEqualityExpr(tEqualityExpr * equalityExpr) {
+	if (isErrorType(equalityExpr->exprType)) {
+		fprintf(logFile, "Operation %s is not valid with operands of type %s and %s.\n",
+			equalityExpr->op, equalityExpr->first->exprType->type, equalityExpr->second->exprType->type);
+	}
 	analyseExpr(equalityExpr->first);
 	analyseExpr(equalityExpr->second);
 }
@@ -1718,8 +1716,7 @@ void deleteIdentifier(tIdentifier * identifier) {
 
 void analyseIdentifier(tIdentifier * identifier) {
 	if (!hasSymbol(identifier->name)) {
-		fprintf(logFile, "Unknown symbol %s\n.", identifier->name);
-		// TODO: Unknown symbol.
+		fprintf(logFile, "Unknown symbol %s.\n", identifier->name);
 	}
 }
 
@@ -1822,6 +1819,10 @@ void deleteOperationExpr(tOperationExpr * operationExpr) {
 }
 
 void analyseOperationExpr(tOperationExpr * operationExpr) {
+	if (isErrorType(operationExpr->exprType)) {
+		fprintf(logFile, "Operation %s is not valid with operands of type %s and %s.\n",
+		operationExpr->op, operationExpr->first->exprType->type, operationExpr->second->exprType->type);
+	}
 	analyseExpr(operationExpr->first);
 	analyseExpr(operationExpr->second);
 }
@@ -1883,6 +1884,10 @@ void deleteModifExpr(tModifExpr * modifExpr) {
 }
 
 void analyseModifExpr(tModifExpr * modifExpr) {
+	if (isErrorType(modifExpr->exprType)) {
+		fprintf(logFile, "Operation %s is not valid with operand of type %s.\n",
+		modifExpr->prevOp != NULL ? modifExpr->prevOp:modifExpr->postOp, modifExpr->expr->exprType->type);
+	}
 	analyseExpr(modifExpr->expr);
 }
 
@@ -1954,6 +1959,10 @@ void deleteObjAccessExpr(tObjAccessExpr * objAccessExpr) {
 }
 
 void analyseObjAccessExpr(tObjAccessExpr * objAccessExpr) {
+	if (isErrorType(objAccessExpr->exprType)) {
+		fprintf(logFile, "%s does not contain a property or method %s.\n",
+		objAccessExpr->expr->exprType->type, objAccessExpr->name);
+	}
 	analyseExpr(objAccessExpr->expr);
 	if (objAccessExpr->params != NULL) {
 		analyseParams(objAccessExpr->params);
@@ -2032,6 +2041,9 @@ void deleteArrayExpr(tArrayExpr * arrayExpr) {
 }
 
 void analyseArrayExpr(tArrayExpr * arrayExpr) {
+	if (isErrorType(arrayExpr->exprType)) {
+		fprintf(logFile, "Array type is not recognized or doesn't match previous declaration.\n");
+	}
 	analyseSizes(arrayExpr->sizes);
 }
 
@@ -2338,6 +2350,10 @@ int typesTypesMatch(tType * type1, tType * type2) {
 	}
 
 	return 0;
+}
+
+int isBoolean(tExpr * expr) {
+	return isBooleanType(expr->exprType) || isUnknownType(expr->exprType);
 }
 
 int isObject(tExpr * expr) {
